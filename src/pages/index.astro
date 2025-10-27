@@ -356,6 +356,336 @@ const error = null
         margin-top: 0.5rem;
       }
       
+      /* Estilos para Login por Empresa */
+      .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        padding: 2rem;
+      }
+      
+      .login-card {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+      }
+      
+      .login-card h2 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+      }
+      
+      .login-card p {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+      }
+      
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      
+      #empresa-login {
+        font-size: 1.2rem;
+        padding: 1rem;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        background: white;
+        transition: border-color 0.3s ease;
+      }
+      
+      #empresa-login:focus {
+        border-color: #3498db;
+        outline: none;
+      }
+      
+      #btn-ingresar {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      #btn-ingresar:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+      
+      #btn-ingresar:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+      }
+      
+      /* Header de empresa logueada */
+      .empresa-header {
+        background: white;
+        padding: 1rem 2rem;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .empresa-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      
+      .empresa-nombre {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      
+      .empresa-rol {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      
+      #btn-cambiar-empresa {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      
+      #btn-cambiar-empresa:hover {
+        background: #c0392b;
+      }
+      
+      /* Estilos para filtros */
+      .filtros-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+      }
+      
+      .filtros-container h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+      }
+      
+      .filtros-row {
+        display: flex;
+        gap: 2rem;
+        align-items: end;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+      
+      .filtro-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 150px;
+      }
+      
+      .filtro-group.rango-fechas {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        min-width: auto;
+      }
+      
+      .filtro-group.rango-fechas label {
+        margin: 0;
+        white-space: nowrap;
+      }
+      
+      .filtro-group label {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+      }
+      
+      .toggle-group {
+        display: flex;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .toggle-btn {
+        background: #f8f9fa;
+        border: none;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        color: #555;
+      }
+      
+      .toggle-btn:hover:not(.active) {
+        background: #e9ecef;
+        color: #333;
+      }
+      
+      .toggle-btn.active {
+        background: #3498db;
+        color: white;
+      }
+      
+      .toggle-btn:first-child {
+        border-right: 1px solid #e1e8ed;
+      }
+      
+      #filtro-fecha, #fecha-desde, #fecha-hasta {
+        padding: 0.75rem;
+        border: 2px solid #e1e8ed;
+        border-radius: 6px;
+        transition: border-color 0.3s ease;
+      }
+      
+      #filtro-fecha:focus, #fecha-desde:focus, #fecha-hasta:focus {
+        border-color: #3498db;
+        outline: none;
+      }
+      
+      #btn-aplicar-rango {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        font-weight: 500;
+      }
+      
+      #btn-aplicar-rango:hover {
+        background: #229954;
+      }
+      
+      .resultados-info {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+      }
+      
+      #contador-resultados {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      
+      /* Estilos para formularios de validación */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+      
+      .form-group textarea,
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e1e8ed;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+      
+      .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+      
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        border-color: #3498db;
+        outline: none;
+      }
+      
+      .mediciones-group {
+        display: flex;
+        gap: 0.5rem;
+      }
+      
+      .mediciones-group input {
+        flex: 1;
+      }
+      
+      .form-group small {
+        color: #666;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+      }
+      
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e1e8ed;
+      }
+      
+      .btn-cancel, .btn-validar, .btn-rechazar, .btn-finalizar {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-cancel {
+        background: #6c757d;
+        color: white;
+      }
+      
+      .btn-cancel:hover {
+        background: #5a6268;
+      }
+      
+      .btn-validar, .btn-finalizar {
+        background: #27ae60;
+        color: white;
+      }
+      
+      .btn-validar:hover, .btn-finalizar:hover {
+        background: #229954;
+      }
+      
+      .btn-rechazar {
+        background: #e74c3c;
+        color: white;
+      }
+      
+      .btn-rechazar:hover {
+        background: #c0392b;
+      }
+      
       #empresa-selector {
         font-size: 1.2rem;
         font-weight: 600;
@@ -404,55 +734,118 @@ const error = null
     <div class="container">
       <div id="mensaje-container"></div>
 
-      <div class="controls">
-        <div class="control-group">
-          <label for="empresa-selector">Seleccionar Empresa:</label>
-          <select id="empresa-selector">
-            <option value="">-- Selecciona tu empresa --</option>
-            <!-- Las empresas se cargarán dinámicamente -->
-          </select>
-        </div>
-
-        <!-- Formulario para crear nueva cancha (solo AngloAmerican) -->
-        <div id="form-crear-cancha" class="control-group hidden">
-          <h3>Crear Nueva Cancha</h3>
-          <div class="form-row">
-            <div>
-              <label for="muro">Muro:</label>
-              <input type="text" id="muro" placeholder="ej: MP, MS, MT" required>
+      <!-- Pantalla de Login por Empresa -->
+      <div id="login-screen" class="login-container">
+        <div class="login-card">
+          <h2>Acceso al Sistema</h2>
+          <p>Selecciona tu empresa para continuar</p>
+          
+          <div class="login-form">
+            <div class="control-group">
+              <label for="empresa-login">Empresa:</label>
+              <select id="empresa-login">
+                <option value="">-- Selecciona tu empresa --</option>
+                <!-- Las empresas se cargarán dinámicamente -->
+              </select>
             </div>
-            <div>
-              <label for="sector">Sector:</label>
-              <input type="text" id="sector" placeholder="ej: S1, S2, S5" required>
-            </div>
-            <div>
-              <label for="nombre-detalle">Nombre:</label>
-              <input type="text" id="nombre-detalle" placeholder="ej: TALUD, BERMA, PISTA" required>
-            </div>
-            <div>
-              <button id="btn-crear-cancha" type="button">Crear Cancha</button>
-            </div>
+            <button id="btn-ingresar" type="button" disabled>Ingresar al Sistema</button>
           </div>
         </div>
       </div>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre de Cancha</th>
-              <th>Estado Actual</th>
-              <th>Empresa Actual</th>
-              <th>Creada Por</th>
-              <th>Fecha Creación</th>
-              <th>Observaciones</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="canchas-tbody">
-            <!-- Las canchas se cargarán dinámicamente -->
-          </tbody>
-        </table>
+      <!-- Pantalla Principal (inicialmente oculta) -->
+      <div id="main-screen" class="hidden">
+        <!-- Header de empresa logueada -->
+        <div class="empresa-header">
+          <div class="empresa-info">
+            <span class="empresa-nombre"></span>
+            <span class="empresa-rol"></span>
+          </div>
+          <button id="btn-cambiar-empresa" type="button">Cambiar Empresa</button>
+        </div>
+
+        <!-- Controles y Filtros -->
+        <div class="controls">
+          <!-- Formulario para crear nueva cancha (solo AngloAmerican) -->
+          <div id="form-crear-cancha" class="control-group hidden">
+            <h3>Crear Nueva Cancha</h3>
+            <div class="form-row">
+              <div>
+                <label for="muro">Muro:</label>
+                <input type="text" id="muro" placeholder="ej: MP, MS, MT" required>
+              </div>
+              <div>
+                <label for="sector">Sector:</label>
+                <input type="text" id="sector" placeholder="ej: S1, S2, S5" required>
+              </div>
+              <div>
+                <label for="nombre-detalle">Nombre:</label>
+                <input type="text" id="nombre-detalle" placeholder="ej: TALUD, BERMA, PISTA" required>
+              </div>
+              <div>
+                <button id="btn-crear-cancha" type="button">Crear Cancha</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="filtros-container">
+            <h3>Filtros</h3>
+            <div class="filtros-row">
+              <div class="filtro-group">
+                <label>Vista:</label>
+                <div class="toggle-group">
+                  <button id="btn-vista-acciones" class="toggle-btn active">Mis Acciones</button>
+                  <button id="btn-vista-historico" class="toggle-btn">Ver Histórico</button>
+                </div>
+              </div>
+              
+              <div class="filtro-group">
+                <label for="filtro-fecha">Filtro de Fecha:</label>
+                <select id="filtro-fecha">
+                  <option value="all">Todas las fechas</option>
+                  <option value="today">Hoy</option>
+                  <option value="week">Última semana</option>
+                  <option value="month">Último mes</option>
+                  <option value="custom">Rango personalizado</option>
+                </select>
+              </div>
+              
+              <div id="rango-fechas" class="filtro-group rango-fechas hidden">
+                <label>Desde:</label>
+                <input type="date" id="fecha-desde">
+                <label>Hasta:</label>
+                <input type="date" id="fecha-hasta">
+                <button id="btn-aplicar-rango" type="button">Aplicar</button>
+              </div>
+            </div>
+            
+            <!-- Contador de resultados -->
+            <div class="resultados-info">
+              <span id="contador-resultados">Cargando...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de canchas -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre de Cancha</th>
+                <th>Estado Actual</th>
+                <th>Empresa Actual</th>
+                <th>Creada Por</th>
+                <th>Fecha Creación</th>
+                <th>Observaciones</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="canchas-tbody">
+              <!-- Las canchas se cargarán dinámicamente -->
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Modal para mostrar observaciones -->
@@ -467,31 +860,153 @@ const error = null
           </div>
         </div>
       </div>
+
+      <!-- Modal para validación de Linkapsis (Espesores) -->
+      <div id="validacion-linkapsis-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Validación de Espesores - Linkapsis</h3>
+            <button class="close-btn">×</button>
+          </div>
+          <form id="form-validacion-linkapsis">
+            <div class="form-group">
+              <label for="linkapsis-observaciones">Observaciones:</label>
+              <textarea id="linkapsis-observaciones" placeholder="Ingresa observaciones sobre la validación..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="linkapsis-espesores">Mediciones de Espesores (mm):</label>
+              <div class="mediciones-group">
+                <input type="number" id="linkapsis-espesor1" placeholder="Punto 1" min="0" step="0.1" required>
+                <input type="number" id="linkapsis-espesor2" placeholder="Punto 2" min="0" step="0.1" required>
+                <input type="number" id="linkapsis-espesor3" placeholder="Punto 3" min="0" step="0.1" required>
+              </div>
+              <small>Ingresa al menos 3 mediciones en diferentes puntos</small>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel">Cancelar</button>
+              <button type="submit" class="btn-validar">Validar Espesores</button>
+              <button type="button" class="btn-rechazar">Rechazar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal para validación de LlayLlay (Densidad) -->
+      <div id="validacion-llayllay-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Validación de Densidad - LlayLlay</h3>
+            <button class="close-btn">×</button>
+          </div>
+          <form id="form-validacion-llayllay">
+            <div class="form-group">
+              <label for="llayllay-observaciones">Observaciones:</label>
+              <textarea id="llayllay-observaciones" placeholder="Ingresa observaciones sobre la validación..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="llayllay-densidad">Densidad (g/cm³):</label>
+              <input type="number" id="llayllay-densidad" placeholder="ej: 2.35" min="0" step="0.01" required>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel">Cancelar</button>
+              <button type="submit" class="btn-validar">Validar Densidad</button>
+              <button type="button" class="btn-rechazar">Rechazar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal para validación/rechazo de Besalco -->
+      <div id="validacion-besalco-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Validación de Trabajo - Besalco</h3>
+            <button class="close-btn">×</button>
+          </div>
+          <form id="form-validacion-besalco">
+            <div class="form-group">
+              <label for="besalco-observaciones">Observaciones del Trabajo:</label>
+              <textarea id="besalco-observaciones" placeholder="Describe el trabajo realizado o motivo del rechazo..." required></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel">Cancelar</button>
+              <button type="submit" class="btn-finalizar">Finalizar Trabajo</button>
+              <button type="button" class="btn-rechazar">Rechazar Trabajo</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <script type="module">
       // Variables globales
-      let empresaSeleccionada = null
+      let empresaLogueada = null
       let cargando = false
+      let vistaActual = 'acciones' // 'acciones' o 'historico'
+      let filtroFecha = 'all'
+      let todasLasCanchas = []
+      let canchasFiltradas = []
 
       // Elementos del DOM
-      const empresaSelector = document.getElementById('empresa-selector')
+      const loginScreen = document.getElementById('login-screen')
+      const mainScreen = document.getElementById('main-screen')
+      const empresaLogin = document.getElementById('empresa-login')
+      const btnIngresar = document.getElementById('btn-ingresar')
+      const btnCambiarEmpresa = document.getElementById('btn-cambiar-empresa')
+      const empresaNombre = document.querySelector('.empresa-nombre')
+      const empresaRol = document.querySelector('.empresa-rol')
       const formCrearCancha = document.getElementById('form-crear-cancha')
       const btnCrearCancha = document.getElementById('btn-crear-cancha')
       const canchasTBody = document.getElementById('canchas-tbody')
       const mensajeContainer = document.getElementById('mensaje-container')
+      const contadorResultados = document.getElementById('contador-resultados')
+      
+      // Elementos de filtros
+      const btnVistaAcciones = document.getElementById('btn-vista-acciones')
+      const btnVistaHistorico = document.getElementById('btn-vista-historico')
+      const filtroFechaSelect = document.getElementById('filtro-fecha')
+      const rangoFechas = document.getElementById('rango-fechas')
+      const fechaDesde = document.getElementById('fecha-desde')
+      const fechaHasta = document.getElementById('fecha-hasta')
+      const btnAplicarRango = document.getElementById('btn-aplicar-rango')
 
       // Cargar datos iniciales
       async function inicializar() {
         try {
           await cargarEmpresas()
-          await cargarCanchas()
+          configurarEventListeners()
           
-          // Configurar event listeners del modal
-          configurarModalEventListeners()
+          // Verificar si hay empresa guardada en localStorage
+          const empresaGuardada = localStorage.getItem('empresaLogueada')
+          if (empresaGuardada) {
+            const empresa = JSON.parse(empresaGuardada)
+            await loginEmpresa(empresa.id, empresa.nombre)
+          }
         } catch (error) {
           console.error('Error al inicializar:', error)
           mostrarMensaje('Error al cargar datos iniciales', 'error')
+        }
+      }
+
+      // Configurar todos los event listeners
+      function configurarEventListeners() {
+        // Login
+        empresaLogin.addEventListener('change', validarFormularioLogin)
+        btnIngresar.addEventListener('click', manejarLogin)
+        btnCambiarEmpresa.addEventListener('click', cerrarSesion)
+        
+        // Filtros
+        btnVistaAcciones.addEventListener('click', () => cambiarVista('acciones'))
+        btnVistaHistorico.addEventListener('click', () => cambiarVista('historico'))
+        filtroFechaSelect.addEventListener('change', manejarCambioFiltroFecha)
+        btnAplicarRango.addEventListener('click', aplicarRangoFechas)
+        
+        // Modal
+        configurarModalEventListeners()
+        
+        // Crear cancha (si aplica)
+        if (btnCrearCancha) {
+          btnCrearCancha.addEventListener('click', crearCancha)
         }
       }
 
@@ -504,7 +1019,85 @@ const error = null
         }
       }
 
+      // === FUNCIONES DE LOGIN ===
+      function validarFormularioLogin() {
+        const empresaSeleccionada = empresaLogin.value
+        btnIngresar.disabled = !empresaSeleccionada
+      }
+
+      async function manejarLogin() {
+        const empresaId = parseInt(empresaLogin.value)
+        const empresaNombreSeleccionada = empresaLogin.options[empresaLogin.selectedIndex].text
+        
+        if (!empresaId) return
+        
+        await loginEmpresa(empresaId, empresaNombreSeleccionada)
+      }
+
+      async function loginEmpresa(empresaId, nombreEmpresa) {
+        try {
+          empresaLogueada = { id: empresaId, nombre: nombreEmpresa }
+          
+          // Guardar en localStorage
+          localStorage.setItem('empresaLogueada', JSON.stringify(empresaLogueada))
+          
+          // Actualizar UI
+          empresaNombre.textContent = nombreEmpresa
+          empresaRol.textContent = getRolEmpresa(nombreEmpresa)
+          
+          // Mostrar/ocultar formulario de crear cancha
+          if (nombreEmpresa === 'AngloAmerican') {
+            formCrearCancha.classList.remove('hidden')
+          } else {
+            formCrearCancha.classList.add('hidden')
+          }
+          
+          // Cambiar a pantalla principal
+          loginScreen.classList.add('hidden')
+          mainScreen.classList.remove('hidden')
+          
+          // Cargar datos
+          await cargarCanchas()
+          
+          mostrarMensaje(`Bienvenido, ${nombreEmpresa}!`, 'success')
+        } catch (error) {
+          console.error('Error en login:', error)
+          mostrarMensaje('Error al iniciar sesión', 'error')
+        }
+      }
+
+      function getRolEmpresa(nombreEmpresa) {
+        const roles = {
+          'AngloAmerican': 'Creación y cierre de canchas',
+          'Besalco': 'Trabajo de maquinaria',
+          'Linkapsis': 'Validación de espesores',
+          'LlayLlay': 'Validación de densidad'
+        }
+        return roles[nombreEmpresa] || 'Usuario del sistema'
+      }
+
+      function cerrarSesion() {
+        empresaLogueada = null
+        localStorage.removeItem('empresaLogueada')
+        
+        // Limpiar formularios
+        empresaLogin.value = ''
+        validarFormularioLogin()
+        
+        // Cambiar a pantalla de login
+        mainScreen.classList.add('hidden')
+        loginScreen.classList.remove('hidden')
+        
+        // Limpiar datos
+        canchasTBody.innerHTML = ''
+        todasLasCanchas = []
+        canchasFiltradas = []
+        
+        mostrarMensaje('Sesión cerrada correctamente', 'success')
+      }
+
       // Cargar empresas
+      // === FUNCIONES DE CARGA DE DATOS ===
       async function cargarEmpresas() {
         try {
           const response = await fetch('/api/empresas')
@@ -514,28 +1107,129 @@ const error = null
             const option = document.createElement('option')
             option.value = empresa.id
             option.textContent = empresa.nombre
-            empresaSelector.appendChild(option)
+            empresaLogin.appendChild(option)
           })
         } catch (error) {
           throw new Error('Error al cargar empresas: ' + error.message)
         }
       }
 
-      // Mostrar/ocultar formulario según empresa
-      empresaSelector.addEventListener('change', (e) => {
-        empresaSeleccionada = parseInt(e.target.value)
+      // === FUNCIONES DE FILTROS ===
+      function cambiarVista(nuevaVista) {
+        vistaActual = nuevaVista
         
-        if (empresaSeleccionada === 1) { // AngloAmerican
-          formCrearCancha.classList.remove('hidden')
+        // Actualizar botones
+        btnVistaAcciones.classList.toggle('active', nuevaVista === 'acciones')
+        btnVistaHistorico.classList.toggle('active', nuevaVista === 'historico')
+        
+        // Aplicar filtros
+        aplicarFiltros()
+      }
+
+      function manejarCambioFiltroFecha() {
+        filtroFecha = filtroFechaSelect.value
+        
+        if (filtroFecha === 'custom') {
+          rangoFechas.classList.remove('hidden')
         } else {
-          formCrearCancha.classList.add('hidden')
+          rangoFechas.classList.add('hidden')
+          aplicarFiltros()
+        }
+      }
+
+      function aplicarRangoFechas() {
+        const desde = fechaDesde.value
+        const hasta = fechaHasta.value
+        
+        if (!desde || !hasta) {
+          mostrarMensaje('Por favor selecciona ambas fechas', 'error')
+          return
         }
         
-        actualizarAcciones()
-      })
+        aplicarFiltros()
+      }
 
-      // Crear nueva cancha
-      btnCrearCancha.addEventListener('click', async () => {
+      function aplicarFiltros() {
+        if (!empresaLogueada || !todasLasCanchas.length) return
+        
+        let canchasFiltradas = [...todasLasCanchas]
+        
+        // Filtro por vista (acciones vs histórico)
+        if (vistaActual === 'acciones') {
+          canchasFiltradas = filtrarPorAccionesDisponibles(canchasFiltradas)
+        }
+        
+        // Filtro por fecha
+        canchasFiltradas = filtrarPorFecha(canchasFiltradas)
+        
+        // Mostrar resultados
+        mostrarCanchas(canchasFiltradas)
+        actualizarContadorResultados(canchasFiltradas.length, todasLasCanchas.length)
+      }
+
+      function filtrarPorAccionesDisponibles(canchas) {
+        const empresaId = empresaLogueada.id
+        const empresaNombre = empresaLogueada.nombre
+        
+        return canchas.filter(cancha => {
+          const estado = cancha.estado_actual
+          const empresaActual = cancha.empresa_actual
+          
+          switch (empresaNombre) {
+            case 'AngloAmerican':
+              return estado === 'Creada' || estado === 'Validada' || estado === 'Rechazada'
+            case 'Besalco':
+              return (estado === 'En Proceso' && empresaActual === 'Besalco') || 
+                     (estado === 'Rechazada' && empresaActual === 'Besalco')
+            case 'Linkapsis':
+              return estado === 'Finalizada' && empresaActual === 'Linkapsis'
+            case 'LlayLlay':
+              return estado === 'Validada' && empresaActual === 'LlayLlay'
+            default:
+              return false
+          }
+        })
+      }
+
+      function filtrarPorFecha(canchas) {
+        if (filtroFecha === 'all') return canchas
+        
+        const ahora = new Date()
+        const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate())
+        
+        return canchas.filter(cancha => {
+          const fechaCancha = new Date(cancha.created_at)
+          
+          switch (filtroFecha) {
+            case 'today':
+              return fechaCancha >= hoy
+            case 'week':
+              const semanaAtras = new Date(hoy.getTime() - 7 * 24 * 60 * 60 * 1000)
+              return fechaCancha >= semanaAtras
+            case 'month':
+              const mesAtras = new Date(hoy.getTime() - 30 * 24 * 60 * 60 * 1000)
+              return fechaCancha >= mesAtras
+            case 'custom':
+              if (!fechaDesde.value || !fechaHasta.value) return true
+              const desde = new Date(fechaDesde.value)
+              const hasta = new Date(fechaHasta.value + 'T23:59:59')
+              return fechaCancha >= desde && fechaCancha <= hasta
+            default:
+              return true
+          }
+        })
+      }
+
+      function actualizarContadorResultados(mostradas, total) {
+        const texto = vistaActual === 'acciones' 
+          ? `${mostradas} acción(es) disponible(s) de ${total} canchas totales`
+          : `${mostradas} de ${total} canchas`
+        
+        contadorResultados.textContent = texto
+      }
+
+      // === FUNCIÓN DE CREACIÓN DE CANCHAS ===
+      async function crearCancha() {
         if (cargando) return
         
         const muro = document.getElementById('muro').value.trim()
@@ -583,21 +1277,27 @@ const error = null
           btnCrearCancha.textContent = 'Crear Cancha'
           btnCrearCancha.disabled = false
         }
-      })
+      }
 
-      // Función para cargar canchas
+      // === FUNCIÓN DE CARGA DE CANCHAS ===
       async function cargarCanchas() {
         try {
           const response = await fetch('/api/canchas')
           if (!response.ok) {
             throw new Error('Error al cargar canchas')
           }
-          const canchas = await response.json()
-          renderizarCanchas(canchas)
+          
+          todasLasCanchas = await response.json()
+          aplicarFiltros()
         } catch (error) {
           console.error('Error al cargar canchas:', error)
           mostrarMensaje('Error al cargar las canchas', 'error')
         }
+      }
+
+      // Mostrar canchas filtradas
+      function mostrarCanchas(canchas) {
+        renderizarCanchas(canchas)
       }
 
       // Renderizar tabla de canchas
@@ -678,12 +1378,13 @@ const error = null
 
       // Generar botones según empresa y estado
       function generarBotonesAccion(canchaId, estado, empresaActual) {
-        if (!empresaSeleccionada) return '<span style="color:#666;">Selecciona tu empresa</span>'
+        if (!empresaLogueada) return '<span style="color:#666;">Selecciona tu empresa</span>'
         
         const botones = []
+        const empresaId = empresaLogueada.id
         
         // AngloAmerican
-        if (empresaSeleccionada === 1) {
+        if (empresaId === 1) {
           if (estado === 'Creada') {
             botones.push(`<button class="btn-accion" data-accion="enviar-besalco" data-cancha-id="${canchaId}">Enviar a Besalco</button>`)
           } else if (estado === 'Validada' && empresaActual === 'AngloAmerican') {
@@ -692,26 +1393,23 @@ const error = null
         }
         
         // Besalco
-        else if (empresaSeleccionada === 2) {
+        else if (empresaId === 2) {
           if ((estado === 'En Proceso' || estado === 'Rechazada') && empresaActual === 'Besalco') {
-            botones.push(`<button class="btn-accion btn-success" data-accion="finalizar-trabajo" data-cancha-id="${canchaId}">Finalizar Trabajo</button>`)
-            botones.push(`<button class="btn-accion btn-danger" data-accion="rechazar-besalco" data-cancha-id="${canchaId}">Rechazar</button>`)
+            botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-besalco" data-cancha-id="${canchaId}">Gestionar Trabajo</button>`)
           }
         }
         
         // Linkapsis
-        else if (empresaSeleccionada === 3) {
+        else if (empresaId === 3) {
           if (estado === 'Finalizada' && empresaActual === 'Linkapsis') {
-            botones.push(`<button class="btn-accion btn-success" data-accion="validar-linkapsis" data-cancha-id="${canchaId}">Validar Espesores</button>`)
-            botones.push(`<button class="btn-accion btn-danger" data-accion="rechazar-linkapsis" data-cancha-id="${canchaId}">Rechazar</button>`)
+            botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-linkapsis" data-cancha-id="${canchaId}">Validar Espesores</button>`)
           }
         }
         
         // LlayLlay
-        else if (empresaSeleccionada === 4) {
+        else if (empresaId === 4) {
           if (estado === 'Validada' && empresaActual === 'LlayLlay') {
-            botones.push(`<button class="btn-accion btn-success" data-accion="validar-llayllay" data-cancha-id="${canchaId}">Validar Densidad</button>`)
-            botones.push(`<button class="btn-accion btn-danger" data-accion="rechazar-llayllay" data-cancha-id="${canchaId}">Rechazar</button>`)
+            botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-llayllay" data-cancha-id="${canchaId}">Validar Densidad</button>`)
           }
         }
         
@@ -732,6 +1430,18 @@ const error = null
         const accion = e.target.dataset.accion
         const canchaId = parseInt(e.target.dataset.canchaId)
         
+        // Manejar apertura de modales
+        if (accion === 'abrir-modal-besalco') {
+          abrirModalBesalco(canchaId)
+          return
+        } else if (accion === 'abrir-modal-linkapsis') {
+          abrirModalLinkapsis(canchaId)
+          return
+        } else if (accion === 'abrir-modal-llayllay') {
+          abrirModalLlayLlay(canchaId)
+          return
+        }
+        
         // Confirmar acción de cierre
         if (accion === 'cerrar') {
           if (!confirm('¿Confirmas el cierre de esta cancha?')) {
@@ -739,7 +1449,7 @@ const error = null
           }
         }
         
-        // Pedir observaciones para rechazos
+        // Pedir observaciones para rechazos (acciones directas legacy)
         let observaciones = null
         if (accion.includes('rechazar')) {
           const empresaNombre = accion === 'rechazar-besalco' ? 'Besalco' : 
@@ -881,13 +1591,243 @@ const error = null
         modal.classList.remove('show')
       }
 
+      // === FUNCIONES DE MODALES DE VALIDACIÓN ===
+      let canchaIdActual = null
+
+      function abrirModalBesalco(canchaId) {
+        canchaIdActual = canchaId
+        const modal = document.getElementById('validacion-besalco-modal')
+        const form = document.getElementById('form-validacion-besalco')
+        
+        // Limpiar formulario
+        form.reset()
+        
+        // Mostrar modal
+        modal.classList.add('show')
+      }
+
+      function abrirModalLinkapsis(canchaId) {
+        canchaIdActual = canchaId
+        const modal = document.getElementById('validacion-linkapsis-modal')
+        const form = document.getElementById('form-validacion-linkapsis')
+        
+        // Limpiar formulario
+        form.reset()
+        
+        // Mostrar modal
+        modal.classList.add('show')
+      }
+
+      function abrirModalLlayLlay(canchaId) {
+        canchaIdActual = canchaId
+        const modal = document.getElementById('validacion-llayllay-modal')
+        const form = document.getElementById('form-validacion-llayllay')
+        
+        // Limpiar formulario
+        form.reset()
+        
+        // Mostrar modal
+        modal.classList.add('show')
+      }
+
+      function cerrarTodosLosModales() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.classList.remove('show')
+        })
+        canchaIdActual = null
+      }
+
       // Cerrar modal al hacer click fuera
       window.addEventListener('click', (e) => {
-        const modal = document.getElementById('observaciones-modal')
-        if (e.target === modal) {
-          cerrarModal()
+        if (e.target.classList.contains('modal')) {
+          cerrarTodosLosModales()
         }
       })
+
+      // Event listeners para botones de cerrar y cancelar
+      document.addEventListener('DOMContentLoaded', () => {
+        // Botones de cerrar (X)
+        document.querySelectorAll('.close-btn').forEach(btn => {
+          btn.addEventListener('click', cerrarTodosLosModales)
+        })
+        
+        // Botones de cancelar
+        document.querySelectorAll('.btn-cancel').forEach(btn => {
+          btn.addEventListener('click', cerrarTodosLosModales)
+        })
+        
+        // Formularios de validación
+        configurarFormulariosValidacion()
+      })
+
+      function configurarFormulariosValidacion() {
+        // Formulario Besalco
+        const formBesalco = document.getElementById('form-validacion-besalco')
+        if (formBesalco) {
+          formBesalco.addEventListener('submit', procesarValidacionBesalco)
+          
+          const btnRechazar = formBesalco.querySelector('.btn-rechazar')
+          if (btnRechazar) {
+            btnRechazar.addEventListener('click', procesarRechazoBesalco)
+          }
+        }
+        
+        // Formulario Linkapsis
+        const formLinkapsis = document.getElementById('form-validacion-linkapsis')
+        if (formLinkapsis) {
+          formLinkapsis.addEventListener('submit', procesarValidacionLinkapsis)
+          
+          const btnRechazar = formLinkapsis.querySelector('.btn-rechazar')
+          if (btnRechazar) {
+            btnRechazar.addEventListener('click', procesarRechazoLinkapsis)
+          }
+        }
+        
+        // Formulario LlayLlay
+        const formLlayLlay = document.getElementById('form-validacion-llayllay')
+        if (formLlayLlay) {
+          formLlayLlay.addEventListener('submit', procesarValidacionLlayLlay)
+          
+          const btnRechazar = formLlayLlay.querySelector('.btn-rechazar')
+          if (btnRechazar) {
+            btnRechazar.addEventListener('click', procesarRechazoLlayLlay)
+          }
+        }
+      }
+
+      // === FUNCIONES DE PROCESAMIENTO DE VALIDACIONES ===
+
+      async function procesarValidacionBesalco(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('besalco-observaciones').value.trim()
+        if (!observaciones) {
+          mostrarMensaje('Por favor ingresa observaciones', 'error')
+          return
+        }
+        
+        await ejecutarAccion('finalizar_besalco', canchaIdActual, observaciones)
+      }
+
+      async function procesarRechazoBesalco(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('besalco-observaciones').value.trim()
+        if (!observaciones) {
+          mostrarMensaje('Por favor ingresa observaciones del rechazo', 'error')
+          return
+        }
+        
+        await ejecutarAccion('rechazar_besalco', canchaIdActual, observaciones)
+      }
+
+      async function procesarValidacionLinkapsis(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('linkapsis-observaciones').value.trim()
+        const espesor1 = parseFloat(document.getElementById('linkapsis-espesor1').value)
+        const espesor2 = parseFloat(document.getElementById('linkapsis-espesor2').value)
+        const espesor3 = parseFloat(document.getElementById('linkapsis-espesor3').value)
+        
+        if (!observaciones || !espesor1 || !espesor2 || !espesor3) {
+          mostrarMensaje('Por favor completa todas las mediciones y observaciones', 'error')
+          return
+        }
+        
+        const mediciones = {
+          espesores: [espesor1, espesor2, espesor3],
+          unidad: 'mm',
+          puntos_medicion: 3,
+          promedio: ((espesor1 + espesor2 + espesor3) / 3).toFixed(1)
+        }
+        
+        await ejecutarAccion('validar_linkapsis', canchaIdActual, observaciones, mediciones)
+      }
+
+      async function procesarRechazoLinkapsis(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('linkapsis-observaciones').value.trim()
+        if (!observaciones) {
+          mostrarMensaje('Por favor ingresa observaciones del rechazo', 'error')
+          return
+        }
+        
+        await ejecutarAccion('rechazar_linkapsis', canchaIdActual, observaciones)
+      }
+
+      async function procesarValidacionLlayLlay(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('llayllay-observaciones').value.trim()
+        const densidad = parseFloat(document.getElementById('llayllay-densidad').value)
+        
+        if (!observaciones || !densidad) {
+          mostrarMensaje('Por favor completa observaciones y densidad', 'error')
+          return
+        }
+        
+        const mediciones = {
+          densidad: densidad,
+          unidad: 'g/cm³'
+        }
+        
+        await ejecutarAccion('validar_llay_llay', canchaIdActual, observaciones, mediciones)
+      }
+
+      async function procesarRechazoLlayLlay(e) {
+        e.preventDefault()
+        
+        const observaciones = document.getElementById('llayllay-observaciones').value.trim()
+        if (!observaciones) {
+          mostrarMensaje('Por favor ingresa observaciones del rechazo', 'error')
+          return
+        }
+        
+        await ejecutarAccion('rechazar_llay_llay', canchaIdActual, observaciones)
+      }
+
+      // Función unificada para ejecutar acciones
+      async function ejecutarAccion(accion, canchaId, observaciones, mediciones = null) {
+        try {
+          cargando = true
+          
+          const payload = {
+            accion: accion,
+            observaciones: observaciones
+          }
+          
+          if (mediciones) {
+            payload.mediciones = mediciones
+          }
+          
+          const response = await fetch(`/api/canchas/${canchaId}/accion`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+          
+          if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor')
+          }
+          
+          const resultado = await response.json()
+          
+          cerrarTodosLosModales()
+          mostrarMensaje(`Acción completada exitosamente`, 'success')
+          
+          // Recargar canchas para mostrar cambios
+          await cargarCanchas()
+          
+        } catch (error) {
+          console.error('Error al ejecutar acción:', error)
+          mostrarMensaje('Error al procesar la acción', 'error')
+        } finally {
+          cargando = false
+        }
+      }
 
       // Inicializar la aplicación
       inicializar()

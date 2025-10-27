@@ -4,10 +4,11 @@ import type { APIRoute } from 'astro'
 export const POST: APIRoute = async ({ params, request }) => {
   try {
     const canchaId = parseInt(params.id!)
-    const { accion, observaciones } = await request.json()
+    const { accion, observaciones, mediciones } = await request.json()
     
     console.log('API Debug - Acción recibida:', accion)
     console.log('API Debug - Observaciones:', observaciones)
+    console.log('API Debug - Mediciones:', mediciones)
     console.log('API Debug - CanchaID:', canchaId)
     
     if (!canchaId || !accion) {
@@ -20,30 +21,30 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
     
     switch (accion) {
-      case 'enviar-besalco':
+      case 'enviar_besalco':
         await CanchaService.enviarABesalco(canchaId)
         break
-      case 'finalizar-trabajo':
-        await CanchaService.finalizarTrabajo(canchaId)
+      case 'finalizar_besalco':
+        await CanchaService.finalizarBesalco(canchaId, observaciones)
         break
-      case 'rechazar-besalco':
+      case 'rechazar_besalco':
         console.log('API Debug - Ejecutando rechazo por Besalco...')
-        await CanchaService.rechazarPorBesalco(canchaId, observaciones)
+        await CanchaService.rechazarBesalco(canchaId, observaciones)
         console.log('API Debug - Rechazo por Besalco completado')
         break
-      case 'validar-linkapsis':
-        await CanchaService.validarLinkapsis(canchaId, true, observaciones)
+      case 'validar_linkapsis':
+        await CanchaService.validarLinkapsis(canchaId, true, observaciones, mediciones)
         break
-      case 'rechazar-linkapsis':
+      case 'rechazar_linkapsis':
         await CanchaService.validarLinkapsis(canchaId, false, observaciones)
         break
-      case 'validar-llayllay':
-        await CanchaService.validarLlayLlay(canchaId, true, observaciones)
+      case 'validar_llay_llay':
+        await CanchaService.validarLlayLlay(canchaId, true, observaciones, mediciones)
         break
-      case 'rechazar-llayllay':
+      case 'rechazar_llay_llay':
         await CanchaService.validarLlayLlay(canchaId, false, observaciones)
         break
-      case 'cerrar':
+      case 'cerrar_cancha':
         await CanchaService.cerrarCancha(canchaId)
         break
       default:

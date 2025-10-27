@@ -132,7 +132,7 @@ export class CanchaService {
   }
 
   // Rechazar por Besalco (nueva función)
-  static async rechazarPorBesalco(canchaId: number, observaciones?: string): Promise<void> {
+  static async rechazarBesalco(canchaId: number, observaciones?: string): Promise<void> {
     // Devolver a AngloAmerican con estado rechazada
     const { error } = await supabase
       .from('canchas')
@@ -156,8 +156,32 @@ export class CanchaService {
       })
   }
 
+  static async finalizarBesalco(canchaId: number, observaciones?: string): Promise<void> {
+    // Enviar a Linkapsis
+    const { error } = await supabase
+      .from('canchas')
+      .update({
+        estado_actual_id: 3, // Finalizada
+        empresa_actual_id: 3  // Linkapsis
+      })
+      .eq('id', canchaId)
+    
+    if (error) throw error
+
+    // Registrar finalización del trabajo
+    await supabase
+      .from('validaciones')
+      .insert({
+        cancha_id: canchaId,
+        empresa_validadora_id: 2, // Besalco
+        tipo_validacion: 'trabajo_maquinaria',
+        resultado: 'validada',
+        observaciones
+      })
+  }
+
   // Validar por Linkapsis
-  static async validarLinkapsis(canchaId: number, validar: boolean, observaciones?: string): Promise<void> {
+  static async validarLinkapsis(canchaId: number, validar: boolean, observaciones?: string, mediciones?: any): Promise<void> {
     if (validar) {
       // Pasar a LlayLlay
       await supabase
@@ -167,6 +191,18 @@ export class CanchaService {
           empresa_actual_id: 4  // LlayLlay
         })
         .eq('id', canchaId)
+      
+      // Guardar validación con mediciones
+      await supabase
+        .from('validaciones')
+        .insert({
+          cancha_id: canchaId,
+          empresa_validadora_id: 3, // Linkapsis
+          tipo_validacion: 'espesores',
+          resultado: 'validada',
+          observaciones,
+          mediciones
+        })
     } else {
       // Rechazar y volver a Besalco
       await supabase
@@ -176,6 +212,17 @@ export class CanchaService {
           empresa_actual_id: 2  // Besalco
         })
         .eq('id', canchaId)
+      
+      // Guardar rechazo
+      await supabase
+        .from('validaciones')
+        .insert({
+          cancha_id: canchaId,
+          empresa_validadora_id: 3, // Linkapsis
+          tipo_validacion: 'espesores',
+          resultado: 'rechazada',
+          observaciones
+        })
     }
 
     // Registrar validación
@@ -191,7 +238,7 @@ export class CanchaService {
   }
 
   // Validar por LlayLlay
-  static async validarLlayLlay(canchaId: number, validar: boolean, observaciones?: string): Promise<void> {
+  static async validarLlayLlay(canchaId: number, validar: boolean, observaciones?: string, mediciones?: any): Promise<void> {
     if (validar) {
       // Devolver a AngloAmerican para cierre
       await supabase
@@ -212,7 +259,7 @@ export class CanchaService {
         .eq('id', canchaId)
     }
 
-    // Registrar validación
+    // Registrar validación con mediciones
     await supabase
       .from('validaciones')
       .insert({
@@ -220,7 +267,8 @@ export class CanchaService {
         empresa_validadora_id: 4, // LlayLlay
         tipo_validacion: 'densidad',
         resultado: validar ? 'validada' : 'rechazada',
-        observaciones
+        observaciones,
+        mediciones
       })
   }
 
