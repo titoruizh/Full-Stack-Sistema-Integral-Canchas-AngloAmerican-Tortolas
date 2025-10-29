@@ -1,13 +1,4 @@
 ---
-
----
-
----
-// La página se carga con datos iniciales vacíos
-// Los datos se cargan dinámicamente desde el cliente
-const canchas = []
-const empresas = []
-const error = null
 ---
 
 <html lang="es">
@@ -1190,7 +1181,10 @@ const error = null
         
         // Crear cancha (si aplica)
         if (btnCrearCancha) {
+          console.log('Registrando event listener para btnCrearCancha')
           btnCrearCancha.addEventListener('click', crearCancha)
+        } else {
+          console.log('No se encontró btnCrearCancha')
         }
       }
 
@@ -1199,7 +1193,7 @@ const error = null
         // Botón de cerrar modal
         const closeBtn = document.querySelector('.close-btn')
         if (closeBtn) {
-          closeBtn.addEventListener('click', cerrarModal)
+          closeBtn.addEventListener('click', cerrarTodosLosModales)
         }
       }
 
@@ -1414,11 +1408,14 @@ const error = null
 
       // === FUNCIÓN DE CREACIÓN DE CANCHAS ===
       async function crearCancha() {
+        console.log('Función crearCancha llamada')
         if (cargando) return
         
         const muro = document.getElementById('muro').value.trim()
         const sector = document.getElementById('sector').value.trim()
         const nombreDetalle = document.getElementById('nombre-detalle').value.trim()
+        
+        console.log('Datos del formulario:', { muro, sector, nombreDetalle })
         
         if (!muro || !sector || !nombreDetalle) {
           alert('Por favor completa todos los campos')
@@ -1538,7 +1535,7 @@ const error = null
           if (estado === 'Creada') {
             botones.push(`<button class="btn-accion" data-accion="enviar-besalco" data-cancha-id="${canchaId}">Enviar a Besalco</button>`)
             botones.push(`<button class="btn-accion btn-danger" data-accion="abrir-modal-borrar" data-cancha-id="${canchaId}">Borrar Cancha</button>`)
-          } else if (estado === 'Validada' && empresaActual === 'AngloAmerican') {
+          } else if (estado === 'En Proceso' && empresaActual === 'AngloAmerican') {
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">Cerrar Cancha</button>`)
           } else if (estado === 'Cerrada') {
             botones.push(`<button class="btn-accion btn-danger" data-accion="abrir-modal-borrar" data-cancha-id="${canchaId}">Borrar Cancha</button>`)
@@ -1554,14 +1551,14 @@ const error = null
         
         // Linkapsis
         else if (empresaId === 3) {
-          if (estado === 'Finalizada' && empresaActual === 'Linkapsis') {
+          if (estado === 'En Proceso' && empresaActual === 'Linkapsis') {
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-linkapsis" data-cancha-id="${canchaId}">Gestionar Cancha</button>`)
           }
         }
         
         // LlayLlay
         else if (empresaId === 4) {
-          if (estado === 'Validada' && empresaActual === 'LlayLlay') {
+          if (estado === 'En Proceso' && empresaActual === 'LlayLlay') {
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-llayllay" data-cancha-id="${canchaId}">Gestionar Cancha</button>`)
           }
         }

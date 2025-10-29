@@ -161,7 +161,7 @@ export class CanchaService {
     const { error } = await supabase
       .from('canchas')
       .update({
-        estado_actual_id: 3, // Finalizada
+        estado_actual_id: 2, // En Proceso
         empresa_actual_id: 3  // Linkapsis
       })
       .eq('id', canchaId)
@@ -187,7 +187,7 @@ export class CanchaService {
       await supabase
         .from('canchas')
         .update({
-          estado_actual_id: 4, // Validada
+          estado_actual_id: 2, // En Proceso
           empresa_actual_id: 4  // LlayLlay
         })
         .eq('id', canchaId)
@@ -233,7 +233,7 @@ export class CanchaService {
       await supabase
         .from('canchas')
         .update({
-          estado_actual_id: 4, // Validada
+          estado_actual_id: 2, // En Proceso
           empresa_actual_id: 1  // AngloAmerican
         })
         .eq('id', canchaId)
