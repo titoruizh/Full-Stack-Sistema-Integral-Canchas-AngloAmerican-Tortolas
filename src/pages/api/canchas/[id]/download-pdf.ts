@@ -3,7 +3,7 @@ import { supabase } from '../../../../lib/supabase'
 import fs from 'fs'
 import path from 'path'
 
-export const POST: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const { id } = params
   
   if (!id) {
@@ -28,17 +28,17 @@ export const POST: APIRoute = async ({ params, request }) => {
       )
     }
 
-    // Obtener las mediciones
-    const { data: mediciones, error: errorMediciones } = await supabase
-      .from('mediciones')
+    // Obtener las validaciones (que contienen las mediciones)
+    const { data: validaciones, error: errorValidaciones } = await supabase
+      .from('validaciones')
       .select('*')
       .eq('cancha_id', id)
       .order('created_at', { ascending: false })
 
-    if (errorMediciones) {
-      console.error('Error al obtener mediciones:', errorMediciones)
+    if (errorValidaciones) {
+      console.error('Error al obtener validaciones:', errorValidaciones)
       return new Response(
-        JSON.stringify({ error: 'Error al obtener mediciones' }), 
+        JSON.stringify({ error: 'Error al obtener validaciones' }), 
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       )
     }
@@ -66,43 +66,50 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
 
     // Extraer datos para el template
-    function extraerDatosParaTemplate(cancha: any, mediciones: any[] = []) {
-      const medicion = mediciones.length > 0 ? mediciones[0] : {}
-      const coordenadas = medicion.coordenadas || {}
+    function extraerDatosParaTemplate(cancha: any, validaciones: any[] = []) {
+      // Buscar validaciones específicas
+      const validacionLinkapsis = validaciones.find(v => v.empresa === 'Linkapsis')
+      const validacionLlayLlay = validaciones.find(v => v.empresa === 'LlayLlay')
+      const validacionBesalco = validaciones.find(v => v.empresa === 'Besalco')
+      
+      // Extraer datos de mediciones de las validaciones
+      const medicionLinkapsis = validacionLinkapsis?.mediciones || {}
+      const medicionLlayLlay = validacionLlayLlay?.mediciones || {}
+      const coordenadas = medicionLinkapsis.coordenadas || {}
 
       return {
         // Datos básicos de la cancha
         NUMERO_INFORME: cancha.numero_informe || '',
-        UBICACION: cancha.ubicacion || '',
-        EMPRESA: cancha.empresa || '',
-        FECHA_VALIDACION: cancha.fecha_ultima_validacion ? 
-          new Date(cancha.fecha_ultima_validacion).toLocaleDateString('es-ES') : '',
-        ESTADO: cancha.estado || '',
+        UBICACION: cancha.nombre || '',
+        EMPRESA: cancha.empresa_actual || '',
+        FECHA_VALIDACION: cancha.updated_at ? 
+          new Date(cancha.updated_at).toLocaleDateString('es-ES') : '',
+        ESTADO: cancha.estado_actual || '',
         OBSERVACIONES: cancha.observaciones || '',
         
         // Datos de mediciones Linkapsis
-        DENSIDAD: medicion.densidad || '',
-        FIBRA_SINTETICA: medicion.fibra_sintetica || '',
-        SHOCK_PAD: medicion.shock_pad || '',
+        DENSIDAD: medicionLlayLlay.densidad || '',
+        FIBRA_SINTETICA: medicionLinkapsis.fibra_sintetica || '',
+        SHOCK_PAD: medicionLinkapsis.shock_pad || '',
         
-        // Coordenadas
-        X1: coordenadas.punto1?.x || '',
-        Y1: coordenadas.punto1?.y || '',
-        X2: coordenadas.punto2?.x || '',
-        Y2: coordenadas.punto2?.y || '',
-        X3: coordenadas.punto3?.x || '',
-        Y3: coordenadas.punto3?.y || '',
-        X4: coordenadas.punto4?.x || '',
-        Y4: coordenadas.punto4?.y || '',
-        X5: coordenadas.punto5?.x || '',
-        Y5: coordenadas.punto5?.y || '',
-        X6: coordenadas.punto6?.x || '',
-        Y6: coordenadas.punto6?.y || '',
+        // Coordenadas (de Linkapsis)
+        X1: coordenadas.p1?.este || '',
+        Y1: coordenadas.p1?.norte || '',
+        X2: coordenadas.p2?.este || '',
+        Y2: coordenadas.p2?.norte || '',
+        X3: coordenadas.p3?.este || '',
+        Y3: coordenadas.p3?.norte || '',
+        X4: coordenadas.p4?.este || '',
+        Y4: coordenadas.p4?.norte || '',
+        X5: coordenadas.p5?.este || '',
+        Y5: coordenadas.p5?.norte || '',
+        X6: coordenadas.p6?.este || '',
+        Y6: coordenadas.p6?.norte || '',
         
-        // Tipos de trabajo
-        MANTENIMIENTO: medicion.tipo_trabajo?.mantenimiento ? 'X' : '',
-        CERTIFICACION: medicion.tipo_trabajo?.certificacion ? 'X' : '',
-        EVALUACION: medicion.tipo_trabajo?.evaluacion ? 'X' : '',
+        // Tipos de trabajo (de Linkapsis)
+        MANTENIMIENTO: medicionLinkapsis.tipoTrabajo?.includes('mantenimiento') ? 'X' : '',
+        CERTIFICACION: medicionLinkapsis.tipoTrabajo?.includes('certificacion') ? 'X' : '',
+        EVALUACION: medicionLinkapsis.tipoTrabajo?.includes('evaluacion') ? 'X' : '',
         
         // Fechas y otros
         FECHA_HOY: new Date().toLocaleDateString('es-ES'),
@@ -111,7 +118,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
 
     // Procesar el template
-    const datosTemplate = extraerDatosParaTemplate(cancha, mediciones)
+    const datosTemplate = extraerDatosParaTemplate(cancha, validaciones)
     const htmlProcesado = reemplazarVariables(htmlTemplate, datosTemplate)
 
     // Crear HTML completo para la descarga

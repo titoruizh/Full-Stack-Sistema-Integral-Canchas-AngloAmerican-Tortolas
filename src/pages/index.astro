@@ -1585,6 +1585,42 @@
         }
       }
 
+      // === FUNCIÓN TEMPORAL DE DEBUG ===
+      window.debugCancha = function(canchaId) {
+        const cancha = todasLasCanchas.find(c => c.id == canchaId)
+        if (cancha) {
+          console.log('=== DEBUG CANCHA ===')
+          console.log('Cancha encontrada:', cancha)
+          console.log('Estado actual:', cancha.estado_actual)
+          console.log('Empresa actual:', cancha.empresa_actual)
+          console.log('Validaciones:', cancha.validaciones)
+          
+          if (cancha.validaciones) {
+            cancha.validaciones.forEach(v => {
+              console.log(`- ${v.empresa}: ${v.estado}`)
+            })
+          }
+          
+          // Verificar qué botones debería mostrar
+          const botonesGenerados = generarBotonesAccion(canchaId, cancha.estado_actual, cancha.empresa_actual)
+          console.log('Botones que debería generar:', botonesGenerados)
+          
+          return cancha
+        } else {
+          console.log('Cancha no encontrada con ID:', canchaId)
+          console.log('Canchas disponibles:', todasLasCanchas.map(c => ({ id: c.id, nombre: c.nombre })))
+          return null
+        }
+      }
+
+      window.debugTodasLasCanchas = function() {
+        console.log('=== TODAS LAS CANCHAS ===')
+        todasLasCanchas.forEach(cancha => {
+          console.log(`ID: ${cancha.id}, Nombre: ${cancha.nombre}, Estado: ${cancha.estado_actual}, Empresa: ${cancha.empresa_actual}`)
+        })
+        return todasLasCanchas
+      }
+
       // === FUNCIONES DE LOGIN ===
       function validarFormularioLogin() {
         const empresaSeleccionada = empresaLogin.value
@@ -1694,6 +1730,7 @@
 
       // === FUNCIONES DE FILTROS ===
       function cambiarVista(nuevaVista) {
+        console.log('Cambiando vista a:', nuevaVista)
         vistaActual = nuevaVista
         
         // Actualizar botones
@@ -1999,9 +2036,12 @@
             const cancha = todasLasCanchas.find(c => c.id == canchaId)
             if (cancha) {
               const validaciones = cancha.validaciones || []
+              console.log('Validaciones encontradas:', validaciones)
               const hasLinkapsis = validaciones.some(v => v.empresa === 'Linkapsis' && v.estado === 'VALIDADO')
               const hasLlayLlay = validaciones.some(v => v.empresa === 'LlayLlay' && v.estado === 'VALIDADO')
               const hasBesalco = validaciones.some(v => v.empresa === 'Besalco' && v.estado === 'VALIDADO')
+              
+              console.log('Estado validaciones:', { hasLinkapsis, hasLlayLlay, hasBesalco })
               
               if (hasLinkapsis && hasLlayLlay && hasBesalco) {
                 console.log('Todas las validaciones completas, agregando botón PDF')
@@ -2011,6 +2051,10 @@
             
             console.log('Agregando botón cerrar cancha')
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">Cerrar Cancha</button>`)
+          } else if (estado === 'Finalizada' || estado === 'Cerrada') {
+            console.log('Estado es Finalizada/Cerrada, agregando botón PDF')
+            // Para canchas finalizadas o cerradas, siempre mostrar el botón PDF
+            botones.push(`<button class="btn-accion btn-pdf" data-accion="exportar-pdf" data-cancha-id="${canchaId}">📄 Exportar PDF</button>`)
           }
         }
         
