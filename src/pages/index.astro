@@ -174,14 +174,24 @@
       
       th, td {
         padding: 1rem;
-        text-align: left;
+        text-align: center;
         border-bottom: 1px solid #e1e8ed;
+        vertical-align: middle;
       }
       
       th {
         background: #f8f9fa;
         font-weight: 600;
         color: #2c3e50;
+      }
+      
+      /* Asegurar que el contenido de las celdas esté centrado */
+      td {
+        text-align: center !important;
+      }
+      
+      td strong {
+        display: inline-block;
       }
       
       tr:hover {
@@ -195,6 +205,7 @@
         font-weight: 600;
         text-align: center;
         white-space: nowrap;
+        display: inline-block;
       }
       
       .estado-creada { background: #e3f2fd; color: #1976d2; }
@@ -208,12 +219,48 @@
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
       }
       
       .actions button {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
         margin: 0;
+      }
+      
+      .admin-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+      }
+      
+      .admin-actions button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #e74c3c;
+        color: white;
+        font-weight: 600;
+      }
+      
+      .admin-actions button:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+      }
+      
+      #borrar-header {
+        text-align: center;
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #e74c3c;
+        border-left: 3px solid #e74c3c;
       }
       
       .loading {
@@ -245,6 +292,8 @@
         padding: 0.3rem 0.6rem;
         border-radius: 15px;
         font-size: 0.8rem;
+        text-align: center;
+        display: inline-block;
       }
       
       .empresa-angloamerican { background: #e3f2fd; color: #1976d2; }
@@ -830,6 +879,51 @@
       .empresa-llayllay::before { background-color: #27ae60; }
       .empresa-angloamerican::before { background-color: #3498db; }
       
+      /* Nuevos estilos para historial mejorado */
+      .historial-entry {
+        background: #ffffff;
+        border: 1px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: box-shadow 0.3s ease;
+      }
+      
+      .historial-entry:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .empresa-nombre {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .fecha-linea, .observacion-linea, .medicion-linea {
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+      }
+      
+      .fecha-label, .observacion-label, .medicion-label {
+        font-weight: 600;
+        color: #34495e;
+      }
+      
+      .medicion-linea {
+        color: #2c3e50;
+        font-size: 0.95rem;
+      }
+      
+      .medicion-linea strong {
+        color: #27ae60;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+      }
+      
       .hidden {
         display: none;
       }
@@ -980,6 +1074,7 @@
                 <th>Empresa Actual</th>
                 <th>Fecha Creación</th>
                 <th>Acciones</th>
+                <th id="borrar-header" class="hidden">Administrar</th>
               </tr>
             </thead>
             <tbody id="canchas-tbody">
@@ -1318,6 +1413,9 @@
           // Cargar datos
           await cargarCanchas()
           
+          // Actualizar columna de administración
+          actualizarColumnaAdmin()
+          
           mostrarMensaje(`Bienvenido, ${nombreEmpresa}!`, 'success')
         } catch (error) {
           console.error('Error en login:', error)
@@ -1351,6 +1449,9 @@
         canchasTBody.innerHTML = ''
         todasLasCanchas = []
         canchasFiltradas = []
+        
+        // Ocultar columna de administración
+        actualizarColumnaAdmin()
         
         mostrarMensaje('Sesión cerrada correctamente', 'success')
       }
@@ -1412,10 +1513,13 @@
         if (!empresaLogueada || !todasLasCanchas.length) return
         
         let canchasFiltradas = [...todasLasCanchas]
+        console.log('Aplicando filtros, vista actual:', vistaActual)
+        console.log('Total canchas antes del filtro:', canchasFiltradas.length)
         
         // Filtro por vista (acciones vs histórico)
         if (vistaActual === 'acciones') {
           canchasFiltradas = filtrarPorAccionesDisponibles(canchasFiltradas)
+          console.log('Canchas después del filtro de acciones:', canchasFiltradas.length)
         }
         
         // Filtro por fecha
@@ -1430,23 +1534,47 @@
         const empresaId = empresaLogueada.id
         const empresaNombre = empresaLogueada.nombre
         
+        console.log('Filtrando para empresa:', empresaNombre)
+        
         return canchas.filter(cancha => {
           const estado = cancha.estado_actual
           const empresaActual = cancha.empresa_actual
           
+          console.log(`Cancha ${cancha.nombre}: estado="${estado}", empresa="${empresaActual}"`)
+          
+          let tieneAccion = false
+          
           switch (empresaNombre) {
             case 'AngloAmerican':
-              return estado === 'Creada' || estado === 'Validada' || estado === 'Rechazada'
+              // AngloAmerican puede actuar cuando:
+              // - Cancha creada (enviar a Besalco)
+              // - Cancha en proceso en AngloAmerican (cerrar)
+              tieneAccion = estado === 'Creada' || 
+                           (estado === 'En Proceso' && empresaActual === 'AngloAmerican')
+              break
+                     
             case 'Besalco':
-              return (estado === 'En Proceso' && empresaActual === 'Besalco') || 
-                     (estado === 'Rechazada' && empresaActual === 'Besalco')
+              // Besalco puede actuar cuando la cancha está en proceso en Besalco o rechazada
+              tieneAccion = (estado === 'En Proceso' && empresaActual === 'Besalco') || 
+                           (estado === 'Rechazada' && empresaActual === 'Besalco')
+              break
+                     
             case 'Linkapsis':
-              return estado === 'Finalizada' && empresaActual === 'Linkapsis'
+              // Linkapsis puede actuar cuando la cancha está en proceso en Linkapsis
+              tieneAccion = estado === 'En Proceso' && empresaActual === 'Linkapsis'
+              break
+              
             case 'LlayLlay':
-              return estado === 'Validada' && empresaActual === 'LlayLlay'
+              // LlayLlay puede actuar cuando la cancha está en proceso en LlayLlay
+              tieneAccion = estado === 'En Proceso' && empresaActual === 'LlayLlay'
+              break
+              
             default:
-              return false
+              tieneAccion = false
           }
+          
+          console.log(`-> Tiene acción: ${tieneAccion}`)
+          return tieneAccion
         })
       }
 
@@ -1582,6 +1710,10 @@
               <div class="actions" data-cancha-id="${cancha.id}" data-estado="${cancha.estado_actual}" data-empresa="${cancha.empresa_actual}">
               </div>
             </td>
+            <td class="borrar-column hidden">
+              <div class="admin-actions" data-cancha-id="${cancha.id}">
+              </div>
+            </td>
           </tr>
         `).join('')
         
@@ -1591,6 +1723,7 @@
       // Actualizar botones de acción según empresa seleccionada
       function actualizarAcciones() {
         const actionsDivs = document.querySelectorAll('.actions')
+        const adminDivs = document.querySelectorAll('.admin-actions')
         
         actionsDivs.forEach(div => {
           const canchaId = div.dataset.canchaId
@@ -1598,6 +1731,12 @@
           const empresaActual = div.dataset.empresa
           
           div.innerHTML = generarBotonesAccion(canchaId, estado, empresaActual)
+        })
+        
+        // Actualizar botones de administración
+        adminDivs.forEach(div => {
+          const canchaId = div.dataset.canchaId
+          div.innerHTML = generarBotonesAdmin(canchaId)
         })
         
         // Agregar event listeners a los botones
@@ -1618,9 +1757,6 @@
           } else if (estado === 'En Proceso' && empresaActual === 'AngloAmerican') {
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">Cerrar Cancha</button>`)
           }
-          
-          // AngloAmerican siempre puede borrar cualquier cancha (administrador)
-          botones.push(`<button class="btn-accion btn-danger" data-accion="abrir-modal-borrar" data-cancha-id="${canchaId}">Borrar Cancha</button>`)
         }
         
         // Besalco
@@ -1645,6 +1781,31 @@
         }
         
         return botones.length > 0 ? botones.join('') : '<span style="color:#666;">Sin acciones disponibles</span>'
+      }
+
+      // Generar botones de administración (solo para AngloAmerican)
+      function generarBotonesAdmin(canchaId) {
+        if (!empresaLogueada || empresaLogueada.id !== 1) {
+          return '' // Solo AngloAmerican puede administrar
+        }
+        
+        return `<button class="btn-accion btn-danger" data-accion="abrir-modal-borrar" data-cancha-id="${canchaId}">🗑️ Borrar</button>`
+      }
+
+      // Mostrar/ocultar columna de administración según empresa
+      function actualizarColumnaAdmin() {
+        const borrarHeader = document.getElementById('borrar-header')
+        const borrarColumns = document.querySelectorAll('.borrar-column')
+        
+        if (empresaLogueada && empresaLogueada.id === 1) {
+          // Mostrar columna para AngloAmerican
+          borrarHeader.classList.remove('hidden')
+          borrarColumns.forEach(col => col.classList.remove('hidden'))
+        } else {
+          // Ocultar columna para otras empresas
+          borrarHeader.classList.add('hidden')
+          borrarColumns.forEach(col => col.classList.add('hidden'))
+        }
       }
 
       // Agregar event listeners a botones de acción
@@ -1765,24 +1926,21 @@
                     if (val.mediciones.espesores) {
                       // Mediciones de Linkapsis (formato anterior)
                       medicionesHtml = `
-                        <div class="observacion-mediciones">
-                          <div class="medicion-titulo">📏 Mediciones de Espesor</div>
-                          <div class="medicion-valor">${val.mediciones.espesores.join(', ')} ${val.mediciones.unidad}</div>
-                          ${val.mediciones.promedio ? `<div style="font-size: 0.8rem; color: #666; margin-top: 0.25rem;">Promedio: ${val.mediciones.promedio} ${val.mediciones.unidad}</div>` : ''}
+                        <div class="medicion-linea">
+                          <span class="medicion-label">Medición de Espesor:</span> <strong>${val.mediciones.espesores.join(', ')} ${val.mediciones.unidad}</strong>
+                          ${val.mediciones.promedio ? `<br><span style="font-size: 0.9rem; color: #666;">Promedio: <strong>${val.mediciones.promedio} ${val.mediciones.unidad}</strong></span>` : ''}
                         </div>`
                     } else if (val.mediciones.espesor) {
                       // Nueva medición de Linkapsis
                       medicionesHtml = `
-                        <div class="observacion-mediciones">
-                          <div class="medicion-titulo">📏 Medición de Espesor</div>
-                          <div class="medicion-valor">${val.mediciones.espesor} ${val.mediciones.unidad}</div>
+                        <div class="medicion-linea">
+                          <span class="medicion-label">Medición de Espesor:</span> <strong>${val.mediciones.espesor} ${val.mediciones.unidad}</strong>
                         </div>`
                     } else if (val.mediciones.densidad) {
                       // Mediciones de LlayLlay
                       medicionesHtml = `
-                        <div class="observacion-mediciones">
-                          <div class="medicion-titulo">⚖️ Medición de Densidad</div>
-                          <div class="medicion-valor">${val.mediciones.densidad} ${val.mediciones.unidad}</div>
+                        <div class="medicion-linea">
+                          <span class="medicion-label">Medición de Densidad:</span> <strong>${val.mediciones.densidad} ${val.mediciones.unidad}</strong>
                         </div>`
                     }
                   }
@@ -1791,22 +1949,22 @@
                   const empresaClass = empresaNombre.toLowerCase().replace(/\s+/g, '')
                   
                   return `
-                    <div class="observacion-item empresa-${empresaClass}">
-                      <div class="observacion-header">
-                        <div class="observacion-empresa">${empresaNombre}</div>
-                        <div class="observacion-fecha">${new Date(val.created_at).toLocaleDateString('es-ES', {
+                    <div class="historial-entry empresa-${empresaClass}">
+                      <div class="empresa-nombre">${empresaNombre}</div>
+                      <div class="fecha-linea">
+                        <span class="fecha-label">Fecha:</span> ${new Date(val.created_at).toLocaleDateString('es-ES', {
                           weekday: 'short',
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit'
-                        })}</div>
+                        })}
                       </div>
-                      <div class="observacion-contenido">
-                        <div class="observacion-texto">"${val.observaciones || 'Sin observaciones específicas'}"</div>
-                        ${medicionesHtml}
+                      <div class="observacion-linea">
+                        <span class="observacion-label">Observaciones:</span> "${val.observaciones || 'Sin observaciones específicas'}"
                       </div>
+                      ${medicionesHtml}
                     </div>`
                 }).join('')}
               </div>
