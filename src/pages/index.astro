@@ -109,6 +109,18 @@
         background: #229954;
       }
       
+      .btn-pdf {
+        background: #8e44ad;
+        color: white;
+        font-weight: 600;
+      }
+      
+      .btn-pdf:hover {
+        background: #732d91;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3);
+      }
+      
       .btn-danger {
         background: #e74c3c;
       }
@@ -682,6 +694,105 @@
         display: block;
       }
       
+      /* Estilos para checkboxes de tipo de trabajo */
+      .checkbox-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+      
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border: 2px solid #e1e8ed;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+      }
+      
+      .checkbox-item:hover {
+        background-color: #f8f9fa;
+        border-color: #3498db;
+      }
+      
+      .checkbox-item input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+      }
+      
+      .checkbox-item span {
+        font-weight: 500;
+        color: #2c3e50;
+      }
+      
+      /* Estilos para coordenadas */
+      .coordenadas-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+      
+      .punto-section {
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 1rem;
+        background-color: #f8f9fa;
+      }
+      
+      .punto-section h5 {
+        margin: 0 0 1rem 0;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+      }
+      
+      .coordenadas-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+      }
+      
+      .coord-field {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .coord-field label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+      }
+      
+      .coord-field input {
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+      
+      .coord-field input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+      
+      /* Responsive para coordenadas */
+      @media (max-width: 768px) {
+        .coordenadas-row {
+          grid-template-columns: 1fr;
+          gap: 0.5rem;
+        }
+        
+        .checkbox-group {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+      
       .form-actions {
         display: flex;
         gap: 1rem;
@@ -1105,11 +1216,110 @@
               <label for="linkapsis-observaciones">Observaciones:</label>
               <textarea id="linkapsis-observaciones" placeholder="Ingresa observaciones sobre la validación..." required></textarea>
             </div>
+            
             <div class="form-group">
               <label for="linkapsis-espesor">Medición de Espesor (metros):</label>
               <input type="number" id="linkapsis-espesor" placeholder="Ej: 0.03" min="0" step="0.001" required>
               <small>Ingresa la medición en metros (ej: 0.03)</small>
             </div>
+            
+            <!-- Tipo de Trabajo -->
+            <div class="form-group">
+              <label>Tipo de Trabajo:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="trabajo-corte" name="tipo-trabajo" value="corte">
+                  <span>Corte</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="trabajo-relleno" name="tipo-trabajo" value="relleno">
+                  <span>Relleno</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Coordenadas de Puntos -->
+            <div class="form-group">
+              <label>Coordenadas de Puntos:</label>
+              <div class="coordenadas-grid">
+                <!-- Punto 1 -->
+                <div class="punto-section">
+                  <h5>Punto 1</h5>
+                  <div class="coordenadas-row">
+                    <div class="coord-field">
+                      <label for="p1-norte">Norte:</label>
+                      <input type="number" id="p1-norte" placeholder="Norte P1" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p1-este">Este:</label>
+                      <input type="number" id="p1-este" placeholder="Este P1" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p1-cota">Cota:</label>
+                      <input type="number" id="p1-cota" placeholder="Cota P1" step="0.001">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Punto 2 -->
+                <div class="punto-section">
+                  <h5>Punto 2</h5>
+                  <div class="coordenadas-row">
+                    <div class="coord-field">
+                      <label for="p2-norte">Norte:</label>
+                      <input type="number" id="p2-norte" placeholder="Norte P2" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p2-este">Este:</label>
+                      <input type="number" id="p2-este" placeholder="Este P2" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p2-cota">Cota:</label>
+                      <input type="number" id="p2-cota" placeholder="Cota P2" step="0.001">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Punto 3 -->
+                <div class="punto-section">
+                  <h5>Punto 3</h5>
+                  <div class="coordenadas-row">
+                    <div class="coord-field">
+                      <label for="p3-norte">Norte:</label>
+                      <input type="number" id="p3-norte" placeholder="Norte P3" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p3-este">Este:</label>
+                      <input type="number" id="p3-este" placeholder="Este P3" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p3-cota">Cota:</label>
+                      <input type="number" id="p3-cota" placeholder="Cota P3" step="0.001">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Punto 4 -->
+                <div class="punto-section">
+                  <h5>Punto 4</h5>
+                  <div class="coordenadas-row">
+                    <div class="coord-field">
+                      <label for="p4-norte">Norte:</label>
+                      <input type="number" id="p4-norte" placeholder="Norte P4" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p4-este">Este:</label>
+                      <input type="number" id="p4-este" placeholder="Este P4" step="0.001">
+                    </div>
+                    <div class="coord-field">
+                      <label for="p4-cota">Cota:</label>
+                      <input type="number" id="p4-cota" placeholder="Cota P4" step="0.001">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div class="form-actions">
               <button type="button" class="btn-cancel">Cancelar</button>
               <button type="submit" class="btn-validar">Validar Espesores</button>
@@ -1140,10 +1350,12 @@
               <label for="llayllay-observaciones">Observaciones:</label>
               <textarea id="llayllay-observaciones" placeholder="Ingresa observaciones sobre la validación..." required></textarea>
             </div>
+            
             <div class="form-group">
               <label for="llayllay-densidad">Densidad (g/cm³):</label>
               <input type="number" id="llayllay-densidad" placeholder="ej: 2.35" min="0" step="0.01" required>
             </div>
+            
             <div class="form-actions">
               <button type="button" class="btn-cancel">Cancelar</button>
               <button type="submit" class="btn-validar">Validar Densidad</button>
@@ -1390,6 +1602,7 @@
 
       async function loginEmpresa(empresaId, nombreEmpresa) {
         try {
+          console.log('Iniciando login para empresa:', { empresaId, nombreEmpresa })
           empresaLogueada = { id: empresaId, nombre: nombreEmpresa }
           
           // Guardar en localStorage
@@ -1401,8 +1614,10 @@
           
           // Mostrar/ocultar formulario de crear cancha
           if (nombreEmpresa === 'AngloAmerican') {
+            console.log('Mostrando formulario de crear cancha para AngloAmerican')
             formCrearCancha.classList.remove('hidden')
           } else {
+            console.log('Ocultando formulario de crear cancha para:', nombreEmpresa)
             formCrearCancha.classList.add('hidden')
           }
           
@@ -1411,12 +1626,15 @@
           mainScreen.classList.remove('hidden')
           
           // Cargar datos
+          console.log('Cargando canchas...')
           await cargarCanchas()
           
           // Actualizar columna de administración
+          console.log('Actualizando columna de administración...')
           actualizarColumnaAdmin()
           
           mostrarMensaje(`Bienvenido, ${nombreEmpresa}!`, 'success')
+          console.log('Login completado exitosamente')
         } catch (error) {
           console.error('Error en login:', error)
           mostrarMensaje('Error al iniciar sesión', 'error')
@@ -1722,39 +1940,76 @@
 
       // Actualizar botones de acción según empresa seleccionada
       function actualizarAcciones() {
+        console.log('Actualizando acciones para empresa:', empresaLogueada)
         const actionsDivs = document.querySelectorAll('.actions')
         const adminDivs = document.querySelectorAll('.admin-actions')
         
-        actionsDivs.forEach(div => {
+        console.log('Encontrados', actionsDivs.length, 'divs de acciones')
+        console.log('Encontrados', adminDivs.length, 'divs de admin')
+        
+        actionsDivs.forEach((div, index) => {
           const canchaId = div.dataset.canchaId
           const estado = div.dataset.estado
           const empresaActual = div.dataset.empresa
           
-          div.innerHTML = generarBotonesAccion(canchaId, estado, empresaActual)
+          console.log(`Procesando div ${index}: canchaId=${canchaId}, estado=${estado}, empresaActual=${empresaActual}`)
+          
+          const botonesHTML = generarBotonesAccion(canchaId, estado, empresaActual)
+          console.log(`Botones generados: ${botonesHTML}`)
+          div.innerHTML = botonesHTML
         })
         
         // Actualizar botones de administración
-        adminDivs.forEach(div => {
+        adminDivs.forEach((div, index) => {
           const canchaId = div.dataset.canchaId
-          div.innerHTML = generarBotonesAdmin(canchaId)
+          console.log(`Procesando admin div ${index}: canchaId=${canchaId}`)
+          const adminHTML = generarBotonesAdmin(canchaId)
+          console.log(`Admin botones generados: ${adminHTML}`)
+          div.innerHTML = adminHTML
         })
         
         // Agregar event listeners a los botones
         agregarEventListeners()
+        console.log('Event listeners agregados')
       }
 
       // Generar botones según empresa y estado
       function generarBotonesAccion(canchaId, estado, empresaActual) {
-        if (!empresaLogueada) return '<span style="color:#666;">Selecciona tu empresa</span>'
+        console.log(`generarBotonesAccion: canchaId=${canchaId}, estado=${estado}, empresaActual=${empresaActual}`)
+        console.log('empresaLogueada:', empresaLogueada)
+        
+        if (!empresaLogueada) {
+          console.log('No hay empresa logueada')
+          return '<span style="color:#666;">Selecciona tu empresa</span>'
+        }
         
         const botones = []
         const empresaId = empresaLogueada.id
+        console.log('Empresa ID:', empresaId)
         
         // AngloAmerican
         if (empresaId === 1) {
+          console.log('Procesando para AngloAmerican')
           if (estado === 'Creada') {
+            console.log('Estado es Creada, agregando botón enviar a Besalco')
             botones.push(`<button class="btn-accion" data-accion="enviar-besalco" data-cancha-id="${canchaId}">Enviar a Besalco</button>`)
           } else if (estado === 'En Proceso' && empresaActual === 'AngloAmerican') {
+            console.log('Estado es En Proceso y empresa actual es AngloAmerican')
+            // Buscar la cancha para verificar validaciones
+            const cancha = todasLasCanchas.find(c => c.id == canchaId)
+            if (cancha) {
+              const validaciones = cancha.validaciones || []
+              const hasLinkapsis = validaciones.some(v => v.empresa === 'Linkapsis' && v.estado === 'VALIDADO')
+              const hasLlayLlay = validaciones.some(v => v.empresa === 'LlayLlay' && v.estado === 'VALIDADO')
+              const hasBesalco = validaciones.some(v => v.empresa === 'Besalco' && v.estado === 'VALIDADO')
+              
+              if (hasLinkapsis && hasLlayLlay && hasBesalco) {
+                console.log('Todas las validaciones completas, agregando botón PDF')
+                botones.push(`<button class="btn-accion btn-pdf" data-accion="exportar-pdf" data-cancha-id="${canchaId}">📄 Exportar PDF</button>`)
+              }
+            }
+            
+            console.log('Agregando botón cerrar cancha')
             botones.push(`<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">Cerrar Cancha</button>`)
           }
         }
@@ -1837,6 +2092,9 @@
           return
         } else if (accion === 'abrir-modal-borrar') {
           abrirModalBorrar(canchaId)
+          return
+        } else if (accion === 'exportar-pdf') {
+          await exportarPDF(canchaId)
           return
         }
         
@@ -2001,6 +2259,23 @@
         // Limpiar formulario
         form.reset()
         
+        // Limpiar checkboxes específicamente
+        document.getElementById('trabajo-corte').checked = false
+        document.getElementById('trabajo-relleno').checked = false
+        
+        // Limpiar todos los campos de coordenadas
+        const coordInputs = [
+          'p1-norte', 'p1-este', 'p1-cota',
+          'p2-norte', 'p2-este', 'p2-cota', 
+          'p3-norte', 'p3-este', 'p3-cota',
+          'p4-norte', 'p4-este', 'p4-cota'
+        ]
+        
+        coordInputs.forEach(id => {
+          const input = document.getElementById(id)
+          if (input) input.value = ''
+        })
+        
         // Cargar historial de observaciones (incluye observaciones de Besalco)
         cargarHistorialObservaciones(canchaId, 'historial-linkapsis')
         
@@ -2049,6 +2324,26 @@
         
         // Mostrar modal
         modal.classList.add('show')
+      }
+
+      // Función para exportar PDF
+      async function exportarPDF(canchaId) {
+        try {
+          cargando = true
+          mostrarMensaje('Generando PDF...', 'info')
+          
+          // Abrir la URL de descarga directamente en una nueva ventana
+          const url = `/api/canchas/${canchaId}/download-pdf`
+          window.open(url, '_blank')
+          
+          mostrarMensaje('PDF generado correctamente', 'success')
+          
+        } catch (error) {
+          console.error('Error al exportar PDF:', error)
+          mostrarMensaje('Error al generar PDF: ' + error.message, 'error')
+        } finally {
+          cargando = false
+        }
       }
 
       function cerrarTodosLosModales() {
@@ -2179,9 +2474,48 @@
           return
         }
         
+        // Verificar si es revalidación
+        const isRevalidacion = await esRevalidacion(canchaIdActual, 'Linkapsis')
+        
+        // Recopilar tipo de trabajo
+        const tipoTrabajo = []
+        if (document.getElementById('trabajo-corte').checked) {
+          tipoTrabajo.push('corte')
+        }
+        if (document.getElementById('trabajo-relleno').checked) {
+          tipoTrabajo.push('relleno')
+        }
+        
+        // Recopilar coordenadas de los 4 puntos
+        const coordenadas = {
+          p1: {
+            norte: parseFloat(document.getElementById('p1-norte').value) || null,
+            este: parseFloat(document.getElementById('p1-este').value) || null,
+            cota: parseFloat(document.getElementById('p1-cota').value) || null
+          },
+          p2: {
+            norte: parseFloat(document.getElementById('p2-norte').value) || null,
+            este: parseFloat(document.getElementById('p2-este').value) || null,
+            cota: parseFloat(document.getElementById('p2-cota').value) || null
+          },
+          p3: {
+            norte: parseFloat(document.getElementById('p3-norte').value) || null,
+            este: parseFloat(document.getElementById('p3-este').value) || null,
+            cota: parseFloat(document.getElementById('p3-cota').value) || null
+          },
+          p4: {
+            norte: parseFloat(document.getElementById('p4-norte').value) || null,
+            este: parseFloat(document.getElementById('p4-este').value) || null,
+            cota: parseFloat(document.getElementById('p4-cota').value) || null
+          }
+        }
+        
         const mediciones = {
           espesor: espesor,
-          unidad: 'metros'
+          unidad: 'metros',
+          tipoTrabajo: tipoTrabajo,
+          coordenadas: coordenadas,
+          isRevalidacion: isRevalidacion
         }
         
         await ejecutarAccion('validar_linkapsis', canchaIdActual, observaciones, mediciones)
@@ -2201,9 +2535,44 @@
         // Incluir mediciones aunque sea rechazo
         let mediciones = null
         if (espesor) {
+          // Recopilar tipo de trabajo si están marcados
+          const tipoTrabajo = []
+          if (document.getElementById('trabajo-corte').checked) {
+            tipoTrabajo.push('corte')
+          }
+          if (document.getElementById('trabajo-relleno').checked) {
+            tipoTrabajo.push('relleno')
+          }
+          
+          // Recopilar coordenadas si están disponibles
+          const coordenadas = {
+            p1: {
+              norte: parseFloat(document.getElementById('p1-norte').value) || null,
+              este: parseFloat(document.getElementById('p1-este').value) || null,
+              cota: parseFloat(document.getElementById('p1-cota').value) || null
+            },
+            p2: {
+              norte: parseFloat(document.getElementById('p2-norte').value) || null,
+              este: parseFloat(document.getElementById('p2-este').value) || null,
+              cota: parseFloat(document.getElementById('p2-cota').value) || null
+            },
+            p3: {
+              norte: parseFloat(document.getElementById('p3-norte').value) || null,
+              este: parseFloat(document.getElementById('p3-este').value) || null,
+              cota: parseFloat(document.getElementById('p3-cota').value) || null
+            },
+            p4: {
+              norte: parseFloat(document.getElementById('p4-norte').value) || null,
+              este: parseFloat(document.getElementById('p4-este').value) || null,
+              cota: parseFloat(document.getElementById('p4-cota').value) || null
+            }
+          }
+          
           mediciones = {
             espesor: espesor,
-            unidad: 'metros'
+            unidad: 'metros',
+            tipoTrabajo: tipoTrabajo,
+            coordenadas: coordenadas
           }
         }
         
@@ -2221,9 +2590,13 @@
           return
         }
         
+        // Verificar si es revalidación
+        const isRevalidacion = await esRevalidacion(canchaIdActual, 'LlayLlay')
+        
         const mediciones = {
           densidad: densidad,
-          unidad: 'g/cm³'
+          unidad: 'g/cm³',
+          isRevalidacion: isRevalidacion
         }
         
         await ejecutarAccion('validar_llay_llay', canchaIdActual, observaciones, mediciones)
@@ -2250,6 +2623,27 @@
         }
         
         await ejecutarAccion('rechazar_llay_llay', canchaIdActual, observaciones, mediciones)
+      }
+
+      // Función auxiliar para determinar si es revalidación
+      async function esRevalidacion(canchaId, empresa) {
+        try {
+          const response = await fetch(`/api/canchas/${canchaId}`)
+          if (!response.ok) return false
+          
+          const data = await response.json()
+          const cancha = data.cancha
+          
+          // Buscar validaciones previas de la misma empresa
+          const validacionesPrevias = cancha.validaciones?.filter(v => 
+            v.empresa === empresa && v.estado === 'VALIDADO'
+          ) || []
+          
+          return validacionesPrevias.length > 0
+        } catch (error) {
+          console.error('Error al verificar revalidación:', error)
+          return false
+        }
       }
 
       // Función unificada para ejecutar acciones

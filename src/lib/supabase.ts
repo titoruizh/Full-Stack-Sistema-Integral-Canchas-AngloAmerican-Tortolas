@@ -30,6 +30,14 @@ export interface Cancha {
   created_by: number
   created_at: string
   updated_at: string
+  numero_informe?: number // Nuevo campo para el número correlativo
+}
+
+export interface ContadorInforme {
+  id: number
+  ultimo_numero: number
+  created_at: string
+  updated_at: string
 }
 
 export interface HistorialCancha {
@@ -52,8 +60,43 @@ export interface Validacion {
   tipo_validacion: string
   resultado: string
   observaciones?: string
-  mediciones?: any
+  mediciones?: MedicionData
   created_at: string
+  is_revalidacion?: boolean // Para distinguir primera vs segunda validación
+}
+
+// Interfaces para mediciones específicas
+export interface MedicionData {
+  // Mediciones de Linkapsis
+  espesor?: number
+  unidad?: string
+  coordenadas?: Coordenadas
+  tipo_trabajo?: TipoTrabajo
+  
+  // Mediciones de LlayLlay  
+  densidad?: number
+  
+  // Mediciones legacy (compatibilidad)
+  espesores?: number[]
+  promedio?: number
+}
+
+export interface Coordenadas {
+  p1: Punto
+  p2: Punto
+  p3: Punto
+  p4: Punto
+}
+
+export interface Punto {
+  norte: number
+  este: number
+  cota: number
+}
+
+export interface TipoTrabajo {
+  corte: boolean
+  relleno: boolean
 }
 
 // Vista completa con joins
@@ -68,6 +111,7 @@ export interface CanchaCompleta {
   creada_por: string
   created_at: string
   updated_at: string
+  numero_informe?: number // Nuevo campo
 }
 
 // Funciones auxiliares para el manejo de datos
@@ -83,9 +127,47 @@ export class CanchaService {
     return data || []
   }
 
+  // Obtener próximo número de informe
+  static async obtenerProximoNumeroInforme(): Promise<number> {
+    // Primero verificar si existe el contador
+    const { data: contador, error: errorGet } = await supabase
+      .from('contador_informes')
+      .select('ultimo_numero')
+      .single()
+    
+    if (errorGet && errorGet.code === 'PGRST116') {
+      // No existe contador, crear uno inicial (empezando en 5001)
+      const { data, error: errorInsert } = await supabase
+        .from('contador_informes')
+        .insert({ ultimo_numero: 5000 })
+        .select()
+        .single()
+      
+      if (errorInsert) throw errorInsert
+      return 5001
+    }
+    
+    if (errorGet) throw errorGet
+    
+    // Incrementar el contador
+    const nuevoNumero = contador.ultimo_numero + 1
+    
+    const { error: errorUpdate } = await supabase
+      .from('contador_informes')
+      .update({ ultimo_numero: nuevoNumero })
+      .eq('id', 1)
+    
+    if (errorUpdate) throw errorUpdate
+    
+    return nuevoNumero
+  }
+
   // Crear nueva cancha
   static async crearCancha(muro: string, sector: string, nombreDetalle: string): Promise<Cancha> {
     const nombre = `${muro}_${sector}_${nombreDetalle}`
+    
+    // Obtener próximo número de informe
+    const numeroInforme = await this.obtenerProximoNumeroInforme()
     
     const { data, error } = await supabase
       .from('canchas')
@@ -96,7 +178,8 @@ export class CanchaService {
         nombre_detalle: nombreDetalle,
         estado_actual_id: 1, // Creada
         empresa_actual_id: 1, // AngloAmerican
-        created_by: 1
+        created_by: 1,
+        numero_informe: numeroInforme
       })
       .select()
       .single()
@@ -181,7 +264,13 @@ export class CanchaService {
   }
 
   // Validar por Linkapsis
-  static async validarLinkapsis(canchaId: number, validar: boolean, observaciones?: string, mediciones?: any): Promise<void> {
+  static async validarLinkapsis(
+    canchaId: number, 
+    validar: boolean, 
+    observaciones?: string, 
+    mediciones?: MedicionData,
+    esRevalidacion: boolean = false
+  ): Promise<void> {
     if (validar) {
       // Pasar a LlayLlay
       await supabase
@@ -201,7 +290,8 @@ export class CanchaService {
           tipo_validacion: 'espesores',
           resultado: 'validada',
           observaciones,
-          mediciones
+          mediciones,
+          is_revalidacion: esRevalidacion
         })
     } else {
       // Rechazar y volver a Besalco
@@ -227,7 +317,13 @@ export class CanchaService {
   }
 
   // Validar por LlayLlay
-  static async validarLlayLlay(canchaId: number, validar: boolean, observaciones?: string, mediciones?: any): Promise<void> {
+  static async validarLlayLlay(
+    canchaId: number, 
+    validar: boolean, 
+    observaciones?: string, 
+    mediciones?: MedicionData,
+    esRevalidacion: boolean = false
+  ): Promise<void> {
     if (validar) {
       // Devolver a AngloAmerican para cierre
       await supabase
@@ -257,7 +353,8 @@ export class CanchaService {
         tipo_validacion: 'densidad',
         resultado: validar ? 'validada' : 'rechazada',
         observaciones,
-        mediciones
+        mediciones,
+        is_revalidacion: esRevalidacion
       })
   }
 
