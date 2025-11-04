@@ -4,10 +4,12 @@
 // Props del componente
 interface Props {
   muroFilter?: string
+  drawingMode?: boolean
+  canchaId?: string
 }
 
-const { muroFilter } = Astro.props
-console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
+const { muroFilter, drawingMode = false, canchaId } = Astro.props
+console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, canchaId })
 ---
 
 <style>
@@ -117,7 +119,7 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
   }
 </style>
 
-<div class="map-container" data-muro-filter={muroFilter || ''}>
+<div class="map-container" data-muro-filter={muroFilter || ''} data-drawing-mode={drawingMode.toString()} data-cancha-id={canchaId || ''}>
   <div id="map"></div>
   
   <div class="map-controls">
@@ -209,6 +211,13 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
         try {
           setLoading(true);
           
+          // Verificar si estamos en modo de dibujo y obtener canchaId
+          const mapContainer = document.querySelector('.map-container');
+          const isDrawingMode = mapContainer?.getAttribute('data-drawing-mode') === 'true';
+          const canchaId = mapContainer?.getAttribute('data-cancha-id');
+          console.log('🎨 Modo de dibujo activo:', isDrawingMode);
+          console.log('🏷️ Cancha ID:', canchaId);
+          
           // CRÍTICO: Establecer el token ANTES de crear el mapa
           const token = await getMapboxToken();
           console.log('🔐 Token de Mapbox obtenido:', token ? 'Sí' : 'No');
@@ -254,6 +263,16 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
           // Configurar eventos del mapa
           setupMapEvents();
 
+          // Si estamos en modo de dibujo, configurar herramientas de dibujo
+          if (isDrawingMode) {
+            await setupDrawingTools();
+          }
+
+          // Si tenemos un canchaId, cargar y mostrar el polígono de la cancha
+          if (canchaId && canchaId !== '') {
+            await loadCanchaPolygon(canchaId);
+          }
+
           setLoading(false);
           console.log('🎉 Mapa inicializado completamente con todas las funcionalidades');
         } catch (err) {
@@ -265,14 +284,18 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
 
       async function loadGISData() {
         try {
+          console.log('🔄 Iniciando carga de datos GIS...');
+          
           // Cargar geojson estático desde public/mapbox-gis/
           const polygonsResponse = await fetch('/mapbox-gis/poligonos.geojson');
           if (!polygonsResponse.ok) throw new Error('No se pudo cargar poligonos');
           const polygonsData = await polygonsResponse.json();
+          console.log('📄 Polígonos cargados:', polygonsData.features?.length || 0);
 
           const sectorsResponse = await fetch('/mapbox-gis/sectores.geojson');
           if (!sectorsResponse.ok) throw new Error('No se pudo cargar sectores');
           const sectorsData = await sectorsResponse.json();
+          console.log('📄 Sectores cargados:', sectorsData.features?.length || 0);
 
           const convertedPolygons = {
             ...polygonsData,
@@ -308,18 +331,33 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
           // Agregar fuente raster del ortomosaico usando TileServer GL (puerto 8081)
           if (!map.getSource('ortomosaico')) {
             console.log('🗺️ Configurando fuente del ortomosaico con TileServer GL...');
+            
+            // Probar diferentes URLs del tileserver
+            const tileUrls = [
+              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.jpg',
+              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.png',
+              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.webp',
+              'http://localhost:8081/data/mapbase/tiles/{z}/{x}/{y}.jpg'
+            ];
+            
+            const tileUrl = tileUrls[0]; // Empezar con la primera
+            console.log('📡 URL de tiles configurada:', tileUrl);
+            console.log('📡 URLs alternativas disponibles:', tileUrls);
+            
             map.addSource('ortomosaico', {
               type: 'raster',
-              tiles: ['http://localhost:8081/data/mapbase/{z}/{x}/{y}.jpg'],
+              tiles: [tileUrl],
               tileSize: 256,
               minzoom: 10,
               maxzoom: 20,
               bounds: [-70.762292, -33.136471, -70.708471, -33.111063]
             });
+            console.log('✅ Fuente de ortomosaico agregada');
           }
 
           // PRIMERA CAPA: Ortomosaico como base (debajo de todo)
           if (!map.getLayer('raster-layer')) {
+            console.log('🗺️ Agregando capa de ortomosaico...');
             map.addLayer({ 
               id: 'raster-layer', 
               type: 'raster', 
@@ -327,6 +365,19 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
               paint: { 'raster-opacity': 1.0 } 
             });
             console.log('✅ Capa de ortomosaico agregada como base');
+            
+            // Escuchar errores específicos de la capa de tiles
+            map.on('sourcedata', function(e) {
+              if (e.sourceId === 'ortomosaico') {
+                console.log('📡 Estado de fuente ortomosaico:', e.type, e.isSourceLoaded);
+              }
+            });
+            
+            map.on('error', function(e) {
+              if (e.error && e.error.message && e.error.message.includes('ortomosaico')) {
+                console.error('❌ Error específico del ortomosaico:', e.error);
+              }
+            });
           }
 
           // SEGUNDA CAPA: Contornos de sectores (VISIBLE, sin relleno)
@@ -354,8 +405,12 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
           setupControls();
 
         } catch (error) {
-          console.error('Error loading GIS data:', error);
+          console.error('❌ Error loading GIS data:', error);
+          console.error('❌ Stack trace:', error.stack);
           showError('Error al cargar datos GIS: ' + (error.message || error));
+          
+          // No fallar completamente, intentar continuar sin datos GIS
+          console.log('⚠️ Continuando sin datos GIS...');
         }
       }
 
@@ -472,6 +527,224 @@ console.log('🏗️ MiningMap iniciado con muroFilter:', muroFilter)
         });
         
         console.log('🖱️ Eventos del mapa configurados');
+      }
+
+      // Configurar herramientas de dibujo
+      async function setupDrawingTools() {
+        try {
+          console.log('🎨 Configurando herramientas de dibujo...');
+          
+          // Importar MapboxDraw desde el paquete instalado
+          const MapboxDraw = (await import('@mapbox/mapbox-gl-draw')).default;
+          
+          // Crear instancia de draw con configuración personalizada
+          const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+              polygon: true,
+              trash: true
+            },
+            defaultMode: 'draw_polygon',
+            styles: [
+              // Estilo para polígonos activos (mientras se dibujan)
+              {
+                'id': 'gl-draw-polygon-fill-inactive',
+                'type': 'fill',
+                'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                'paint': {
+                  'fill-color': '#3b82f6',
+                  'fill-opacity': 0.2
+                }
+              },
+              {
+                'id': 'gl-draw-polygon-stroke-inactive',
+                'type': 'line',
+                'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                'layout': {
+                  'line-cap': 'round',
+                  'line-join': 'round'
+                },
+                'paint': {
+                  'line-color': '#3b82f6',
+                  'line-width': 3
+                }
+              },
+              // Estilo para vértices
+              {
+                'id': 'gl-draw-polygon-and-line-vertex-inactive',
+                'type': 'circle',
+                'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
+                'paint': {
+                  'circle-radius': 5,
+                  'circle-color': '#ffffff',
+                  'circle-stroke-color': '#3b82f6',
+                  'circle-stroke-width': 2
+                }
+              }
+            ]
+          });
+          
+          // Agregar el control al mapa
+          map.addControl(draw, 'top-left');
+          
+          // Configurar eventos del draw
+          map.on('draw.create', function(e) {
+            const coordinates = e.features[0].geometry.coordinates[0];
+            console.log('✅ Polígono creado:', coordinates);
+            
+            // Enviar las coordenadas al parent window
+            if (window.parent) {
+              window.parent.postMessage({
+                type: 'polygon-drawn',
+                coordinates: coordinates
+              }, '*');
+            }
+            
+            // Limpiar otros polígonos (solo uno a la vez)
+            const allFeatures = draw.getAll();
+            if (allFeatures.features.length > 1) {
+              // Mantener solo el último polígono dibujado
+              const latestFeature = allFeatures.features[allFeatures.features.length - 1];
+              draw.deleteAll();
+              draw.add(latestFeature);
+            }
+          });
+          
+          map.on('draw.update', function(e) {
+            const coordinates = e.features[0].geometry.coordinates[0];
+            console.log('📝 Polígono actualizado:', coordinates);
+            
+            // Enviar las coordenadas actualizadas al parent window
+            if (window.parent) {
+              window.parent.postMessage({
+                type: 'polygon-drawn',
+                coordinates: coordinates
+              }, '*');
+            }
+          });
+          
+          map.on('draw.delete', function() {
+            console.log('🗑️ Polígono eliminado');
+            
+            // Notificar al parent que se eliminó el polígono
+            if (window.parent) {
+              window.parent.postMessage({
+                type: 'polygon-deleted'
+              }, '*');
+            }
+          });
+          
+          console.log('✅ Herramientas de dibujo configuradas exitosamente');
+          
+        } catch (error) {
+          console.error('❌ Error al configurar herramientas de dibujo:', error);
+          showError('Error al cargar herramientas de dibujo: ' + (error as Error).message);
+        }
+      }
+
+      // Cargar y mostrar el polígono de una cancha específica
+      async function loadCanchaPolygon(canchaId) {
+        try {
+          console.log('🔍 Cargando polígono de cancha:', canchaId);
+          
+          // Hacer petición al API para obtener los datos de la cancha
+          const response = await fetch(`/api/canchas/${canchaId}`);
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+          }
+          
+          const data = await response.json();
+          console.log('📊 Respuesta completa de la API:', data);
+          
+          if (!data.success || !data.cancha) {
+            console.error('❌ Error en respuesta de API:', data);
+            return;
+          }
+          
+          const cancha = data.cancha;
+          console.log('📄 Datos de cancha extraídos:', {
+            id: cancha.id,
+            nombre: cancha.nombre,
+            poligono_presente: !!cancha.poligono_coordenadas,
+            tipo_poligono: typeof cancha.poligono_coordenadas,
+            es_array: Array.isArray(cancha.poligono_coordenadas),
+            longitud: cancha.poligono_coordenadas?.length || 0,
+            primeros_puntos: cancha.poligono_coordenadas?.slice(0, 3) || []
+          });
+          
+          // Verificar si la cancha tiene polígono
+          if (!cancha.poligono_coordenadas || !Array.isArray(cancha.poligono_coordenadas)) {
+            console.log('⚠️ Esta cancha no tiene polígono definido');
+            return;
+          }
+          
+          // Crear GeoJSON del polígono
+          const polygonGeoJSON = {
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [cancha.poligono_coordenadas]
+              },
+              properties: {
+                cancha_id: cancha.id,
+                cancha_nombre: cancha.nombre,
+                tipo: 'cancha_area'
+              }
+            }]
+          };
+          
+          // Agregar fuente del polígono al mapa
+          if (map.getSource('cancha-polygon')) {
+            map.removeSource('cancha-polygon');
+          }
+          
+          map.addSource('cancha-polygon', {
+            type: 'geojson',
+            data: polygonGeoJSON
+          });
+          
+          // Agregar capas del polígono
+          map.addLayer({
+            id: 'cancha-polygon-fill',
+            type: 'fill',
+            source: 'cancha-polygon',
+            paint: {
+              'fill-color': '#10b981', // Verde
+              'fill-opacity': 0.3
+            }
+          });
+          
+          map.addLayer({
+            id: 'cancha-polygon-stroke',
+            type: 'line',
+            source: 'cancha-polygon',
+            paint: {
+              'line-color': '#059669',
+              'line-width': 3,
+              'line-opacity': 0.8
+            }
+          });
+          
+          // Calcular bounds del polígono y centrar el mapa
+          const coordinates = cancha.poligono_coordenadas;
+          if (coordinates.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            coordinates.forEach(coord => bounds.extend(coord));
+            
+            map.fitBounds(bounds, {
+              padding: 50,
+              duration: 1000
+            });
+          }
+          
+          console.log('✅ Polígono de cancha mostrado exitosamente');
+          
+        } catch (error) {
+          console.error('❌ Error al cargar polígono de cancha:', error);
+          showError('Error al cargar el área de la cancha: ' + (error as Error).message);
+        }
       }
 
       // Inicializar cuando el DOM esté listo

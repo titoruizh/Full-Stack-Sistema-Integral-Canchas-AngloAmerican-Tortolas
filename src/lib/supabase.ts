@@ -31,6 +31,7 @@ export interface Cancha {
   created_at: string
   updated_at: string
   numero_informe?: number // Nuevo campo para el número correlativo
+  poligono_coordenadas?: any // Nuevo campo para coordenadas del polígono dibujado
 }
 
 export interface ContadorInforme {
@@ -112,6 +113,7 @@ export interface CanchaCompleta {
   created_at: string
   updated_at: string
   numero_informe?: number // Nuevo campo
+  poligono_coordenadas?: any // Nuevo campo para coordenadas del polígono
 }
 
 // Funciones auxiliares para el manejo de datos
@@ -180,6 +182,38 @@ export class CanchaService {
         empresa_actual_id: 1, // AngloAmerican
         created_by: 1,
         numero_informe: numeroInforme
+      })
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  }
+
+  // Crear nueva cancha con polígono (para AngloAmerican)
+  static async crearCanchaConPoligono(
+    muro: string, 
+    sector: string, 
+    nombreDetalle: string, 
+    poligonoCoordinadas: any
+  ): Promise<Cancha> {
+    const nombre = `${muro}_${sector}_${nombreDetalle}`
+    
+    // Obtener próximo número de informe
+    const numeroInforme = await this.obtenerProximoNumeroInforme()
+    
+    const { data, error } = await supabase
+      .from('canchas')
+      .insert({
+        nombre,
+        muro,
+        sector,
+        nombre_detalle: nombreDetalle,
+        estado_actual_id: 1, // Creada
+        empresa_actual_id: 1, // AngloAmerican
+        created_by: 1,
+        numero_informe: numeroInforme,
+        poligono_coordenadas: poligonoCoordinadas
       })
       .select()
       .single()

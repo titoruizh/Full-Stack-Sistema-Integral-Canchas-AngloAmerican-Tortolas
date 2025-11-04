@@ -1,10 +1,12 @@
 ---
 import MiningMap from '../components/MiningMap.astro'
 
-// Obtener el parámetro 'muro' de la URL
+// Obtener los parámetros de la URL
 const url = Astro.url
 const muro = url.searchParams.get('muro')
-console.log('🔧 Parámetro muro recibido:', muro)
+const drawing = url.searchParams.get('drawing') === 'true'
+const canchaId = url.searchParams.get('canchaId')
+console.log('🔧 Parámetros recibidos:', { muro, drawing, canchaId })
 ---
 
 <!doctype html>
@@ -12,14 +14,60 @@ console.log('🔧 Parámetro muro recibido:', muro)
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visor Mapbox - Integración</title>
+    <title>Visor Mapbox - {drawing ? 'Modo Dibujo' : 'Integración'}</title>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css" rel="stylesheet" />
-    <style>html,body{height:100%;margin:0;padding:0}body{font-family:Inter,Arial,Helvetica,sans-serif}</style>
+    {drawing && (
+      <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" />
+    )}
+    <style>
+      html,body{height:100%;margin:0;padding:0}
+      body{font-family:Inter,Arial,Helvetica,sans-serif}
+      
+      /* Estilos específicos para el modo dibujo */
+      .drawing-mode .map-controls {
+        top: 70px; /* Espacio para los controles de dibujo */
+      }
+      
+      .drawing-instructions {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        right: 16px;
+        z-index: 1000;
+        background: rgba(37, 99, 235, 0.95);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+      }
+      
+      /* Personalizar controles de Mapbox GL Draw */
+      .mapbox-gl-draw_ctrl-draw-btn {
+        background-color: #3b82f6;
+        color: white;
+      }
+      
+      .mapbox-gl-draw_ctrl-draw-btn:hover {
+        background-color: #2563eb;
+      }
+      
+      .mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_active {
+        background-color: #1d4ed8;
+      }
+    </style>
   </head>
-  <body>
+  <body class={drawing ? 'drawing-mode' : ''}>
+    {drawing && (
+      <div class="drawing-instructions">
+        🎨 <strong>Modo Dibujo:</strong> Haz clic en el ícono del polígono y dibuja el área de trabajo en el mapa
+      </div>
+    )}
+    
     <!-- Render the MiningMap component -->
     <main>
-      <MiningMap muroFilter={muro} />
+      <MiningMap muroFilter={muro || undefined} drawingMode={drawing} canchaId={canchaId || undefined} />
     </main>
   </body>
 </html>
