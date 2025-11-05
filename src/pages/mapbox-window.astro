@@ -31,16 +31,24 @@ console.log('🔧 Parámetros recibidos:', { muro, drawing, canchaId })
       .drawing-instructions {
         position: absolute;
         top: 16px;
-        left: 16px;
         right: 16px;
-        z-index: 1000;
-        background: rgba(37, 99, 235, 0.95);
+        z-index: 999;
+        background: rgba(37, 99, 235, 0.9);
         color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
         font-weight: 500;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        font-size: 0.85rem;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        max-width: 200px;
+        backdrop-filter: blur(10px);
+      }
+      
+      .drawing-mode-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
       }
       
       /* Personalizar controles de Mapbox GL Draw */
@@ -61,7 +69,7 @@ console.log('🔧 Parámetros recibidos:', { muro, drawing, canchaId })
   <body class={drawing ? 'drawing-mode' : ''}>
     {drawing && (
       <div class="drawing-instructions">
-        🎨 <strong>Modo Dibujo:</strong> Haz clic en el ícono del polígono y dibuja el área de trabajo en el mapa
+        <span class="drawing-mode-indicator">🎨 Modo Dibujo</span>
       </div>
     )}
     

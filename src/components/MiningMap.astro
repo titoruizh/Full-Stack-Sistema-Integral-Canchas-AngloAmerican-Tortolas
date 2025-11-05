@@ -465,8 +465,9 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
               ]);
               
               map.fitBounds([sw, ne], {
-                padding: 50,
-                duration: 1000
+                padding: 80,
+                duration: 2000, // Transición más suave y lenta
+                easing: (t) => t * (2 - t) // Easing suave
               });
               
               console.log(`🔒 Mapa bloqueado en muro ${filter}:`, [sw, ne]);
@@ -483,9 +484,10 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             map.setLayoutProperty('polygons-stroke', 'visibility', 'none');
             
             // Volver a la vista general
-            map.fitBounds(MAP_CONFIG.bounds, { 
+            map.fitBounds(MAP_CONFIG.bounds, {
               padding: 50,
-              duration: 1000 
+              duration: 1500, // Transición más suave
+              easing: (t) => t * (2 - t) // Easing suave
             });
             console.log('🔓 Mapa desbloqueado - Volviendo a vista general');
           }
@@ -727,19 +729,8 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             }
           });
           
-          // Calcular bounds del polígono y centrar el mapa
-          const coordinates = cancha.poligono_coordenadas;
-          if (coordinates.length > 0) {
-            const bounds = new mapboxgl.LngLatBounds();
-            coordinates.forEach(coord => bounds.extend(coord));
-            
-            map.fitBounds(bounds, {
-              padding: 50,
-              duration: 1000
-            });
-          }
-          
-          console.log('✅ Polígono de cancha mostrado exitosamente');
+          // No hacer zoom al polígono individual - dejar que el filtro de muro maneje la vista
+          console.log('✅ Polígono de cancha mostrado exitosamente - zoom manejado por filtro de muro');
           
         } catch (error) {
           console.error('❌ Error al cargar polígono de cancha:', error);
