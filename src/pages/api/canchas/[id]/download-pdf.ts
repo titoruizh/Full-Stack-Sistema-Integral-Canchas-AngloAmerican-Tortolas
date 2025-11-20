@@ -78,21 +78,21 @@ export const GET: APIRoute = async ({ params, request }) => {
       const validacionesLlayLlay = validaciones.filter(v => v.empresa_validadora_id === 4 && v.resultado === 'validada')
         .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       
-      // Obtener primera y segunda validación de cada empresa
+      // Obtener primera y última validación de cada empresa
       const validacionBesalco = validacionesBesalco[0] || null
-      const validacionBesalco2 = validacionesBesalco[1] || null
+      const validacionBesalco2 = validacionesBesalco.length > 1 ? validacionesBesalco[validacionesBesalco.length - 1] : null
       const validacionLinkapsis = validacionesLinkapsis[0] || null
-      const validacionLinkapsis2 = validacionesLinkapsis[1] || null
+      const validacionLinkapsis2 = validacionesLinkapsis.length > 1 ? validacionesLinkapsis[validacionesLinkapsis.length - 1] : null
       const validacionLlayLlay = validacionesLlayLlay[0] || null
-      const validacionLlayLlay2 = validacionesLlayLlay[1] || null
+      const validacionLlayLlay2 = validacionesLlayLlay.length > 1 ? validacionesLlayLlay[validacionesLlayLlay.length - 1] : null
       
       // DEBUG: Logs para ver la estructura de datos
       console.log('=== DEBUG VALIDACIONES ===')
       console.log('Cancha completa:', JSON.stringify(cancha, null, 2))
       console.log('Todas las validaciones:', JSON.stringify(validaciones, null, 2))
-      console.log('Validaciones Besalco (1ra y 2da):', { primera: validacionBesalco, segunda: validacionBesalco2 })
-      console.log('Validaciones Linkapsis (1ra y 2da):', { primera: validacionLinkapsis, segunda: validacionLinkapsis2 })
-      console.log('Validaciones LlayLlay (1ra y 2da):', { primera: validacionLlayLlay, segunda: validacionLlayLlay2 })
+      console.log(`Besalco: ${validacionesBesalco.length} validaciones -`, { primera: validacionBesalco, ultima: validacionBesalco2 })
+      console.log(`Linkapsis: ${validacionesLinkapsis.length} validaciones -`, { primera: validacionLinkapsis, ultima: validacionLinkapsis2 })
+      console.log(`LlayLlay: ${validacionesLlayLlay.length} validaciones -`, { primera: validacionLlayLlay, ultima: validacionLlayLlay2 })
       
       // Extraer datos de mediciones de las validaciones
       const medicionLinkapsis = validacionLinkapsis?.mediciones || {}
