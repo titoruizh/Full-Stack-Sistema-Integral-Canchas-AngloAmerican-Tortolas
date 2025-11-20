@@ -119,7 +119,7 @@ export const GET: APIRoute = async ({ params, request }) => {
         
         // Información de sector y nombre
         SECTOR: cancha.sector || '',
-        CANCHA_NAME: cancha.nombre_detalle || cancha.nombre || '',
+        CANCHA_NAME: (cancha.nombre_detalle || cancha.nombre || '').toUpperCase(),
         
         // Fechas principales
         FECHA_ANGLO: cancha.created_at ? 
@@ -127,7 +127,27 @@ export const GET: APIRoute = async ({ params, request }) => {
         
         // Datos de Linkapsis (Topografía)
         ESPESOR_LK: medicionLinkapsis.espesor || '',
-        TICKET_LK: '☐', // Checkbox para tipo de trabajo
+        
+        // Checkboxes según lo marcado por el usuario experto
+        TICKET_LK_C: (() => {
+          const tipoTrabajo = medicionLinkapsis.tipoTrabajo || []
+          return tipoTrabajo.includes('corte') ? '☑' : '☐'
+        })(),
+        
+        TICKET_LK_R: (() => {
+          const tipoTrabajo = medicionLinkapsis.tipoTrabajo || []
+          return tipoTrabajo.includes('relleno') ? '☑' : '☐'
+        })(),
+        
+        // LÓGICA ALTERNATIVA COMENTADA (basada en espesor automático):
+        // TICKET_LK_C: (() => {
+        //   const espesor = parseFloat(medicionLinkapsis.espesor)
+        //   return (!isNaN(espesor) && espesor < -0.1) ? '☑' : '☐'  // Corte si espesor < -0.1
+        // })(),
+        // TICKET_LK_R: (() => {
+        //   const espesor = parseFloat(medicionLinkapsis.espesor)
+        //   return (!isNaN(espesor) && espesor > 0.1) ? '☑' : '☐'   // Relleno si espesor > 0.1
+        // })(),
         
         // Coordenadas de puntos - ahora usando la estructura real
         P1_N: coordenadas.p1?.norte || '',
