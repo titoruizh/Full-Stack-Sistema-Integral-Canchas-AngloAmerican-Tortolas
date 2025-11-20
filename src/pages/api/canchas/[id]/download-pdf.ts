@@ -170,12 +170,10 @@ export const GET: APIRoute = async ({ params, request }) => {
         FIRMA_LL: '[Firma LlayLlay]',
         FIRMA2_LL: '[Firma LlayLlay 2]',
         
-        // Comentarios y observaciones - usando las observaciones reales
-        COMENTARIOS: [
-          validacionBesalco?.observaciones,
-          validacionLinkapsis?.observaciones, 
-          validacionLlayLlay?.observaciones
-        ].filter(Boolean).join(' | ') || cancha.observaciones || '',
+        // Comentarios y observaciones separados por empresa
+        COMENTARIOS_BESALCO: validacionBesalco?.observaciones || '',
+        COMENTARIOS_LINKAPSIS: validacionLinkapsis?.observaciones || '',
+        COMENTARIOS_LLAYLLAY: validacionLlayLlay?.observaciones || '',
         
         // Personal de AngloAmerican
         NOMBRE_AAQAQC: 'Ingeniero QA/QC',
