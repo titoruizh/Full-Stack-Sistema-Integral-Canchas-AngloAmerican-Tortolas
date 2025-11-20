@@ -65,6 +65,23 @@ export const GET: APIRoute = async ({ params, request }) => {
       })
     }
 
+    // Obtener usuarios de AngloAmerican para las firmas
+    const { data: usuariosAnglo, error: errorUsuarios } = await supabase
+      .from('vista_usuarios_completa')
+      .select('*')
+      .eq('empresa_id', 1) // AngloAmerican
+      .eq('activo', true)
+
+    if (errorUsuarios) {
+      console.error('Error al obtener usuarios de AngloAmerican:', errorUsuarios)
+    }
+
+    console.log('Usuarios AngloAmerican encontrados:', usuariosAnglo)
+
+    // Buscar usuarios específicos por rol
+    const usuarioQAQC = usuariosAnglo?.find(u => u.rol_nombre === 'Ingeniero QA/QC')
+    const usuarioJefeOps = usuariosAnglo?.find(u => u.rol_nombre === 'Jefe de Operaciones')
+
     // Extraer datos para el template
     function extraerDatosParaTemplate(cancha: any, validaciones: any[] = []) {
       // Buscar validaciones específicas por empresa_validadora_id
@@ -211,11 +228,11 @@ export const GET: APIRoute = async ({ params, request }) => {
         COMENTARIOS_LINKAPSIS: validacionLinkapsis?.observaciones || '',
         COMENTARIOS_LLAYLLAY: validacionLlayLlay?.observaciones || '',
         
-        // Personal de AngloAmerican
-        NOMBRE_AAQAQC: 'Ingeniero QA/QC',
-        FIRMA_AAQAQC: '[Firma QA/QC]',
-        NOMBRE_AAJO: 'Jefe de Operaciones',
-        FIRMA_AAJO: new Date().toLocaleDateString('es-ES')
+        // Personal de AngloAmerican (nombres reales desde la base de datos)
+        NOMBRE_AAQAQC: usuarioQAQC?.nombre_completo || 'Ingeniero QA/QC',
+        FIRMA_AAQAQC: usuarioQAQC ? '[Firma QA/QC]' : '[Sin asignar]',
+        NOMBRE_AAJO: usuarioJefeOps?.nombre_completo || 'Jefe de Operaciones',
+        FIRMA_AAJO: usuarioJefeOps ? new Date().toLocaleDateString('es-ES') : '[Sin asignar]'
       }
     }
 

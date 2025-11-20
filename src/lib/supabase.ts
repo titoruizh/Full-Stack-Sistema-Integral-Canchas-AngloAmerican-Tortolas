@@ -100,6 +100,44 @@ export interface TipoTrabajo {
   relleno: boolean
 }
 
+// Nuevas interfaces para sistema de usuarios y roles
+export interface Rol {
+  id: number
+  nombre: string
+  empresa_id: number
+  descripcion?: string
+  created_at: string
+}
+
+export interface Usuario {
+  id: number
+  nombre_completo: string
+  email?: string
+  empresa_id: number
+  rol_id: number
+  activo: boolean
+  password_hash?: string // Para autenticación básica (desarrollo)
+  created_at: string
+  updated_at: string
+}
+
+// Vista completa con información de empresa y rol
+export interface UsuarioCompleto {
+  id: number
+  nombre_completo: string
+  email?: string
+  activo: boolean
+  empresa_id: number
+  empresa_nombre: string
+  rol_id: number
+  rol_nombre: string
+  created_at: string
+}
+
+// Tipos de roles predefinidos por empresa
+export type RolAngloAmerican = 'Ingeniero QA/QC' | 'Jefe de Operaciones'
+export type RolOtrasEmpresas = 'Admin' | 'Operador'
+
 // Vista completa con joins
 export interface CanchaCompleta {
   id: number
@@ -475,5 +513,216 @@ export class CanchaService {
       .eq('id', canchaId)
     
     if (errorCancha) throw errorCancha
+  }
+}
+
+// =====================================================
+// SERVICIO PARA GESTIÓN DE ROLES
+// =====================================================
+export class RolService {
+  // Crear roles predeterminados para una empresa
+  static async crearRolesPorDefecto(empresaId: number): Promise<Rol[]> {
+    const rolesDefecto = this.obtenerRolesPorDefecto(empresaId)
+    
+    const { data, error } = await supabase
+      .from('roles')
+      .insert(rolesDefecto.map(rol => ({
+        nombre: rol.nombre,
+        empresa_id: empresaId,
+        descripcion: rol.descripcion
+      })))
+      .select()
+    
+    if (error) throw error
+    return data || []
+  }
+  
+  // Obtener roles por empresa
+  static async obtenerRolesPorEmpresa(empresaId: number): Promise<Rol[]> {
+    const { data, error } = await supabase
+      .from('roles')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('nombre')
+    
+    if (error) throw error
+    return data || []
+  }
+  
+  // Obtener todos los roles con información de empresa
+  static async obtenerTodosLosRoles(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('roles')
+      .select(`
+        *,
+        empresa:empresas!empresa_id(id, nombre)
+      `)
+      .order('empresa_id', { ascending: true })
+      .order('nombre', { ascending: true })
+    
+    if (error) throw error
+    return data || []
+  }
+  
+  // Definir roles por defecto según empresa
+  private static obtenerRolesPorDefecto(empresaId: number) {
+    switch (empresaId) {
+      case 1: // AngloAmerican
+        return [
+          { nombre: 'Ingeniero QA/QC', descripcion: 'Ingeniero de Control de Calidad' },
+          { nombre: 'Jefe de Operaciones', descripcion: 'Responsable de Operaciones' }
+        ]
+      case 2: // Besalco
+      case 3: // Linkapsis  
+      case 4: // LlayLlay
+      default:
+        return [
+          { nombre: 'Admin', descripcion: 'Administrador de la empresa' },
+          { nombre: 'Operador', descripcion: 'Operador de campo' }
+        ]
+    }
+  }
+}
+
+// =====================================================
+// SERVICIO PARA GESTIÓN DE USUARIOS
+// =====================================================
+export class UsuarioService {
+  // Crear nuevo usuario
+  static async crearUsuario(
+    nombreCompleto: string,
+    empresaId: number,
+    rolId: number,
+    email?: string
+  ): Promise<Usuario> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .insert({
+        nombre_completo: nombreCompleto,
+        email,
+        empresa_id: empresaId,
+        rol_id: rolId,
+        activo: true,
+        password_hash: await this.hashPassword('123') // Password por defecto para desarrollo
+      })
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  }
+  
+  // Obtener todos los usuarios con información completa
+  static async obtenerUsuariosCompletos(): Promise<UsuarioCompleto[]> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select(`
+        *,
+        empresa:empresas!empresa_id(id, nombre),
+        rol:roles!rol_id(id, nombre)
+      `)
+      .eq('activo', true)
+      .order('empresa_id')
+      .order('nombre_completo')
+    
+    if (error) throw error
+    
+    // Mapear a la estructura UsuarioCompleto
+    return (data || []).map(user => ({
+      id: user.id,
+      nombre_completo: user.nombre_completo,
+      email: user.email,
+      activo: user.activo,
+      empresa_id: user.empresa_id,
+      empresa_nombre: user.empresa?.nombre || '',
+      rol_id: user.rol_id,
+      rol_nombre: user.rol?.nombre || '',
+      created_at: user.created_at
+    }))
+  }
+  
+  // Obtener usuarios por empresa
+  static async obtenerUsuariosPorEmpresa(empresaId: number): Promise<UsuarioCompleto[]> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select(`
+        *,
+        empresa:empresas!empresa_id(id, nombre),
+        rol:roles!rol_id(id, nombre)
+      `)
+      .eq('empresa_id', empresaId)
+      .eq('activo', true)
+      .order('nombre_completo')
+    
+    if (error) throw error
+    
+    return (data || []).map(user => ({
+      id: user.id,
+      nombre_completo: user.nombre_completo,
+      email: user.email,
+      activo: user.activo,
+      empresa_id: user.empresa_id,
+      empresa_nombre: user.empresa?.nombre || '',
+      rol_id: user.rol_id,
+      rol_nombre: user.rol?.nombre || '',
+      created_at: user.created_at
+    }))
+  }
+  
+  // Autenticación básica para desarrollo
+  static async autenticarUsuario(empresaId: number, nombreCompleto: string, password: string): Promise<Usuario | null> {
+    if (password !== '123') {
+      return null // Password incorrecto
+    }
+    
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .eq('nombre_completo', nombreCompleto)
+      .eq('activo', true)
+      .single()
+    
+    if (error || !data) {
+      return null
+    }
+    
+    return data
+  }
+  
+  // Obtener usuarios por rol específico (para PDF)
+  static async obtenerUsuarioPorRol(empresaId: number, nombreRol: string): Promise<Usuario | null> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select(`
+        *,
+        rol:roles!rol_id(nombre)
+      `)
+      .eq('empresa_id', empresaId)
+      .eq('activo', true)
+    
+    if (error) throw error
+    
+    // Buscar usuario que tenga el rol específico
+    const usuario = (data || []).find(user => user.rol?.nombre === nombreRol)
+    
+    return usuario || null
+  }
+  
+  // Desactivar usuario (soft delete)
+  static async desactivarUsuario(usuarioId: number): Promise<void> {
+    const { error } = await supabase
+      .from('usuarios')
+      .update({ activo: false, updated_at: new Date().toISOString() })
+      .eq('id', usuarioId)
+    
+    if (error) throw error
+  }
+  
+  // Hash simple para desarrollo (usar bcrypt en producción)
+  private static async hashPassword(password: string): Promise<string> {
+    // Para desarrollo, simplemente retorna el password
+    // En producción usar: await bcrypt.hash(password, 10)
+    return password
   }
 }
