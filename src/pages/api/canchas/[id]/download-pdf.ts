@@ -90,18 +90,32 @@ export const GET: APIRoute = async ({ params, request }) => {
       console.log('Medición LlayLlay:', JSON.stringify(medicionLlayLlay, null, 2))
       console.log('Coordenadas extraídas:', JSON.stringify(coordenadas, null, 2))
       
-      // Determinar qué muro marcar según el campo 'muro' de la cancha
+      // Determinar el nombre del muro según el código
       const muroCancha = cancha.muro || ''
-      console.log('Muro de la cancha:', muroCancha)
+      let nombreMuro = ''
+      
+      switch (muroCancha) {
+        case 'MP':
+          nombreMuro = 'PRINCIPAL'
+          break
+        case 'MO':
+          nombreMuro = 'OESTE'
+          break
+        case 'ME':
+          nombreMuro = 'ESTE'
+          break
+        default:
+          nombreMuro = muroCancha || 'N/A'
+      }
+      
+      console.log('Muro de la cancha:', muroCancha, '-> Nombre:', nombreMuro)
 
       return {
         // Encabezado principal
         NUMERO_CN: cancha.numero_informe || '',
         
-        // Checkboxes de muros según el muro de la cancha
-        TICKET_CNP: muroCancha === 'MP' ? '☑' : '☐', // Muro Principal
-        TICKET_CNO: muroCancha === 'MO' ? '☑' : '☐', // Muro Oeste  
-        TICKET_CNE: muroCancha === 'ME' ? '☑' : '☐', // Muro Este
+        // Información del muro (nombre legible)
+        MURO: nombreMuro,
         
         // Información de sector y nombre
         SECTOR: cancha.sector || '',

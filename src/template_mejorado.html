@@ -1,173 +1,232 @@
-<div>
-<p>&nbsp;</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe Control de Calidad</title>
+    <style>
+        /* ESTILOS GENERALES */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px; /* Reducido ligeramente para asegurar espacio */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .page-container {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: white;
+            padding: 10mm 15mm; /* Márgenes verticales reducidos */
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px; /* Menos espacio entre tablas */
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 4px 5px; /* Padding reducido para compactar */
+            vertical-align: middle;
+        }
+
+        /* Clases Utilitarias */
+        .text-center { text-align: center; }
+        .text-bold { font-weight: bold; }
+        .text-right { text-align: right; }
+        .bg-gray { background-color: #e0e0e0; }
+        
+        /* Títulos de Sección */
+        .section-header {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 4px;
+            border: 1px solid #000;
+            border-bottom: none; /* Para unir con la tabla de abajo */
+            margin-top: 10px;
+        }
+        
+        /* Cajas de Firmas Compactas */
+        .signature-box {
+            height: 35px; /* Altura reducida drásticamente */
+            border-top: 1px dashed #ccc;
+            margin-top: 5px;
+            padding-top: 2px;
+            color: #666;
+            font-size: 10px;
+        }
+
+        .main-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        /* Ajustes para impresión */
+        @media print {
+            body { background-color: white; padding: 0; }
+            .page-container { box-shadow: none; margin: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+
+    <table>
+        <tr>
+            <td class="text-center main-title" style="width: 60%;">CONTROL DE CALIDAD CANCHAS</td>
+            <td class="text-center" style="width: 40%;">
+                <strong>N° INFORME:</strong> {{NUMERO_CN}}
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td class="bg-gray text-bold" style="width: 10%;">MURO:</td>
+            <td style="width: 15%;">
+                {{MURO}}
+            </td>
+            <td class="bg-gray text-bold" style="width: 10%;">SECTOR:</td>
+            <td style="width: 15%;">{{SECTOR}}</td>
+            <td class="bg-gray text-bold" style="width: 10%;">FECHA:</td>
+            <td style="width: 40%;">{{FECHA_ANGLO}}</td>
+        </tr>
+        <tr>
+            <td class="bg-gray text-bold" colspan="2">NOMBRE CANCHA:</td>
+            <td colspan="4" class="text-center">{{CANCHA_NAME}}</td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td colspan="4" class="text-center">
+                <strong>Espesor Promedio [m]:</strong> {{ESPESOR_LK}} &nbsp;|&nbsp; 
+                <strong>Requiere Corte:</strong> {{TICKET_LK}} &nbsp;|&nbsp; 
+                <strong>Requiere Relleno:</strong> {{TICKET_LK}}
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <thead>
+            <tr class="bg-gray">
+                <th style="width: 10%;">PUNTO</th>
+                <th style="width: 30%;">NORTE</th>
+                <th style="width: 30%;">ESTE</th>
+                <th style="width: 30%;">COTA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-center text-bold">P1</td>
+                <td class="text-center">{{P1_N}}</td>
+                <td class="text-center">{{P1_E}}</td>
+                <td class="text-center">{{P1_C}}</td>
+            </tr>
+            <tr>
+                <td class="text-center text-bold">P2</td>
+                <td class="text-center">{{P2_N}}</td>
+                <td class="text-center">{{P2_E}}</td>
+                <td class="text-center">{{P2_C}}</td>
+            </tr>
+            <tr>
+                <td class="text-center text-bold">P3</td>
+                <td class="text-center">{{P3_N}}</td>
+                <td class="text-center">{{P3_E}}</td>
+                <td class="text-center">{{P3_C}}</td>
+            </tr>
+            <tr>
+                <td class="text-center text-bold">P4</td>
+                <td class="text-center">{{P4_N}}</td>
+                <td class="text-center">{{P4_E}}</td>
+                <td class="text-center">{{P4_C}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="section-header">RECEPCIÓN EMPRESA MOVIMIENTO DE TIERRA</div>
+    <table style="margin-top: 0;">
+        <tr>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 1</strong> - {{FECHA_BS}}<br>
+                <div class="signature-box">{{FIRMA_BS}}</div>
+            </td>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 2</strong> - {{FECHA2_BS}}<br>
+                <div class="signature-box">{{FIRMA2_BS}}</div>
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-bottom: 0; border-bottom: none;">
+        <tr>
+            <td class="bg-gray text-bold" style="border-bottom: none;">RECEPCIÓN EMPRESA TOPOGRAFÍA</td>
+            <td class="text-right bg-gray" style="border-bottom: none;">PROTOCOLO N° {{NUM_PLK}}</td>
+        </tr>
+    </table>
+    <table style="margin-top: 0;">
+        <tr>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 1</strong> - {{FECHA_LK}}<br>
+                <div class="signature-box">{{FIRMA_LK}}</div>
+            </td>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 2</strong> - {{FECHA2_LK}}<br>
+                <div class="signature-box">{{FIRMA2_LK}}</div>
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-bottom: 0; border-bottom: none;">
+        <tr>
+            <td class="bg-gray text-bold" style="border-bottom: none;">RECEPCIÓN LABORATORIO</td>
+            <td class="text-right bg-gray" style="border-bottom: none;">FICHA CONTROL N° {{NUM_PLL}}</td>
+        </tr>
+    </table>
+    <table style="margin-top: 0;">
+        <tr>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 1</strong> - {{FECHA_LL}}<br>
+                <div class="signature-box">{{FIRMA_LL}}</div>
+            </td>
+            <td class="text-center" style="width: 50%;">
+                <strong>ENTREGA 2</strong> - {{FECHA2_LL}}<br>
+                <div class="signature-box">{{FIRMA2_LL}}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-header">COMENTARIOS
+  
+  </div>
+    <div style="border: 1px solid #000; height: 50px; padding: 5px; margin-bottom: 10px; font-size: 11px;">
+        {{COMENTARIOS}}
+    </div>
+    <table>
+        <tr>
+            <td class="text-center" style="width: 50%; padding: 5px;">
+                <strong style="font-size: 10px;">INGENIERO QA/QC</strong>
+                <div style="margin-top: 5px; text-align: left; font-size: 10px;">NOMBRE: {{NOMBRE_AAQAQC}}</div>
+                <div class="signature-box" style="height: 25px; margin-top: 2px;">FIRMA: {{FIRMA_AAQAQC}}</div>
+            </td>
+            <td class="text-center" style="width: 50%; padding: 5px;">
+                <strong style="font-size: 10px;">JEFE DE OPERACIONES</strong>
+                <div style="margin-top: 5px; text-align: left; font-size: 10px;">NOMBRE: {{NOMBRE_AAJO}}</div>
+                <div class="signature-box" style="height: 25px; margin-top: 2px;">FECHA: {{FIRMA_AAJO}}</div>
+            </td>
+        </tr>
+    </table>
+
 </div>
-<div>
-<div>
-<div>
-<div>
-<table style="border-collapse: collapse; width: 100%; height: 37px;" border="1">
-<tbody>
-<tr style="height: 19px;">
-<td style="width: 56.1644%; text-align: center; height: 19px;">CONTROL DE CALIDAD CANCHAS</td>
-<td style="width: 43.8356%; text-align: center; height: 19px;">N° INFORME <code class="">{{NUMERO_CN}}</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div>
-<div>
-<div>
-<div>
-<table style="border-collapse: collapse; width: 100%; height: 51px;" border="1">
-<tbody>
-<tr style="height: 18px;">
-<td style="width: 100%; height: 18px; text-align: center;">
-<pre class="CodeBlock-module__code--gyjSL" tabindex="0"><span style="font-family: Verdana, Arial, Helvetica, sans-serif;">{{TICKET_CN}}Muro Principal   {{TICKET_CN}}Muro Oeste  {{TICKET_CN}}Muro Este</span></pre>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div>
-<div>
-<div>
-<div>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 100%; text-align: center;">
-<p>SECTOR {{SECTOR}}     NOMBRE  {{CANCHA_NAME}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div>
-<table style="border-collapse: collapse; width: 100%; height: 46px;" border="1">
-<tbody>
-<tr style="height: 46px;">
-<td style="width: 100%; height: 46px;">
-<p style="text-align: center;">ENTREGA SECTOR PARA PREPARACION  {{FECHA_ANGLO}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%; height: 18px;" border="1">
-<tbody>
-<tr style="height: 18px;">
-<td style="width: 100%; height: 18px;">
-<p>Espesor promedio [m] {{ESPESOR_LK}}   Requiere: Corte {{TICKET_LK}} Relleno {{TICKET_LK}}</p>
-<p style="text-align: center;">P1 NORTE {{P1_N}}                 P1 ESTE {{P1_E}}                  P1 COTA {{P1_C}}</p>
-<p style="text-align: center;">P2 NORTE {{P2_N}}                 P2 ESTE {{P2_E}}                  P2 COTA {{P2_C}}</p>
-<p style="text-align: center;">P3 NORTE {{P3_N}}                 P3 ESTE {{P3_E}}                  P3_COTA {{P3_C}}</p>
-<p style="text-align: center;">P4 NORTE {{P4_N}}                 P4 ESTE {{P4_E}}                  P4_COTA {{P4_C}}</p>
-<p style="text-align: center;">RECEPCIONADO POR:</p>
-<p style="text-align: center;">{{NOMBRE}}</p>
-<p style="text-align: center;">{{FIRMA}}</p>
-</td>
-</tr>
-<tr>
-<td style="width: 100%;">
-<p>RECEPCION EMPRESA MOVIMIENTO DE TIERRA</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<table style="border-collapse: collapse; width: 100%; height: 18px;" border="1">
-<tbody>
-<tr style="height: 18px;">
-<td style="width: 50%; text-align: center; height: 18px;">
-<p>ENTREGA 1   FECHA {{FECHA_BS}}</p>
-<p>RECEPCIONADO POR: {{FIRMA_BS}}</p>
-</td>
-<td style="width: 50%; text-align: center; height: 18px;">
-<p>ENTREGA 2   FECHA {{FECHA2_BS}}</p>
-<p>RECEPCIONADO POR: {{FIRMA2_BS}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 100%;">
-<p>RECEPCION EMPRESA TOPOGRAFIA                                                         PROTOCOLO N° {{NUM_PLK}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 50%; text-align: center;">
-<p>ENTREGA 1   FECHA {{FECHA_LK}}</p>
-<p>RECEPCIONADO POR: {{FIRMA_LK}}</p>
-</td>
-<td style="width: 50%; text-align: center;">
-<p>ENTREGA 2   FECHA {{FECHA2_LK}}</p>
-<p>RECEPCIONADO POR: {{FIRMA2_LK}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 100%;">
-<p>RECEPCION LABORATORIO                                                                FICHA CONTROL N° {{NUM_PLL}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 50%;">
-<p style="text-align: center;">ENTREGA 1   FECHA {{FECHA_LL}}</p>
-<p style="text-align: center;">RECEPCIONADO POR: {{FIRMA_LL}}</p>
-</td>
-<td style="width: 50%;">
-<p style="text-align: center;">ENTREGA 2   FECHA {{FECHA2_LL}}</p>
-<p style="text-align: center;">RECEPCIONADO POR: {{FIRMA2_LL}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 100%;">
-<p>COMENTARIOS : {{COMENTARIOS}}</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-</td>
-</tr>
-</tbody>
-</table>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 50%;">
-<p>INGENIERO QA/QC</p>
-<p>NOMBRE: {{NOMBRE_AAQAQC}}</p>
-<p>FIRMA: {{FIRMA_AAQAQC}}</p>
-</td>
-<td style="width: 50%;">
-<p>JEFE DE OPERACIONES</p>
-<p>NOMBRE: {{NOMBRE_AAJO}}</p>
-<p>FECHA: {{FIRMA_AAJO}}</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p>&nbsp;</p>
+
+</body>
+</html>
