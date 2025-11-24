@@ -705,16 +705,160 @@ import AuthGuard from '../components/AuthGuard.astro';
         background: #229954;
       }
       
-      .resultados-info {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #3498db;
+      /* Layout principal de filtros */
+      .filtros-main-layout {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: start;
       }
       
-      #contador-resultados {
-        font-weight: 600;
+      .filtros-controls {
+        flex: 1;
+      }
+      
+      /* Sidebar de estadísticas */
+      .stats-sidebar {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        min-width: 400px;
+      }
+      
+      .stats-sidebar .stat-card {
+        flex: 1;
+        min-width: 180px;
+      }
+      
+      .stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e1e8ed;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+      
+      .stat-card:hover::before {
+        width: 8px;
+      }
+      
+      .stat-primary::before {
+        background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+      }
+      
+      .stat-info::before {
+        background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%);
+      }
+      
+      .stat-success::before {
+        background: linear-gradient(180deg, #27ae60 0%, #229954 100%);
+      }
+      
+      .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+      }
+      
+      .stat-card:hover .stat-icon {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      
+      .stat-content {
+        flex: 1;
+      }
+      
+      .stat-number, .stat-percentage {
+        font-size: 2.2rem;
+        font-weight: 800;
         color: #2c3e50;
+        margin-bottom: 0.25rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        line-height: 1;
+      }
+      
+      .stat-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .stat-primary .stat-number {
+        color: #3498db;
+      }
+      
+      .stat-info .stat-number {
+        color: #9b59b6;
+      }
+      
+      .stat-success .stat-percentage {
+        color: #27ae60;
+      }
+      
+      @media (max-width: 1024px) {
+        .filtros-main-layout {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        
+        .stats-sidebar {
+          justify-content: center;
+          min-width: unset;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .stats-sidebar {
+          gap: 0.8rem;
+        }
+        
+        .stats-sidebar .stat-card {
+          padding: 1.25rem;
+          min-width: 160px;
+        }
+        
+        .stat-number {
+          font-size: 1.8rem;
+        }
+        
+        .stat-icon {
+          font-size: 2rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .stats-sidebar {
+          flex-direction: column;
+          gap: 1rem;
+        }
+        
+        .stats-sidebar .stat-card {
+          min-width: unset;
+        }
       }
       
       /* Estilos para formularios de validación */
@@ -1735,38 +1879,58 @@ import AuthGuard from '../components/AuthGuard.astro';
           <!-- Filtros -->
           <div class="filtros-container">
             <h3>Filtros</h3>
-            <div class="filtros-row">
-              <div class="filtro-group">
-                <label>Vista:</label>
-                <div class="toggle-group">
-                  <button id="btn-vista-acciones" class="toggle-btn active">Mis Acciones</button>
-                  <button id="btn-vista-historico" class="toggle-btn">Ver Histórico</button>
+            <!-- Layout principal con controles a la izquierda y stats a la derecha -->
+            <div class="filtros-main-layout">
+              <!-- Controles de filtros -->
+              <div class="filtros-controls">
+                <div class="filtros-row">
+                  <div class="filtro-group">
+                    <label>Vista:</label>
+                    <div class="toggle-group">
+                      <button id="btn-vista-acciones" class="toggle-btn active">Mis Acciones</button>
+                      <button id="btn-vista-historico" class="toggle-btn">Ver Histórico</button>
+                    </div>
+                  </div>
+                  
+                  <div class="filtro-group">
+                    <label for="filtro-fecha">Filtro de Fecha:</label>
+                    <select id="filtro-fecha">
+                      <option value="all">Todas las fechas</option>
+                      <option value="today">Hoy</option>
+                      <option value="week">Última semana</option>
+                      <option value="month">Último mes</option>
+                      <option value="custom">Rango personalizado</option>
+                    </select>
+                  </div>
+                  
+                  <div id="rango-fechas" class="filtro-group rango-fechas hidden">
+                    <label>Desde:</label>
+                    <input type="date" id="fecha-desde">
+                    <label>Hasta:</label>
+                    <input type="date" id="fecha-hasta">
+                    <button id="btn-aplicar-rango" type="button">Aplicar</button>
+                  </div>
                 </div>
               </div>
               
-              <div class="filtro-group">
-                <label for="filtro-fecha">Filtro de Fecha:</label>
-                <select id="filtro-fecha">
-                  <option value="all">Todas las fechas</option>
-                  <option value="today">Hoy</option>
-                  <option value="week">Última semana</option>
-                  <option value="month">Último mes</option>
-                  <option value="custom">Rango personalizado</option>
-                </select>
+              <!-- Dashboard de Estadísticas en sidebar -->
+              <div class="stats-sidebar">
+                <div class="stat-card stat-primary">
+                  <div class="stat-icon">⚙️</div>
+                  <div class="stat-content">
+                    <div class="stat-number" id="stat-acciones">-</div>
+                    <div class="stat-label">Acciones Disponibles</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card stat-info">
+                  <div class="stat-icon">📋</div>
+                  <div class="stat-content">
+                    <div class="stat-number" id="stat-total">-</div>
+                    <div class="stat-label">Total de Canchas</div>
+                  </div>
+                </div>
               </div>
-              
-              <div id="rango-fechas" class="filtro-group rango-fechas hidden">
-                <label>Desde:</label>
-                <input type="date" id="fecha-desde">
-                <label>Hasta:</label>
-                <input type="date" id="fecha-hasta">
-                <button id="btn-aplicar-rango" type="button">Aplicar</button>
-              </div>
-            </div>
-            
-            <!-- Contador de resultados -->
-            <div class="resultados-info">
-              <span id="contador-resultados">Cargando...</span>
             </div>
           </div>
         </div>
@@ -2075,7 +2239,7 @@ import AuthGuard from '../components/AuthGuard.astro';
       const btnAbrirModalCrear = document.getElementById('btn-abrir-modal-crear')
       const canchasTBody = document.getElementById('canchas-tbody')
       const mensajeContainer = document.getElementById('mensaje-container')
-      const contadorResultados = document.getElementById('contador-resultados')
+      // Elementos del dashboard de estadísticas (reemplaza contador-resultados)
       
       // Elementos de filtros
       const btnVistaAcciones = document.getElementById('btn-vista-acciones')
@@ -2467,11 +2631,45 @@ import AuthGuard from '../components/AuthGuard.astro';
       }
 
       function actualizarContadorResultados(mostradas, total) {
-        const texto = vistaActual === 'acciones' 
-          ? `${mostradas} acción(es) disponible(s) de ${total} canchas totales`
-          : `${mostradas} de ${total} canchas`
+        const statAcciones = document.getElementById('stat-acciones')
+        const statTotal = document.getElementById('stat-total')
         
-        contadorResultados.textContent = texto
+        if (!statAcciones || !statTotal) return
+        
+        // Actualizar números con animación
+        animateNumber(statAcciones, parseInt(statAcciones.textContent) || 0, mostradas)
+        animateNumber(statTotal, parseInt(statTotal.textContent) || 0, total)
+        
+        // Actualizar etiquetas según la vista
+        const accionLabel = document.querySelector('#stat-acciones').parentElement.querySelector('.stat-label')
+        if (vistaActual === 'acciones') {
+          accionLabel.textContent = 'Acciones Disponibles'
+        } else {
+          accionLabel.textContent = 'Canchas Mostradas'
+        }
+      }
+      
+      // Función para animar números
+      function animateNumber(element, start, end, suffix = '') {
+        const duration = 800
+        const startTime = Date.now()
+        
+        function update() {
+          const elapsed = Date.now() - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          
+          // Easing function (ease-out)
+          const easedProgress = 1 - Math.pow(1 - progress, 3)
+          const current = Math.round(start + (end - start) * easedProgress)
+          
+          element.textContent = current + suffix
+          
+          if (progress < 1) {
+            requestAnimationFrame(update)
+          }
+        }
+        
+        update()
       }
 
       // === FUNCIÓN DE CREACIÓN DE CANCHAS ===
