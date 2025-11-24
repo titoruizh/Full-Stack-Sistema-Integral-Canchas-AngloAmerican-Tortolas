@@ -923,23 +923,27 @@ import AuthGuard from '../components/AuthGuard.astro';
       /* Estilos para historial de observaciones */
       .historial-observaciones {
         margin: 1rem 0;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
         border-left: 4px solid #3498db;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
       
       .historial-observaciones h4 {
-        margin: 0 0 1rem 0;
-        font-size: 1.1rem;
+        margin: 0 0 1.5rem 0;
+        font-size: 1.3rem;
         color: #2c3e50;
         text-align: center;
-        border-bottom: 2px solid #3498db;
-        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
       
       .historial-content {
-        max-height: 300px;
+        max-height: 400px;
         overflow-y: auto;
         padding-right: 0.5rem;
       }
@@ -1067,46 +1071,127 @@ import AuthGuard from '../components/AuthGuard.astro';
       /* Nuevos estilos para historial mejorado */
       .historial-entry {
         background: #ffffff;
-        border: 1px solid #e1e8ed;
-        border-radius: 8px;
-        padding: 1.25rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: box-shadow 0.3s ease;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        position: relative;
       }
       
       .historial-entry:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+      }
+      
+      .historial-entry::after {
+        content: '────────────────────────────────────────────────────────';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #bdc3c7;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        text-align: center;
+        width: 100%;
+        z-index: 1;
+      }
+      
+      .historial-entry:last-child::after {
+        display: none;
       }
       
       .empresa-nombre {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.2px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      
+      /* Colores específicos por empresa */
+      .historial-entry.empresa-besalco {
+        border-left: 6px solid #e74c3c;
+        background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+      }
+      
+      .historial-entry.empresa-besalco .empresa-nombre {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+      }
+      
+      .historial-entry.empresa-linkapsis {
+        border-left: 6px solid #f39c12;
+        background: linear-gradient(135deg, #fffaf5 0%, #ffffff 100%);
+      }
+      
+      .historial-entry.empresa-linkapsis .empresa-nombre {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+      }
+      
+      .historial-entry.empresa-llayllay {
+        border-left: 6px solid #27ae60;
+        background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
+      }
+      
+      .historial-entry.empresa-llayllay .empresa-nombre {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+      }
+      
+      .historial-entry.empresa-angloamerican {
+        border-left: 6px solid #3498db;
+        background: linear-gradient(135deg, #f5f9ff 0%, #ffffff 100%);
+      }
+      
+      .historial-entry.empresa-angloamerican .empresa-nombre {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
       }
       
       .fecha-linea, .observacion-linea, .medicion-linea {
-        margin-bottom: 0.5rem;
-        line-height: 1.5;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        padding: 0.5rem 0;
       }
       
       .fecha-label, .observacion-label, .medicion-label {
-        font-weight: 600;
-        color: #34495e;
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 1rem;
+        display: inline-block;
+        min-width: 120px;
+      }
+      
+      .observacion-linea {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+        font-style: italic;
+        font-size: 1.05rem;
       }
       
       .medicion-linea {
-        color: #2c3e50;
-        font-size: 0.95rem;
+        background: linear-gradient(135deg, #e8f4fd 0%, #d1ecf1 100%);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #bee5eb;
+        font-size: 1rem;
       }
       
       .medicion-linea strong {
-        color: #27ae60;
+        color: #155724;
         font-family: 'Courier New', monospace;
-        font-size: 1rem;
+        font-size: 1.1rem;
+        font-weight: 800;
       }
       
       .hidden {
@@ -2771,7 +2856,7 @@ import AuthGuard from '../components/AuthGuard.astro';
           } else {
             content.innerHTML = `
               <div class="historial-timeline">
-                ${validaciones.map(val => {
+                ${validaciones.map((val, index) => {
                   let medicionesHtml = ''
                   
                   if (val.mediciones) {
@@ -2779,20 +2864,20 @@ import AuthGuard from '../components/AuthGuard.astro';
                       // Mediciones de Linkapsis (formato anterior)
                       medicionesHtml = `
                         <div class="medicion-linea">
-                          <span class="medicion-label">Medición de Espesor:</span> <strong>${val.mediciones.espesores.join(', ')} ${val.mediciones.unidad}</strong>
-                          ${val.mediciones.promedio ? `<br><span style="font-size: 0.9rem; color: #666;">Promedio: <strong>${val.mediciones.promedio} ${val.mediciones.unidad}</strong></span>` : ''}
+                          <span class="medicion-label">📏 Medición de Espesor:</span> <strong>${val.mediciones.espesores.join(', ')} ${val.mediciones.unidad || 'metros'}</strong>
+                          ${val.mediciones.promedio ? `<br><span style="font-size: 0.95rem; color: #666; margin-left: 1.5rem;">📊 Promedio: <strong>${val.mediciones.promedio} ${val.mediciones.unidad || 'metros'}</strong></span>` : ''}
                         </div>`
                     } else if (val.mediciones.espesor) {
                       // Nueva medición de Linkapsis
                       medicionesHtml = `
                         <div class="medicion-linea">
-                          <span class="medicion-label">Medición de Espesor:</span> <strong>${val.mediciones.espesor} ${val.mediciones.unidad}</strong>
+                          <span class="medicion-label">📏 Medición de Espesor:</span> <strong>${val.mediciones.espesor} ${val.mediciones.unidad || 'metros'}</strong>
                         </div>`
                     } else if (val.mediciones.densidad) {
                       // Mediciones de LlayLlay
                       medicionesHtml = `
                         <div class="medicion-linea">
-                          <span class="medicion-label">Medición de Densidad:</span> <strong>${val.mediciones.densidad} ${val.mediciones.unidad}</strong>
+                          <span class="medicion-label">⚖️ Medición de Densidad:</span> <strong>${val.mediciones.densidad} ${val.mediciones.unidad || 'g/cm³'}</strong>
                         </div>`
                     }
                   }
@@ -2802,9 +2887,9 @@ import AuthGuard from '../components/AuthGuard.astro';
                   
                   return `
                     <div class="historial-entry empresa-${empresaClass}">
-                      <div class="empresa-nombre">${empresaNombre}</div>
+                      <div class="empresa-nombre">🏢 ${empresaNombre}</div>
                       <div class="fecha-linea">
-                        <span class="fecha-label">Fecha:</span> ${new Date(val.created_at).toLocaleDateString('es-ES', {
+                        <span class="fecha-label">📅 Fecha:</span> ${new Date(val.created_at).toLocaleDateString('es-ES', {
                           weekday: 'short',
                           year: 'numeric',
                           month: 'short',
@@ -2814,7 +2899,7 @@ import AuthGuard from '../components/AuthGuard.astro';
                         })}
                       </div>
                       <div class="observacion-linea">
-                        <span class="observacion-label">Observaciones:</span> "${val.observaciones || 'Sin observaciones específicas'}"
+                        <span class="observacion-label">💬 Observaciones:</span> "${val.observaciones || 'Sin observaciones específicas'}"
                       </div>
                       ${medicionesHtml}
                     </div>`
