@@ -212,7 +212,7 @@ async function cargarUsuarioAutenticado(usuario) {
         // Actualizar columna de administración
         actualizarColumnaAdmin()
 
-        mostrarMensaje(`¡Bienvenido, ${usuario.nombre_completo}!`, 'success')
+        // Mensaje de bienvenida eliminado para evitar duplicados
 
     } catch (error) {
         console.error('Error cargando usuario:', error)

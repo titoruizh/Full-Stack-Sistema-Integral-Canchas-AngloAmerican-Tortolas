@@ -183,16 +183,156 @@ const logosMap = {
         }
 
         @media (max-width: 768px) {
-            .main-title { font-size: 2.5rem; }
-            .companies-row { 
-                grid-template-columns: 1fr;
-                gap: 2rem; 
-                max-width: 320px;
-            }
-            .company-card { height: 240px; }
+          .main-title { font-size: 2.5rem; }
+          .companies-row { 
+            grid-template-columns: 1fr;
+            gap: 2rem; 
+            max-width: 320px;
+          }
+          .company-card { height: 240px; }
         }
-
-        /* VISTA 2: FORMULARIO DE LOGIN */
+        
+        /* Modal de Bienvenida */
+        .welcome-modal {
+          display: none;
+          position: fixed;
+          z-index: 10000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(8px);
+          animation: fadeInModal 0.3s ease-out;
+        }
+        
+        .welcome-modal.show {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .welcome-modal-content {
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+          border-radius: 20px;
+          padding: 3rem;
+          text-align: center;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          max-width: 450px;
+          width: 90%;
+          position: relative;
+          animation: slideInWelcome 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .welcome-icon {
+          font-size: 4rem;
+          margin-bottom: 1.5rem;
+          animation: bounceIcon 0.6s ease-out 0.2s both;
+        }
+        
+        .welcome-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #2c3e50;
+          margin-bottom: 1rem;
+          animation: slideInText 0.5s ease-out 0.3s both;
+        }
+        
+        .welcome-message {
+          font-size: 1.2rem;
+          color: #5a6c7d;
+          margin-bottom: 2rem;
+          line-height: 1.5;
+          animation: slideInText 0.5s ease-out 0.4s both;
+        }
+        
+        .welcome-progress {
+          width: 100%;
+          height: 6px;
+          background: #e1e8ed;
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 1.5rem;
+        }
+        
+        .welcome-progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #3498db, #2ecc71);
+          border-radius: 3px;
+          animation: progressLoad 2s ease-out;
+        }
+        
+        .welcome-status {
+          font-size: 1rem;
+          color: #7f8c8d;
+          font-weight: 500;
+          animation: slideInText 0.5s ease-out 0.5s both;
+        }
+        
+        @keyframes fadeInModal {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideInWelcome {
+          from {
+            opacity: 0;
+            transform: scale(0.8) translateY(-40px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        @keyframes bounceIcon {
+          0% {
+            opacity: 0;
+            transform: scale(0.3) translateY(-20px);
+          }
+          50% {
+            transform: scale(1.1) translateY(-5px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        @keyframes slideInText {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes progressLoad {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+        
+        @media (max-width: 480px) {
+          .welcome-modal-content {
+            padding: 2rem;
+            margin: 1rem;
+          }
+          
+          .welcome-icon {
+            font-size: 3rem;
+          }
+          
+          .welcome-title {
+            font-size: 1.6rem;
+          }
+          
+          .welcome-message {
+            font-size: 1rem;
+          }
+        }        /* VISTA 2: FORMULARIO DE LOGIN */
         .login-window {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -373,13 +513,24 @@ const logosMap = {
     </div>
 
     <!-- VISTA 2: FORMULARIO DE LOGIN -->
+    <!-- Modal de Bienvenida -->
+    <div id="welcome-modal" class="welcome-modal">
+      <div class="welcome-modal-content">
+        <div class="welcome-icon">⛏️</div>
+        <h2 class="welcome-title">¡Bienvenido!</h2>
+        <p class="welcome-message">Iniciando sesión y cargando tu espacio de trabajo...</p>
+        <div class="welcome-progress">
+          <div class="welcome-progress-bar"></div>
+        </div>
+        <div class="welcome-status">Preparando el sistema para ti</div>
+      </div>
+    </div>
+
     <div id="view-login" class="login-window hidden">
-        <button type="button" class="back-btn" id="btn-back">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Volver
-        </button>
-        
-        <div class="selected-company-header">
+      <button type="button" class="back-btn" id="btn-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Volver
+      </button>        <div class="selected-company-header">
             <img id="selected-company-img" src="" alt="" class="selected-logo">
             <p style="color: #64748b; font-size: 0.9rem;">Ingrese sus credenciales de acceso</p>
         </div>
@@ -656,7 +807,7 @@ const logosMap = {
                         }));
 
                         this.showMessage('¡Bienvenido! Ingresando...', 'success');
-                        setTimeout(() => window.location.href = '/', 1000);
+                        setTimeout(() => window.location.href = '/', 2800);
                     } else {
                         this.showMessage(data.details || 'Credenciales incorrectas', 'error');
                         this.setLoading(false);
@@ -678,6 +829,12 @@ const logosMap = {
             }
 
             showMessage(message, type) {
+                // Si es un mensaje de éxito de bienvenida, usar el modal especial
+                if (type === 'success' && (message.includes('Bienvenido') || message.includes('Ingresando'))) {
+                    this.showWelcomeModal();
+                    return;
+                }
+                
                 const className = type === 'error' ? 'message-error' : 'message-success';
                 const icon = type === 'error' ? '⚠️' : '✅';
                 this.messageContainer.innerHTML = `
@@ -685,6 +842,16 @@ const logosMap = {
                         <span>${icon}</span> ${message}
                     </div>
                 `;
+            }
+            
+            showWelcomeModal() {
+                const modal = document.getElementById('welcome-modal');
+                modal.classList.add('show');
+                
+                // Ocultar el modal después de 2.5 segundos
+                setTimeout(() => {
+                    modal.classList.remove('show');
+                }, 2500);
             }
 
             checkExistingLogin() {
