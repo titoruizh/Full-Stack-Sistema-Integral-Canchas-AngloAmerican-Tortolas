@@ -248,9 +248,70 @@ import AuthGuard from '../components/AuthGuard.astro';
       
       .table-container {
         background: white;
-        border-radius: 12px;
+        border-radius: 12px 12px 0 0;
         box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         overflow: hidden;
+      }
+      
+      /* Estilos de paginación */
+      .pagination-container {
+        background: white;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      
+      .pagination-info {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .pagination-current {
+        color: #334155;
+        font-weight: 600;
+        padding: 0 1rem;
+      }
+      
+      .pagination-btn {
+        background: white;
+        border: 1px solid #e5e7eb;
+        color: #64748b;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .pagination-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #334155;
+      }
+      
+      .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f9fafb;
       }
       
       table {
@@ -2060,6 +2121,22 @@ import AuthGuard from '../components/AuthGuard.astro';
               <!-- Las canchas se cargarán dinámicamente -->
             </tbody>
           </table>
+          
+          <!-- Controles de paginación -->
+          <div class="pagination-container">
+            <div class="pagination-info">
+              Mostrando <span id="pagination-start">0</span> - <span id="pagination-end">0</span> de <span id="pagination-total">0</span> canchas
+            </div>
+            <div class="pagination-controls">
+              <button id="btn-primera-pagina" class="pagination-btn" title="Primera página">&laquo;</button>
+              <button id="btn-pagina-anterior" class="pagination-btn" title="Página anterior">&lsaquo;</button>
+              <span class="pagination-current">
+                Página <span id="pagina-actual">1</span> de <span id="total-paginas">1</span>
+              </span>
+              <button id="btn-pagina-siguiente" class="pagination-btn" title="Página siguiente">&rsaquo;</button>
+              <button id="btn-ultima-pagina" class="pagination-btn" title="Última página">&raquo;</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2433,6 +2510,10 @@ import AuthGuard from '../components/AuthGuard.astro';
       let filtroFecha = 'all'
       let todasLasCanchas = []
       let canchasFiltradas = []
+      
+      // Variables de paginación
+      let paginaActual = 1
+      const filasPorPagina = 15
 
       // Elementos del DOM
       const mainScreen = document.getElementById('main-screen')
@@ -2533,6 +2614,38 @@ import AuthGuard from '../components/AuthGuard.astro';
         
         // Configurar selectores dinámicos de Muro y Sector
         configurarSelectoresMuroSector()
+        
+        // Configurar botones de paginación
+        configurarPaginacion()
+      }
+      
+      // Configurar event listeners de paginación
+      function configurarPaginacion() {
+        document.getElementById('btn-primera-pagina').addEventListener('click', () => {
+          paginaActual = 1
+          renderizarPaginaCanchas()
+        })
+        
+        document.getElementById('btn-pagina-anterior').addEventListener('click', () => {
+          if (paginaActual > 1) {
+            paginaActual--
+            renderizarPaginaCanchas()
+          }
+        })
+        
+        document.getElementById('btn-pagina-siguiente').addEventListener('click', () => {
+          const totalPaginas = Math.ceil(canchasFiltradas.length / filasPorPagina)
+          if (paginaActual < totalPaginas) {
+            paginaActual++
+            renderizarPaginaCanchas()
+          }
+        })
+        
+        document.getElementById('btn-ultima-pagina').addEventListener('click', () => {
+          const totalPaginas = Math.ceil(canchasFiltradas.length / filasPorPagina)
+          paginaActual = totalPaginas || 1
+          renderizarPaginaCanchas()
+        })
       }
 
       // Configurar selectores dinámicos de Muro y Sector
@@ -2743,7 +2856,7 @@ import AuthGuard from '../components/AuthGuard.astro';
       function aplicarFiltros() {
         if (!empresaLogueada || !todasLasCanchas.length) return
         
-        let canchasFiltradas = [...todasLasCanchas]
+        canchasFiltradas = [...todasLasCanchas]
         console.log('Aplicando filtros, vista actual:', vistaActual)
         console.log('Total canchas antes del filtro:', canchasFiltradas.length)
         
@@ -3032,9 +3145,20 @@ import AuthGuard from '../components/AuthGuard.astro';
         actualizarMapaDashboard(canchas)
       }
 
-      // Renderizar tabla de canchas
+      // Renderizar tabla de canchas con paginación
       function renderizarCanchas(canchas) {
-        canchasTBody.innerHTML = canchas.map(cancha => `
+        canchasFiltradas = canchas
+        paginaActual = 1 // Resetear a la primera página cuando cambian los datos
+        renderizarPaginaCanchas()
+      }
+      
+      // Renderizar página específica de canchas
+      function renderizarPaginaCanchas() {
+        const inicio = (paginaActual - 1) * filasPorPagina
+        const fin = inicio + filasPorPagina
+        const canchasPagina = canchasFiltradas.slice(inicio, fin)
+        
+        canchasTBody.innerHTML = canchasPagina.map(cancha => `
           <tr data-cancha-id="${cancha.id}" class="cancha-row">
             <td><strong>${cancha.nombre.toUpperCase()}</strong></td>
             <td>
@@ -3078,6 +3202,27 @@ import AuthGuard from '../components/AuthGuard.astro';
         }, 100) // Pequeño delay para asegurar que el DOM esté actualizado
         
         actualizarAcciones()
+        actualizarControlesPaginacion()
+      }
+      
+      // Actualizar controles de paginación
+      function actualizarControlesPaginacion() {
+        const totalCanchas = canchasFiltradas.length
+        const totalPaginas = Math.ceil(totalCanchas / filasPorPagina)
+        const inicio = (paginaActual - 1) * filasPorPagina + 1
+        const fin = Math.min(inicio + filasPorPagina - 1, totalCanchas)
+        
+        document.getElementById('pagination-start').textContent = totalCanchas > 0 ? inicio : 0
+        document.getElementById('pagination-end').textContent = fin
+        document.getElementById('pagination-total').textContent = totalCanchas
+        document.getElementById('pagina-actual').textContent = paginaActual
+        document.getElementById('total-paginas').textContent = totalPaginas || 1
+        
+        // Habilitar/deshabilitar botones
+        document.getElementById('btn-primera-pagina').disabled = paginaActual === 1
+        document.getElementById('btn-pagina-anterior').disabled = paginaActual === 1
+        document.getElementById('btn-pagina-siguiente').disabled = paginaActual >= totalPaginas
+        document.getElementById('btn-ultima-pagina').disabled = paginaActual >= totalPaginas
       }
 
       // Actualizar botones de acción según empresa seleccionada

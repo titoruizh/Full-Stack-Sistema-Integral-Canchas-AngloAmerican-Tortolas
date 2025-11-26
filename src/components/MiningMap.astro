@@ -678,6 +678,11 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
           
           console.log(`📊 ${canchasConPoligono.length} de ${ids.length} canchas tienen polígonos`);
           
+          // Debug: mostrar estado de cada cancha
+          canchasConPoligono.forEach(cancha => {
+            console.log(`🏷️ Cancha ${cancha.nombre}: Estado ID = ${cancha.estado_actual_id}, Estado = ${cancha.estado_actual}`);
+          });
+          
           if (canchasConPoligono.length === 0) {
             console.log('⚠️ Ninguna cancha tiene polígono definido');
             return;
@@ -694,6 +699,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
               cancha_id: cancha.id,
               cancha_nombre: cancha.nombre,
               estado_actual: cancha.estado_actual || 'Sin estado',
+              estado_actual_id: cancha.estado_actual_id || 1,
               empresa_actual: cancha.empresa_actual || 'Sin empresa',
               tipo: 'cancha_area'
             }
@@ -703,6 +709,14 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             type: 'FeatureCollection',
             features: features
           };
+          
+          // Debug: mostrar el GeoJSON generado
+          console.log('🗺️ GeoJSON generado:', JSON.stringify(polygonsGeoJSON, null, 2));
+          console.log('🎨 Estados de las features:', features.map(f => ({ 
+            nombre: f.properties.cancha_nombre, 
+            estado_id: f.properties.estado_actual_id,
+            estado_nombre: f.properties.estado_actual
+          })));
           
           // Remover fuentes anteriores si existen
           if (map.getSource('canchas-dashboard')) {
@@ -717,27 +731,66 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             data: polygonsGeoJSON
           });
           
-          // Agregar capas con estilos
+          // Agregar capas con estilos dinámicos según estado
+          // Estados:
+          // 1: Creada - Azul con borde azul
+          // 7: En Espera - Amarillo con borde amarillo
+          // 3: En Proceso - Amarillo con borde verde
+          // 4: Validada - Verde con borde amarillo
+          // 8: Rechazada, en Espera - Rojo con borde amarillo
+          // 6: Cerrada - Verde con borde verde
+          
+          console.log('🎨 Aplicando colores a las capas del mapa...');
+          console.log('📊 Distribución de estados:', features.reduce((acc, f) => {
+            const estadoId = f.properties.estado_actual_id;
+            acc[estadoId] = (acc[estadoId] || 0) + 1;
+            return acc;
+          }, {}));
+          
           map.addLayer({
             id: 'canchas-dashboard-fill',
             type: 'fill',
             source: 'canchas-dashboard',
             paint: {
-              'fill-color': '#3b82f6', // Azul para todas por ahora
+              'fill-color': [
+                'match',
+                ['get', 'estado_actual_id'],
+                1, '#3b82f6',  // Creada: Azul
+                7, '#fbbf24',  // En Espera: Amarillo
+                2, '#fbbf24',  // En Proceso: Amarillo - ID 2
+                4, '#10b981',  // Validada: Verde
+                8, '#ef4444',  // Rechazada, en Espera: Rojo
+                6, '#10b981',  // Cerrada: Verde
+                '#3b82f6'      // Default: Azul
+              ],
               'fill-opacity': 0.3
             }
           });
+          
+          console.log('✅ Capa de relleno agregada con colores dinámicos');
           
           map.addLayer({
             id: 'canchas-dashboard-stroke',
             type: 'line',
             source: 'canchas-dashboard',
             paint: {
-              'line-color': '#2563eb',
+              'line-color': [
+                'match',
+                ['get', 'estado_actual_id'],
+                1, '#2563eb',  // Creada: Azul
+                7, '#f59e0b',  // En Espera: Amarillo más oscuro
+                2, '#10b981',  // En Proceso: Verde - ID 2
+                4, '#fbbf24',  // Validada: Amarillo
+                8, '#fbbf24',  // Rechazada, en Espera: Amarillo
+                6, '#059669',  // Cerrada: Verde oscuro
+                '#2563eb'      // Default: Azul
+              ],
               'line-width': 2,
               'line-opacity': 0.8
             }
           });
+          
+          console.log('✅ Capa de borde agregada con colores dinámicos');
           
           // NO hacer zoom automático - mantener vista general
           // El zoom se hará solo cuando el usuario haga doble-click en una fila de la tabla
@@ -875,6 +928,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
               properties: {
                 cancha_id: cancha.id,
                 cancha_nombre: cancha.nombre,
+                estado_actual_id: cancha.estado_actual_id || 1,
                 tipo: 'cancha_area'
               }
             }]
@@ -890,13 +944,45 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             data: polygonGeoJSON
           });
           
-          // Agregar capas del polígono
+          // Determinar colores según el estado
+          const estadoId = cancha.estado_actual_id || 1;
+          let fillColor = '#3b82f6';  // Default: Azul (Creada)
+          let strokeColor = '#2563eb'; // Default: Azul oscuro
+          
+          switch(estadoId) {
+            case 1: // Creada
+              fillColor = '#3b82f6';
+              strokeColor = '#2563eb';
+              break;
+            case 7: // En Espera
+              fillColor = '#fbbf24';
+              strokeColor = '#f59e0b';
+              break;
+            case 2: // En Proceso - ID 2
+              fillColor = '#fbbf24';
+              strokeColor = '#10b981';
+              break;
+            case 4: // Validada
+              fillColor = '#10b981';
+              strokeColor = '#fbbf24';
+              break;
+            case 8: // Rechazada, en Espera
+              fillColor = '#ef4444';
+              strokeColor = '#fbbf24';
+              break;
+            case 6: // Cerrada
+              fillColor = '#10b981';
+              strokeColor = '#059669';
+              break;
+          }
+          
+          // Agregar capas del polígono con colores dinámicos
           map.addLayer({
             id: 'cancha-polygon-fill',
             type: 'fill',
             source: 'cancha-polygon',
             paint: {
-              'fill-color': '#10b981', // Verde
+              'fill-color': fillColor,
               'fill-opacity': 0.3
             }
           });
@@ -906,7 +992,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
             type: 'line',
             source: 'cancha-polygon',
             paint: {
-              'line-color': '#059669',
+              'line-color': strokeColor,
               'line-width': 3,
               'line-opacity': 0.8
             }

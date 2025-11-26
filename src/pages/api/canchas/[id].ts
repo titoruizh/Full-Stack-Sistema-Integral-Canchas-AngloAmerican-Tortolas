@@ -40,7 +40,9 @@ export const GET: APIRoute = async ({ params }) => {
       sector: cancha.sector,
       nombre_detalle: cancha.nombre_detalle,
       estado_actual: cancha.estado_actual?.nombre || 'Sin estado',
+      estado_actual_id: cancha.estado_actual_id, // Agregar el ID del estado
       empresa_actual: cancha.empresa_actual?.nombre || 'Sin empresa',
+      empresa_actual_id: cancha.empresa_actual_id, // Agregar el ID de la empresa
       creada_por: cancha.creada_por?.nombre || 'Sin usuario',
       created_at: cancha.created_at,
       updated_at: cancha.updated_at,
@@ -51,6 +53,7 @@ export const GET: APIRoute = async ({ params }) => {
     console.log('Cancha obtenida:', {
       id: canchaFormateada.id,
       nombre: canchaFormateada.nombre,
+      estado_actual_id: canchaFormateada.estado_actual_id,
       poligono_presente: !!canchaFormateada.poligono_coordenadas,
       poligono_data: canchaFormateada.poligono_coordenadas
     })
