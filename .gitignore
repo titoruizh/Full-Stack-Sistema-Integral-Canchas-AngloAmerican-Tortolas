@@ -23,3 +23,4 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 et --hard 1603a9d
+src/pages/api/auth/verify-password.ts
