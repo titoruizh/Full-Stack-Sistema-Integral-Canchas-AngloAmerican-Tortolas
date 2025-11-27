@@ -24,3 +24,4 @@ pnpm-debug.log*
 .idea/
 et --hard 1603a9d
 src/pages/api/auth/verify-password.ts
+test.js
