@@ -5749,8 +5749,15 @@ import AuthGuard from "../components/AuthGuard.astro";
 
           for (const canchaId of canchaIds) {
             try {
-              const response = await fetch(`/api/canchas/${canchaId}`, {
-                method: "DELETE",
+              // Usar el endpoint de acción con borrar_cancha
+              const response = await fetch(`/api/canchas/${canchaId}/accion`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  accion: "borrar_cancha",
+                }),
               });
 
               if (response.ok) {
