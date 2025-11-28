@@ -3879,9 +3879,11 @@ import AuthGuard from "../components/AuthGuard.astro";
             case "AngloAmerican":
               // AngloAmerican puede actuar cuando:
               // - Cancha creada (enviar a Besalco)
+              // - Cancha validada (cerrar)
               // - Cancha en proceso en AngloAmerican (cerrar)
               tieneAccion =
                 estado === "Creada" ||
+                estado === "Validada" ||
                 (estado === "En Proceso" && empresaActual === "AngloAmerican");
               break;
 
@@ -4441,6 +4443,11 @@ import AuthGuard from "../components/AuthGuard.astro";
             botones.push(
               `<button class="btn-accion" data-accion="enviar-besalco" data-cancha-id="${canchaId}">📤 Enviar a Besalco</button>`,
             );
+          } else if (estado === "Validada") {
+            console.log("Estado es Validada, agregando botón cerrar cancha");
+            botones.push(
+              `<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">🔒 Cerrar Cancha</button>`,
+            );
           } else if (
             estado === "En Proceso" &&
             empresaActual === "AngloAmerican"
@@ -4478,11 +4485,6 @@ import AuthGuard from "../components/AuthGuard.astro";
                 );
               }
             }
-
-            console.log("Agregando botón cerrar cancha");
-            botones.push(
-              `<button class="btn-accion btn-success" data-accion="abrir-modal-cierre" data-cancha-id="${canchaId}">🔒 Cerrar Cancha</button>`,
-            );
           } else if (estado === "Finalizada" || estado === "Cerrada") {
             console.log("Estado es Finalizada/Cerrada, agregando botón PDF");
             // Para canchas finalizadas o cerradas, siempre mostrar el botón PDF

@@ -54,6 +54,19 @@ export interface HistorialCancha {
   created_at: string
 }
 
+export interface TransicionEstado {
+  id: number
+  cancha_id: number
+  estado_anterior_id?: number
+  estado_nuevo_id: number
+  empresa_anterior_id?: number
+  empresa_nueva_id?: number
+  accion: string
+  observaciones?: string
+  usuario_id?: number
+  created_at: string
+}
+
 export interface Validacion {
   id: number
   cancha_id: number
@@ -158,6 +171,36 @@ export interface CanchaCompleta {
 
 // Funciones auxiliares para el manejo de datos
 export class CanchaService {
+  // Registrar transición de estado
+  private static async registrarTransicion(
+    canchaId: number,
+    estadoAnteriorId: number | null,
+    estadoNuevoId: number,
+    empresaAnteriorId: number | null,
+    empresaNuevaId: number | null,
+    accion: string,
+    observaciones?: string,
+    usuarioId?: number
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('transiciones_estado')
+      .insert({
+        cancha_id: canchaId,
+        estado_anterior_id: estadoAnteriorId,
+        estado_nuevo_id: estadoNuevoId,
+        empresa_anterior_id: empresaAnteriorId,
+        empresa_nueva_id: empresaNuevaId,
+        accion,
+        observaciones,
+        usuario_id: usuarioId
+      })
+    
+    if (error) {
+      console.error('Error al registrar transición:', error)
+      // No lanzar error para no bloquear el flujo principal
+    }
+  }
+
   // Obtener todas las canchas con información completa
   static async obtenerCanchas(): Promise<CanchaCompleta[]> {
     const { data, error } = await supabase
@@ -227,6 +270,19 @@ export class CanchaService {
       .single()
     
     if (error) throw error
+    
+    // Registrar transición: creación de cancha
+    await this.registrarTransicion(
+      data.id,
+      null, // No hay estado anterior
+      1, // Estado nuevo: Creada
+      null, // No hay empresa anterior
+      1, // AngloAmerican
+      'crear_cancha',
+      `Cancha creada: ${nombre}`,
+      1 // Usuario por defecto
+    )
+    
     return data
   }
 
@@ -259,11 +315,31 @@ export class CanchaService {
       .single()
     
     if (error) throw error
+    
+    // Registrar transición: creación de cancha con polígono
+    await this.registrarTransicion(
+      data.id,
+      null,
+      1,
+      null,
+      1,
+      'crear_cancha_con_poligono',
+      `Cancha creada con polígono: ${nombre}`,
+      1
+    )
+    
     return data
   }
 
   // Enviar cancha a Besalco
   static async enviarABesalco(canchaId: number): Promise<void> {
+    // Obtener estado actual antes de cambiar
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     const { error } = await supabase
       .from('canchas')
       .update({
@@ -273,6 +349,17 @@ export class CanchaService {
       .eq('id', canchaId)
     
     if (error) throw error
+    
+    // Registrar transición: enviar a Besalco
+    await this.registrarTransicion(
+      canchaId,
+      canchaActual?.estado_actual_id || null,
+      7,
+      canchaActual?.empresa_actual_id || null,
+      2,
+      'enviar_besalco',
+      'Cancha enviada a Besalco para trabajo de maquinaria'
+    )
   }
 
   // Tomar trabajo (cambiar de "En Espera" a "En Proceso")
@@ -291,26 +378,39 @@ export class CanchaService {
       throw new Error('La cancha no está en estado de espera')
     }
     
-    // Cambiar a "En Proceso" (3)
+    // Cambiar a "En Proceso" (2)
     const { error } = await supabase
       .from('canchas')
       .update({
-        estado_actual_id: 3 // En Proceso
+        estado_actual_id: 2 // En Proceso
         // empresa_actual_id no cambia, permanece la misma
       })
       .eq('id', canchaId)
     
     if (error) throw error
     
-    console.log(`Trabajo tomado por ${empresa}: cancha ${canchaId} ahora en estado En Proceso (3)`)
+    // Registrar transición: tomar trabajo
+    await this.registrarTransicion(
+      canchaId,
+      cancha.estado_actual_id,
+      2,
+      cancha.empresa_actual_id,
+      cancha.empresa_actual_id, // Misma empresa
+      'tomar_trabajo',
+      `${empresa} toma el trabajo - cambio a En Proceso`
+    )
+    
+    console.log(`Trabajo tomado por ${empresa}: cancha ${canchaId} ahora en estado En Proceso (2)`)
   }
 
-  // Finalizar trabajo de Besalco
+  // Finalizar trabajo de Besalco (MÉTODO DEPRECADO - usar finalizarBesalco)
   static async finalizarTrabajo(canchaId: number): Promise<void> {
+    // Este método ya no se usa - usar finalizarBesalco() en su lugar
+    console.warn('DEPRECADO: Usar finalizarBesalco() en lugar de finalizarTrabajo()')
     const { error } = await supabase
       .from('canchas')
       .update({
-        estado_actual_id: 3, // Finalizada
+        estado_actual_id: 7, // En Espera
         empresa_actual_id: 3  // Linkapsis (siguiente en el flujo)
       })
       .eq('id', canchaId)
@@ -320,6 +420,13 @@ export class CanchaService {
 
   // Rechazar por Besalco (nueva función)
   static async rechazarBesalco(canchaId: number, observaciones?: string): Promise<void> {
+    // Obtener estado actual
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     // Devolver a AngloAmerican con estado "Rechazada, en Espera"
     const { error } = await supabase
       .from('canchas')
@@ -341,9 +448,27 @@ export class CanchaService {
         resultado: 'rechazada',
         observaciones
       })
+    
+    // Registrar transición: rechazo por Besalco
+    await this.registrarTransicion(
+      canchaId,
+      canchaActual?.estado_actual_id || null,
+      8,
+      canchaActual?.empresa_actual_id || null,
+      1,
+      'rechazar_besalco',
+      observaciones || 'Cancha rechazada por Besalco'
+    )
   }
 
   static async finalizarBesalco(canchaId: number, observaciones?: string, usuario?: any): Promise<void> {
+    // Obtener estado actual
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     // Enviar a Linkapsis en estado "En Espera"
     const { error } = await supabase
       .from('canchas')
@@ -373,6 +498,18 @@ export class CanchaService {
     await supabase
       .from('validaciones')
       .insert(validacionData)
+    
+    // Registrar transición: finalizar Besalco
+    await this.registrarTransicion(
+      canchaId,
+      canchaActual?.estado_actual_id || null,
+      7,
+      canchaActual?.empresa_actual_id || null,
+      3,
+      'finalizar_besalco',
+      observaciones || 'Trabajo de Besalco finalizado, enviado a Linkapsis',
+      usuario?.id
+    )
   }
 
   // Validar por Linkapsis
@@ -384,6 +521,13 @@ export class CanchaService {
     esRevalidacion: boolean = false,
     usuario?: any
   ): Promise<void> {
+    // Obtener estado actual
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     if (validar) {
       // Pasar a LlayLlay en estado "En Espera"
       await supabase
@@ -414,6 +558,18 @@ export class CanchaService {
       await supabase
         .from('validaciones')
         .insert(validacionData)
+      
+      // Registrar transición: validación Linkapsis
+      await this.registrarTransicion(
+        canchaId,
+        canchaActual?.estado_actual_id || null,
+        7,
+        canchaActual?.empresa_actual_id || null,
+        4,
+        'validar_linkapsis',
+        observaciones || 'Espesores validados por Linkapsis, enviado a LlayLlay',
+        usuario?.id
+      )
     } else {
       // Rechazar y volver a Besalco en estado "Rechazada, en Espera"
       await supabase
@@ -442,6 +598,18 @@ export class CanchaService {
       await supabase
         .from('validaciones')
         .insert(rechazoData)
+      
+      // Registrar transición: rechazo Linkapsis
+      await this.registrarTransicion(
+        canchaId,
+        canchaActual?.estado_actual_id || null,
+        8,
+        canchaActual?.empresa_actual_id || null,
+        2,
+        'rechazar_linkapsis',
+        observaciones || 'Espesores rechazados por Linkapsis, devuelto a Besalco',
+        usuario?.id
+      )
     }
   }
 
@@ -454,15 +622,34 @@ export class CanchaService {
     esRevalidacion: boolean = false,
     usuario?: any
   ): Promise<void> {
+    // Obtener estado actual
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     if (validar) {
-      // Devolver a AngloAmerican para cierre en estado "En Espera"
+      // Devolver a AngloAmerican con estado "Validada"
       await supabase
         .from('canchas')
         .update({
-          estado_actual_id: 7, // En Espera
+          estado_actual_id: 4, // Validada (todas las validaciones completas)
           empresa_actual_id: 1  // AngloAmerican
         })
         .eq('id', canchaId)
+      
+      // Registrar transición: validación LlayLlay
+      await this.registrarTransicion(
+        canchaId,
+        canchaActual?.estado_actual_id || null,
+        4,
+        canchaActual?.empresa_actual_id || null,
+        1,
+        'validar_llay_llay',
+        observaciones || 'Densidad validada por LlayLlay - Cancha completamente validada',
+        usuario?.id
+      )
     } else {
       // Rechazar y volver a Besalco en estado "Rechazada, en Espera"
       await supabase
@@ -472,6 +659,18 @@ export class CanchaService {
           empresa_actual_id: 2  // Besalco
         })
         .eq('id', canchaId)
+      
+      // Registrar transición: rechazo LlayLlay
+      await this.registrarTransicion(
+        canchaId,
+        canchaActual?.estado_actual_id || null,
+        8,
+        canchaActual?.empresa_actual_id || null,
+        2,
+        'rechazar_llay_llay',
+        observaciones || 'Densidad rechazada por LlayLlay, devuelto a Besalco',
+        usuario?.id
+      )
     }
 
     // Registrar validación con mediciones y usuario
@@ -498,6 +697,13 @@ export class CanchaService {
 
   // Cerrar cancha (AngloAmerican)
   static async cerrarCancha(canchaId: number): Promise<void> {
+    // Obtener estado actual
+    const { data: canchaActual } = await supabase
+      .from('canchas')
+      .select('estado_actual_id, empresa_actual_id')
+      .eq('id', canchaId)
+      .single()
+    
     const { error } = await supabase
       .from('canchas')
       .update({
@@ -506,6 +712,17 @@ export class CanchaService {
       .eq('id', canchaId)
     
     if (error) throw error
+    
+    // Registrar transición: cerrar cancha
+    await this.registrarTransicion(
+      canchaId,
+      canchaActual?.estado_actual_id || null,
+      6,
+      canchaActual?.empresa_actual_id || null,
+      1, // AngloAmerican
+      'cerrar_cancha',
+      'Cancha cerrada por AngloAmerican - proceso completado'
+    )
   }
 
   // Obtener historial de una cancha
@@ -515,6 +732,18 @@ export class CanchaService {
       .select('*')
       .eq('cancha_id', canchaId)
       .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return data || []
+  }
+
+  // Obtener transiciones de estado de una cancha (nuevo timeline completo)
+  static async obtenerTransicionesCancha(canchaId: number) {
+    const { data, error } = await supabase
+      .from('vista_transiciones_completa')
+      .select('*')
+      .eq('cancha_id', canchaId)
+      .order('fecha_transicion', { ascending: true })
     
     if (error) throw error
     return data || []
