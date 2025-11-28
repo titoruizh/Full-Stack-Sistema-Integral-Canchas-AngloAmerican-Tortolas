@@ -97,43 +97,54 @@ import AuthGuard from "../../components/AuthGuard.astro";
             }
 
             .btn {
-                padding: 0.75rem 1.5rem;
+                padding: 0.6rem 1.5rem;
                 border: none;
-                border-radius: 8px;
+                border-radius: 50px;
                 font-weight: 600;
                 cursor: pointer;
                 transition: all 0.3s ease;
                 text-decoration: none;
-                display: inline-block;
-                text-align: center;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             }
 
             .btn-primary {
-                background: #3498db;
+                background: linear-gradient(135deg, #3b82f6, #2563eb);
                 color: white;
             }
 
             .btn-primary:hover {
-                background: #2980b9;
-                transform: translateY(-1px);
+                background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
             }
 
             .btn-success {
-                background: #27ae60;
+                background: linear-gradient(135deg, #10b981, #059669);
                 color: white;
             }
 
             .btn-success:hover {
-                background: #229954;
+                background: linear-gradient(135deg, #059669, #047857);
+                box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
             }
 
             .btn-danger {
-                background: #e74c3c;
+                background: linear-gradient(135deg, #ef4444, #dc2626);
                 color: white;
             }
 
             .btn-danger:hover {
-                background: #c0392b;
+                background: linear-gradient(135deg, #dc2626, #b91c1c);
+                box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
             }
 
             .btn-secondary {
@@ -178,24 +189,44 @@ import AuthGuard from "../../components/AuthGuard.astro";
             }
 
             .form-control {
-                padding: 0.75rem;
-                border: 2px solid #e1e5e9;
-                border-radius: 8px;
-                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+                border: 1px solid #cbd5e1;
+                border-radius: 50px;
+                font-size: 0.9rem;
                 transition: all 0.3s ease;
+                background-color: white;
+                color: #334155;
+            }
+
+            select.form-control {
+                appearance: none;
+                padding-right: 2.5rem;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.8rem center;
+                background-size: 1rem;
+                cursor: pointer;
             }
 
             .form-control:focus {
                 outline: none;
-                border-color: #3498db;
-                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             }
 
             .table-container {
                 background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                border-radius: 16px;
+                box-shadow:
+                    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
                 overflow: hidden;
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                transition: transform 0.3s ease;
+            }
+
+            .table-container:hover {
+                transform: translateY(-2px);
             }
 
             table {
@@ -212,13 +243,27 @@ import AuthGuard from "../../components/AuthGuard.astro";
             }
 
             th {
-                background: #f8f9fa;
-                font-weight: 600;
-                color: #2c3e50;
+                background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+                font-weight: 700;
+                color: #1e3a8a;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+                letter-spacing: 0.05em;
+                border-bottom: 2px solid #bfdbfe;
+            }
+
+            tr {
+                transition: all 0.2s ease;
             }
 
             tr:hover {
-                background: #f8f9fa;
+                background: #f8fafc;
+                border-left: 3px solid #3b82f6;
+            }
+
+            td {
+                color: #475569;
+                font-size: 0.95rem;
             }
 
             .estado {
@@ -944,7 +989,7 @@ import AuthGuard from "../../components/AuthGuard.astro";
                         <td>
                             <div class="actions">
                                 <button class="btn btn-primary" onclick="usuarioManager.editUsuario(${usuario.id})">
-                                    Editar
+                                    ✏️ Editar
                                 </button>
                             </div>
                         </td>
