@@ -581,13 +581,25 @@ import AuthGuard from "../components/AuthGuard.astro";
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
 
       .modal.show {
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem;
       }
 
       .modal-content {
@@ -598,38 +610,54 @@ import AuthGuard from "../components/AuthGuard.astro";
         max-height: 80vh;
         overflow-y: auto;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        position: relative;
+        margin: auto;
       }
 
       .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #e1e8ed;
+        margin: -2rem -2rem 2rem -2rem;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
       }
 
       .modal-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #2c3e50;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
       }
 
       .close-btn {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        font-size: 1.75rem;
         cursor: pointer;
-        color: #666;
-        padding: 0.5rem;
-        border-radius: 50%;
+        color: #ffffff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
         transition: all 0.3s ease;
+        font-weight: 700;
+        line-height: 1;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .close-btn:hover {
-        background: #f1f2f6;
-        color: #333;
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.1) rotate(90deg);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       }
 
       .observacion-item {
@@ -2496,6 +2524,22 @@ import AuthGuard from "../components/AuthGuard.astro";
         max-width: 95vw;
         width: 1400px;
         max-height: 90vh;
+        box-shadow: 
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          0 0 100px rgba(59, 130, 246, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
       }
 
       .timeline-container {
@@ -2566,43 +2610,66 @@ import AuthGuard from "../components/AuthGuard.astro";
 
       .timeline-legend-container {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
         gap: 1rem;
         margin-bottom: 1.5rem;
-        padding: 0.5rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+      }
+
+      .timeline-legend-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #334155;
+        margin: 0 0 0.5rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .timeline-legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
       }
 
       .timeline-legend-item {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        padding: 0.5rem 1.25rem;
+        padding: 0.6rem 1.25rem;
         background: #ffffff;
-        border-radius: 50px; /* Pill shape */
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e2e8f0;
         transition:
           transform 0.2s ease,
-          box-shadow 0.2s ease;
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
       }
 
       .timeline-legend-item:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        border-color: currentColor;
       }
 
       .timeline-legend-dot {
-        display: block; /* Ensure it takes up space */
-        width: 16px; /* Slightly larger */
-        height: 16px;
+        display: block;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         flex-shrink: 0;
-        border: 2px solid white; /* Contrast ring */
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px currentColor, 0 2px 8px rgba(0, 0, 0, 0.15);
       }
 
       .timeline-legend-name {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         font-weight: 600;
         color: #475569;
         white-space: nowrap;
@@ -2650,19 +2717,54 @@ import AuthGuard from "../components/AuthGuard.astro";
         top: 50%;
         left: 60px;
         right: 60px;
-        height: 4px; /* Thinner axis */
+        height: 10px;
         background: linear-gradient(
           90deg,
-          #e2e8f0 0%,
-          #cbd5e1 50%,
-          #e2e8f0 100%
-        ); /* Subtle axis */
-        border-radius: 2px;
+          #3b82f6 0%,
+          #6366f1 25%,
+          #8b5cf6 50%,
+          #a855f7 75%,
+          #ec4899 100%
+        );
+        border-radius: 5px;
         transform: translateY(-50%);
         z-index: 1;
+        box-shadow: 
+          0 0 20px rgba(59, 130, 246, 0.6),
+          0 0 40px rgba(139, 92, 246, 0.4),
+          0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: timeline-glow 3s ease-in-out infinite;
       }
 
-      /* Highlight the active part of the axis if needed, or keep it subtle */
+      @keyframes timeline-glow {
+        0%, 100% {
+          box-shadow: 
+            0 0 20px rgba(59, 130, 246, 0.6),
+            0 0 40px rgba(139, 92, 246, 0.4),
+            0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        50% {
+          box-shadow: 
+            0 0 30px rgba(59, 130, 246, 0.8),
+            0 0 60px rgba(139, 92, 246, 0.6),
+            0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+      }
+
+      /* Flecha GRANDE al final del eje */
+      .timeline-axis::after {
+        content: '';
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 20px solid #ec4899;
+        border-top: 12px solid transparent;
+        border-bottom: 12px solid transparent;
+        filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.8));
+      }
 
       .timeline-events {
         position: absolute;
@@ -2685,43 +2787,44 @@ import AuthGuard from "../components/AuthGuard.astro";
         transition-delay: 0s;
       }
 
-      /* Ring Style Dots */
+      /* Puntos sólidos con borde blanco */
       .timeline-dot {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        background-color: #ffffff !important; /* Force white center */
-        border: 4px solid currentColor; /* Use the color set by JS */
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        background-color: currentColor !important; /* Color sólido de la cancha */
+        border: 5px solid #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 20; /* Above lines */
+        z-index: 20;
         transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         cursor: pointer;
       }
 
       .timeline-event:hover .timeline-dot {
-        transform: translate(-50%, -50%) scale(1.3);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        border-width: 5px;
+        transform: translate(-50%, -50%) scale(1.35);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 3px 10px rgba(0, 0, 0, 0.2);
+        border-width: 6px;
       }
 
       .timeline-line {
         position: absolute;
-        width: 2px !important; /* Thinner lines */
+        width: 4px !important;
         background: currentColor;
-        opacity: 0.4;
+        opacity: 0.7;
         left: 50%;
         transform: translateX(-50%);
         z-index: 5;
         transition: all 0.3s ease;
+        border-radius: 2px;
       }
 
       .timeline-event:hover .timeline-line {
-        opacity: 0.8;
-        width: 2px !important;
+        opacity: 0.95;
+        width: 5px !important;
       }
 
       .timeline-label {
@@ -2731,12 +2834,12 @@ import AuthGuard from "../components/AuthGuard.astro";
         font-weight: 600;
         color: #334155;
         background: #ffffff;
-        padding: 0.5rem 1rem;
+        padding: 0.6rem 1.1rem;
         border-radius: 8px;
         box-shadow:
-          0 2px 8px rgba(0, 0, 0, 0.06),
-          0 1px 2px rgba(0, 0, 0, 0.04);
-        border: 1px solid #f1f5f9;
+          0 4px 12px rgba(0, 0, 0, 0.1),
+          0 2px 4px rgba(0, 0, 0, 0.06);
+        border: 1.5px solid #e2e8f0;
         pointer-events: none;
         z-index: 30;
         left: 50%;
@@ -2748,34 +2851,40 @@ import AuthGuard from "../components/AuthGuard.astro";
       }
 
       .timeline-event:hover .timeline-label {
-        transform: translateX(-50%) translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        border-color: #e2e8f0;
+        transform: translateX(-50%) translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
         color: #0f172a;
         z-index: 101;
       }
 
-      /* Date Markers - Positioned below the dot */
+      /* Date Markers - MUY VISIBLES */
       .timeline-event-date {
         position: absolute;
         top: 50%;
-        margin-top: 24px; /* Below the 32px dot */
+        margin-top: 32px;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 0.75rem;
-        color: #64748b;
-        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+        font-weight: 800;
         white-space: nowrap;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         z-index: 15;
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        padding: 0.4rem 0.7rem;
+        border-radius: 6px;
+        border: 2px solid #fbbf24;
+        box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
         pointer-events: none;
       }
 
       .timeline-event:hover .timeline-event-date {
-        color: #334155;
-        transform: translateX(-50%) scale(1.1);
+        color: #0f172a;
+        transform: translateX(-50%) scale(1.15);
+        box-shadow: 0 5px 15px rgba(251, 191, 36, 0.6), 0 2px 5px rgba(0, 0, 0, 0.25);
+        background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
       }
     </style>
   </head>
@@ -3571,7 +3680,15 @@ import AuthGuard from "../components/AuthGuard.astro";
       <div id="timeline-modal" class="modal">
         <div class="modal-content modal-timeline">
           <div class="modal-header">
-            <h3 class="modal-title">📊 Timeline de Canchas Seleccionadas</h3>
+            <div>
+              <h3 class="modal-title">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                Timeline de Transiciones
+              </h3>
+              <p style="margin: 0.5rem 0 0 0; font-size: 0.95rem; color: rgba(255,255,255,0.85); font-weight: 400;">Visualización cronológica de eventos de las canchas seleccionadas</p>
+            </div>
             <button class="close-btn" id="timeline-close-btn">×</button>
           </div>
 
@@ -6156,9 +6273,40 @@ import AuthGuard from "../components/AuthGuard.astro";
       // ========== FUNCIONES DEL TIMELINE ==========
 
       // Generar color aleatorio vibrante para cada cancha
-      function generateRandomColor() {
-        const hue = Math.floor(Math.random() * 360);
-        return `hsl(${hue}, 70%, 50%)`;
+      // Generar colores muy distintos entre sí usando una paleta predefinida
+      function generateDistinctColors(count) {
+        // Paleta de colores vibrantes y muy diferentes
+        const distinctColors = [
+          '#ef4444', // Rojo vibrante
+          '#3b82f6', // Azul brillante
+          '#10b981', // Verde esmeralda
+          '#f59e0b', // Naranja dorado
+          '#8b5cf6', // Púrpura
+          '#ec4899', // Rosa fuerte
+          '#06b6d4', // Cyan
+          '#84cc16', // Lima
+          '#f97316', // Naranja intenso
+          '#6366f1', // Índigo
+          '#14b8a6', // Turquesa
+          '#eab308', // Amarillo
+          '#a855f7', // Violeta
+          '#22c55e', // Verde brillante
+          '#f43f5e', // Rosa rojo
+          '#0ea5e9', // Azul cielo
+        ];
+        
+        // Si hay más canchas que colores, generar colores adicionales con HSL espaciados
+        if (count > distinctColors.length) {
+          const step = 360 / count;
+          return Array.from({ length: count }, (_, i) => {
+            const hue = Math.floor(i * step);
+            return `hsl(${hue}, 75%, 55%)`;
+          });
+        }
+        
+        // Mezclar los colores para que no sigan un patrón predecible
+        const shuffled = [...distinctColors].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
       }
 
       // Abrir modal de timeline
@@ -6187,27 +6335,33 @@ import AuthGuard from "../components/AuthGuard.astro";
 
           // === SMART TITLE LOGIC ===
           if (timelineData.length > 1) {
-            if (timelineData.length <= 3) {
-              // If 2-3 canchas, list their names
-              const names = timelineData
-                .map((d) => d.canchaName.replace(/_/g, " "))
-                .join(" vs ");
-              modalTitle.textContent = `Comparativa: ${names}`;
-            } else {
-              modalTitle.textContent = `Comparativa de ${timelineData.length} Canchas`;
-            }
+            modalTitle.innerHTML = `
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              Timeline Comparativo
+            `;
           } else if (timelineData.length === 1) {
-            const name = timelineData[0].canchaName;
-            const cleanName = name.replace(/_/g, " ");
-            modalTitle.textContent = `Timeline Cancha: ${cleanName}`;
+            modalTitle.innerHTML = `
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              Timeline de Transiciones
+            `;
           } else {
-            modalTitle.textContent = "Timeline de Canchas";
+            modalTitle.innerHTML = `
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              Timeline
+            `;
           }
 
-          // Generar colores para cada cancha
+          // Generar colores distintos para cada cancha
+          const colors = generateDistinctColors(timelineData.length);
           const canchaColors = {};
           timelineData.forEach((data, index) => {
-            canchaColors[data.canchaId] = generateRandomColor();
+            canchaColors[data.canchaId] = colors[index];
           });
 
           // Renderizar leyenda
@@ -6258,23 +6412,34 @@ import AuthGuard from "../components/AuthGuard.astro";
           return;
         }
 
+        const title = timelineData.length === 1 
+          ? "Cancha en Timeline" 
+          : `Canchas en Timeline (${timelineData.length})`;
+
         container.innerHTML =
-          `<div class="timeline-legend-container">` +
+          `<div class="timeline-legend-container">
+            <div class="timeline-legend-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+              ${title}
+            </div>
+            <div class="timeline-legend-items">` +
           timelineData
             .map((data) => {
               const color = canchaColors[data.canchaId];
-              // Clean up name for display
               const displayName = data.canchaName.replace(/_/g, " ");
 
               return `
-              <div class="timeline-legend-item">
-                <span class="timeline-legend-dot" style="background-color: ${color}; box-shadow: 0 0 0 2px ${color}40;"></span>
+              <div class="timeline-legend-item" style="color: ${color};">
+                <span class="timeline-legend-dot" style="background-color: ${color};"></span>
                 <span class="timeline-legend-name">${displayName}</span>
               </div>
             `;
             })
             .join("") +
-          `</div>`;
+          `</div></div>`;
       }
 
       // Renderizar timeline visual
