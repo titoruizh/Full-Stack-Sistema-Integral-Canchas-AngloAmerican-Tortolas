@@ -2604,61 +2604,70 @@ import AuthGuard from "../components/AuthGuard.astro";
         left: 0;
         width: 100%;
         height: 100%;
+        pointer-events: none;
       }
 
       .timeline-event {
         position: absolute;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        transition: all 0.3s ease;
+        pointer-events: all;
         z-index: 10;
       }
 
       .timeline-event:hover {
-        transform: translate(-50%, -50%) scale(1.15);
         z-index: 100;
       }
 
+      .timeline-event:hover .timeline-dot {
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+
+      .timeline-event:hover .timeline-label {
+        transform: translateX(-50%) scale(1.05);
+      }
+
       .timeline-dot {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         border: 4px solid #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        position: relative;
-        z-index: 2;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
       }
 
       .timeline-line {
         position: absolute;
-        width: 3px;
+        width: 4px;
         background: currentColor;
-        opacity: 0.6;
+        opacity: 0.7;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1;
+        z-index: 5;
+        border-radius: 2px;
       }
 
       .timeline-label {
         position: absolute;
         white-space: nowrap;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: 0.85rem;
+        font-weight: 700;
         color: #1e293b;
         background: white;
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        border: 2px solid #e2e8f0;
         pointer-events: none;
-        z-index: 3;
+        z-index: 20;
         left: 50%;
         transform: translateX(-50%);
       }
 
       .timeline-date-marker {
         position: absolute;
-        top: 50%;
-        transform: translate(-50%, 40px);
         font-size: 0.8rem;
         color: #475569;
         font-weight: 600;
@@ -6110,6 +6119,10 @@ import AuthGuard from "../components/AuthGuard.astro";
       function renderTimeline(timelineData, canchaColors, container) {
         container.innerHTML = '';
 
+        console.log('🔍 DEBUG Timeline - timelineData:', timelineData);
+        console.log('🔍 DEBUG Timeline - canchaColors:', canchaColors);
+        console.log('🔍 DEBUG Timeline - container:', container);
+
         // Obtener todas las fechas para calcular el rango
         let allDates = [];
         let allTransitions = [];
@@ -6125,6 +6138,15 @@ import AuthGuard from "../components/AuthGuard.astro";
             });
           });
         });
+
+        console.log('🔍 DEBUG Timeline - allTransitions:', allTransitions);
+        console.log('🔍 DEBUG Timeline - allDates:', allDates);
+        
+        // Debug: mostrar primera transición completa
+        if (allTransitions.length > 0) {
+          console.log('🔍 DEBUG Timeline - Primera transición completa:', allTransitions[0]);
+          console.log('🔍 DEBUG Timeline - Campo accion:', allTransitions[0].accion);
+        }
 
         if (allDates.length === 0) {
           container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">No hay transiciones para mostrar</p>';
@@ -6143,6 +6165,16 @@ import AuthGuard from "../components/AuthGuard.astro";
         const startX = 70;
         const centerY = containerHeight / 2;
 
+        console.log('🔍 DEBUG Timeline - Dimensiones:', {
+          containerWidth,
+          containerHeight,
+          startX,
+          centerY,
+          minDate: minDate.toLocaleDateString(),
+          maxDate: maxDate.toLocaleDateString(),
+          timeRange
+        });
+
         // Agrupar eventos por posición X para evitar superposición
         const eventsByPosition = {};
         
@@ -6158,10 +6190,20 @@ import AuthGuard from "../components/AuthGuard.astro";
         });
 
         // Renderizar cada evento
+        console.log('🔍 DEBUG Timeline - eventsByPosition:', eventsByPosition);
+        console.log('🔍 DEBUG Timeline - Total grupos de eventos:', Object.keys(eventsByPosition).length);
+        
         Object.values(eventsByPosition).forEach(events => {
           events.forEach((eventData, stackIndex) => {
             const { transicion, xPosition } = eventData;
             const eventDate = new Date(transicion.fecha_transicion);
+            
+            console.log('🔍 DEBUG Timeline - Renderizando evento:', {
+              accion: transicion.accion,
+              fecha: eventDate.toLocaleDateString(),
+              xPosition,
+              color: transicion.color
+            });
             
             // Alternar eventos arriba y abajo de la línea central
             const isTop = stackIndex % 2 === 0;
@@ -6173,42 +6215,59 @@ import AuthGuard from "../components/AuthGuard.astro";
             // Crear marcador de evento
             const eventDiv = document.createElement('div');
             eventDiv.className = 'timeline-event';
+            eventDiv.style.position = 'absolute';
             eventDiv.style.left = `${xPosition}px`;
             eventDiv.style.top = `${centerY}px`;
+            eventDiv.style.width = '0px';
+            eventDiv.style.height = '0px';
             eventDiv.style.color = transicion.color;
 
             // Línea perpendicular desde el eje hasta el punto
             const line = document.createElement('div');
             line.className = 'timeline-line';
+            line.style.position = 'absolute';
             line.style.backgroundColor = transicion.color;
+            line.style.width = '4px';
+            line.style.left = '50%';
+            line.style.transform = 'translateX(-50%)';
             
             if (isTop) {
               line.style.height = `${yOffset}px`;
-              line.style.bottom = '10px';
+              line.style.bottom = '0px';
             } else {
-      // Renderizar marcadores de fecha en el eje
-      function renderDateMarkers(minDate, maxDate, timeRange, startX, containerWidth, container, centerY) {
-        const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-        const markerCount = Math.min(Math.max(daysDiff, 5), 12); // Entre 5 y 12 marcadores
+              line.style.height = `${yOffset}px`;
+              line.style.top = '0px';
+            }
 
-        for (let i = 0; i <= markerCount; i++) {
-          const progress = i / markerCount;
-          const markerDate = new Date(minDate.getTime() + (progress * timeRange));
-          const xPosition = startX + (progress * containerWidth);
+            // Punto en el eje
+            const dot = document.createElement('div');
+            dot.className = 'timeline-dot';
+            dot.style.backgroundColor = transicion.color;
+            dot.title = `${transicion.canchaName}\n${transicion.accion}\n${eventDate.toLocaleDateString('es-CL')}`;
 
-          const marker = document.createElement('div');
-          marker.className = 'timeline-date-marker';
-          marker.style.left = `${xPosition}px`;
-          marker.style.top = `${centerY}px`;
-          
-          marker.textContent = markerDate.toLocaleDateString('es-CL', { 
-            day: '2-digit', 
-            month: 'short' 
-          });
-
-          container.appendChild(marker);
-        }
-      }     }
+            // Etiqueta de la acción
+            const label = document.createElement('div');
+            label.className = 'timeline-label';
+            const accionRaw = transicion.accion || 'Sin acción';
+            const accionTexto = accionRaw.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            console.log('🔍 DEBUG Timeline - Creando label:', { accionRaw, accionTexto });
+            
+            if (timelineData.length > 1) {
+              // Si hay múltiples canchas, mostrar nombre corto
+              const nombreCorto = transicion.canchaName.length > 20 
+                ? transicion.canchaName.substring(0, 17) + '...' 
+                : transicion.canchaName;
+              label.innerHTML = `<strong style="color: ${transicion.color};">${nombreCorto}</strong><br/>${accionTexto}`;
+            } else {
+              label.textContent = accionTexto;
+            }
+            
+            if (isTop) {
+              label.style.bottom = `${yOffset + 15}px`;
+            } else {
+              label.style.top = `${yOffset + 15}px`;
+            }
 
             eventDiv.appendChild(line);
             eventDiv.appendChild(dot);
@@ -6223,18 +6282,9 @@ import AuthGuard from "../components/AuthGuard.astro";
       }
 
       // Renderizar marcadores de fecha en el eje
-      function renderDateMarkers(minDate, maxDate, timeRange, startX, containerWidth, container) {
+      function renderDateMarkers(minDate, maxDate, timeRange, startX, containerWidth, container, centerY) {
         const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-        const markerCount = Math.min(daysDiff + 1, 10);
-        
-        // Posicionar el eje horizontal
-        const axisElement = document.getElementById('timeline-axis');
-        if (axisElement) {
-          const containerHeight = container.parentElement.offsetHeight;
-          axisElement.style.bottom = '50px';
-          axisElement.style.left = `${startX}px`;
-          axisElement.style.width = `${containerWidth}px`;
-        }
+        const markerCount = Math.min(Math.max(daysDiff, 5), 12); // Entre 5 y 12 marcadores
 
         for (let i = 0; i <= markerCount; i++) {
           const progress = i / markerCount;
@@ -6243,7 +6293,11 @@ import AuthGuard from "../components/AuthGuard.astro";
 
           const marker = document.createElement('div');
           marker.className = 'timeline-date-marker';
+          marker.style.position = 'absolute';
           marker.style.left = `${xPosition}px`;
+          marker.style.top = `${centerY + 40}px`;
+          marker.style.transform = 'translateX(-50%)';
+          
           marker.textContent = markerDate.toLocaleDateString('es-CL', { 
             day: '2-digit', 
             month: 'short' 
