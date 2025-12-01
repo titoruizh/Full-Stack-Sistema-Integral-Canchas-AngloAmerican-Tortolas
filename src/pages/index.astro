@@ -2571,13 +2571,14 @@ import AuthGuard from "../components/AuthGuard.astro";
       .timeline-canvas-wrapper {
         position: relative;
         width: 100%;
-        min-height: 400px;
-        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-        border-radius: 12px;
+        min-height: 500px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 16px;
         overflow-x: auto;
         overflow-y: hidden;
-        border: 1px solid #e1e8ed;
-        padding: 40px 20px;
+        border: 2px solid #cbd5e1;
+        padding: 60px 40px;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
       }
 
       #timeline-canvas {
@@ -2591,11 +2592,12 @@ import AuthGuard from "../components/AuthGuard.astro";
         top: 50%;
         left: 60px;
         right: 60px;
-        height: 4px;
-        background: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899);
-        border-radius: 2px;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        height: 6px;
+        background: linear-gradient(to right, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+        border-radius: 3px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-50%);
+        z-index: 1;
       }
 
       .timeline-events {
@@ -2618,64 +2620,81 @@ import AuthGuard from "../components/AuthGuard.astro";
       }
 
       .timeline-event:hover .timeline-dot {
-        transform: translate(-50%, -50%) scale(1.2);
+        transform: translate(-50%, -50%) scale(1.3);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
       .timeline-event:hover .timeline-label {
-        transform: translateX(-50%) scale(1.05);
+        transform: translateX(-50%) scale(1.08);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 4px 8px rgba(0, 0, 0, 0.12);
+        border-color: #cbd5e1;
+      }
+
+      .timeline-event:hover .timeline-line {
+        opacity: 1;
+        width: 4px;
       }
 
       .timeline-dot {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        border: 4px solid #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        border: 5px solid #fff;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15);
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 10;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
       }
 
       .timeline-line {
         position: absolute;
-        width: 4px;
+        width: 3px;
         background: currentColor;
-        opacity: 0.7;
+        opacity: 0.8;
         left: 50%;
         transform: translateX(-50%);
         z-index: 5;
         border-radius: 2px;
+        transition: all 0.3s ease;
       }
 
       .timeline-label {
         position: absolute;
         white-space: nowrap;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 700;
         color: #1e293b;
-        background: white;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 0.65rem 1.2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
         border: 2px solid #e2e8f0;
         pointer-events: none;
         z-index: 20;
         left: 50%;
         transform: translateX(-50%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        letter-spacing: 0.3px;
       }
 
       .timeline-date-marker {
         position: absolute;
-        font-size: 0.8rem;
-        color: #475569;
-        font-weight: 600;
-        background: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1.5px solid #cbd5e1;
         white-space: nowrap;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
       }
     </style>
   </head>
@@ -6119,10 +6138,6 @@ import AuthGuard from "../components/AuthGuard.astro";
       function renderTimeline(timelineData, canchaColors, container) {
         container.innerHTML = '';
 
-        console.log('🔍 DEBUG Timeline - timelineData:', timelineData);
-        console.log('🔍 DEBUG Timeline - canchaColors:', canchaColors);
-        console.log('🔍 DEBUG Timeline - container:', container);
-
         // Obtener todas las fechas para calcular el rango
         let allDates = [];
         let allTransitions = [];
@@ -6138,15 +6153,6 @@ import AuthGuard from "../components/AuthGuard.astro";
             });
           });
         });
-
-        console.log('🔍 DEBUG Timeline - allTransitions:', allTransitions);
-        console.log('🔍 DEBUG Timeline - allDates:', allDates);
-        
-        // Debug: mostrar primera transición completa
-        if (allTransitions.length > 0) {
-          console.log('🔍 DEBUG Timeline - Primera transición completa:', allTransitions[0]);
-          console.log('🔍 DEBUG Timeline - Campo accion:', allTransitions[0].accion);
-        }
 
         if (allDates.length === 0) {
           container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">No hay transiciones para mostrar</p>';
@@ -6165,16 +6171,6 @@ import AuthGuard from "../components/AuthGuard.astro";
         const startX = 70;
         const centerY = containerHeight / 2;
 
-        console.log('🔍 DEBUG Timeline - Dimensiones:', {
-          containerWidth,
-          containerHeight,
-          startX,
-          centerY,
-          minDate: minDate.toLocaleDateString(),
-          maxDate: maxDate.toLocaleDateString(),
-          timeRange
-        });
-
         // Agrupar eventos por posición X para evitar superposición
         const eventsByPosition = {};
         
@@ -6190,20 +6186,10 @@ import AuthGuard from "../components/AuthGuard.astro";
         });
 
         // Renderizar cada evento
-        console.log('🔍 DEBUG Timeline - eventsByPosition:', eventsByPosition);
-        console.log('🔍 DEBUG Timeline - Total grupos de eventos:', Object.keys(eventsByPosition).length);
-        
         Object.values(eventsByPosition).forEach(events => {
           events.forEach((eventData, stackIndex) => {
             const { transicion, xPosition } = eventData;
             const eventDate = new Date(transicion.fecha_transicion);
-            
-            console.log('🔍 DEBUG Timeline - Renderizando evento:', {
-              accion: transicion.accion,
-              fecha: eventDate.toLocaleDateString(),
-              xPosition,
-              color: transicion.color
-            });
             
             // Alternar eventos arriba y abajo de la línea central
             const isTop = stackIndex % 2 === 0;
@@ -6250,8 +6236,6 @@ import AuthGuard from "../components/AuthGuard.astro";
             label.className = 'timeline-label';
             const accionRaw = transicion.accion || 'Sin acción';
             const accionTexto = accionRaw.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            
-            console.log('🔍 DEBUG Timeline - Creando label:', { accionRaw, accionTexto });
             
             if (timelineData.length > 1) {
               // Si hay múltiples canchas, mostrar nombre corto
