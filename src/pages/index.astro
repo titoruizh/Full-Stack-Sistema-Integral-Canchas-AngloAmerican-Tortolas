@@ -233,20 +233,24 @@ import AuthGuard from "../components/AuthGuard.astro";
       }
 
       .header-btn-linkapsis::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.3));
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.3),
+          rgba(37, 99, 235, 0.3)
+        );
         transition: left 0.5s ease;
       }
 
       .header-btn-linkapsis:hover {
         background: linear-gradient(135deg, #60a5fa, #3b82f6);
         transform: translateY(-2px);
-        box-shadow: 
+        box-shadow:
           0 8px 20px rgba(59, 130, 246, 0.4),
           0 0 30px rgba(59, 130, 246, 0.2);
       }
@@ -582,34 +586,26 @@ import AuthGuard from "../components/AuthGuard.astro";
       }
 
       .empresa-actual {
-        font-weight: 600;
-        padding: 0.4rem 0.8rem;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        text-align: center;
         display: inline-block;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        height: 36px;
+        padding: 0.3rem 0.8rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
       }
 
-      .empresa-angloamerican {
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #dbeafe;
+      .empresa-actual:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
       }
-      .empresa-besalco {
-        background: #fff7ed;
-        color: #c2410c;
-        border: 1px solid #ffedd5;
-      }
-      .empresa-linkapsis {
-        background: #f0fdf4;
-        color: #15803d;
-        border: 1px solid #dcfce7;
-      }
-      .empresa-llayllay {
-        background: #faf5ff;
-        color: #7e22ce;
-        border: 1px solid #f3e8ff;
+
+      .empresa-actual img {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+        display: block;
       }
 
       .modal {
@@ -2793,15 +2789,15 @@ import AuthGuard from "../components/AuthGuard.astro";
       .timeline-axis {
         position: absolute;
         top: 50%;
-        left: 10px; /* Extensión dramática al inicio */
-        right: 10px; /* Extensión dramática al final */
-        height: 8px; /* Ligeramente más delgado */
+        left: 2%; /* Porcentaje para responsividad */
+        right: 5%; /* Más espacio para la flecha */
+        height: 8px;
         background: linear-gradient(
           90deg,
           #cbd5e1 0%,
           #94a3b8 50%,
           #64748b 100%
-        ); /* Gradiente más sutil y profesional */
+        );
         border-radius: 4px;
         transform: translateY(-50%);
         z-index: 1;
@@ -3053,7 +3049,14 @@ import AuthGuard from "../components/AuthGuard.astro";
             >
           </div>
           <div class="header-buttons">
-            <span id="user-company" class="empresa-actual">Cargando...</span>
+            <div id="user-company" class="empresa-actual">
+              <img
+                id="user-company-logo"
+                src=""
+                alt="Logo Empresa"
+                style="display: none;"
+              />
+            </div>
             <button
               id="btn-abrir-modal-crear"
               type="button"
@@ -4395,7 +4398,22 @@ import AuthGuard from "../components/AuthGuard.astro";
           // Actualizar UI del header
           userName.textContent = usuario.nombre_completo;
           userRole.textContent = `${usuario.rol_nombre} - ${usuario.empresa_nombre}`;
-          userCompany.textContent = usuario.empresa_nombre;
+
+          // Asignar logo de empresa
+          const companyLogo = document.getElementById("user-company-logo");
+          const logoMap = {
+            AngloAmerican: "/AngloAmerican.png",
+            Besalco: "/Besalco.png",
+            Linkapsis: "/Linkapsis.png",
+            LlayLlay: "/LlayLlay.png",
+          };
+
+          if (companyLogo && logoMap[usuario.empresa_nombre]) {
+            companyLogo.src = logoMap[usuario.empresa_nombre];
+            companyLogo.alt = `Logo ${usuario.empresa_nombre}`;
+            companyLogo.style.display = "block";
+          }
+
           userCompany.className = `empresa-actual empresa-${usuario.empresa_nombre.toLowerCase().replace(" ", "")}`;
 
           // Mostrar/ocultar botón de crear cancha según la empresa
@@ -4421,12 +4439,15 @@ import AuthGuard from "../components/AuthGuard.astro";
 
           // === MOSTRAR BOTONES ESPECIALES PARA LINKAPSIS ===
           // Linkapsis tiene empresa_nombre === "Linkapsis" (verificar en base de datos)
-          const btnSubirRevanchas = document.getElementById("btn-subir-revanchas");
+          const btnSubirRevanchas = document.getElementById(
+            "btn-subir-revanchas",
+          );
           const btnSubirCanchas = document.getElementById("btn-subir-canchas");
-          
+
           if (usuario.empresa_nombre === "Linkapsis") {
             console.log("Mostrando botones especiales para Linkapsis");
-            if (btnSubirRevanchas) btnSubirRevanchas.style.display = "inline-flex";
+            if (btnSubirRevanchas)
+              btnSubirRevanchas.style.display = "inline-flex";
             if (btnSubirCanchas) btnSubirCanchas.style.display = "inline-flex";
           } else {
             if (btnSubirRevanchas) btnSubirRevanchas.style.display = "none";
@@ -4463,9 +4484,11 @@ import AuthGuard from "../components/AuthGuard.astro";
        * - btn-subir-canchas: Abre modal para carga masiva de canchas
        */
       function configurarBotonesLinkapsis() {
-        const btnSubirRevanchas = document.getElementById("btn-subir-revanchas");
+        const btnSubirRevanchas = document.getElementById(
+          "btn-subir-revanchas",
+        );
         const btnSubirCanchas = document.getElementById("btn-subir-canchas");
-        
+
         // Event listener para Subir Revanchas
         if (btnSubirRevanchas) {
           btnSubirRevanchas.addEventListener("click", () => {
@@ -4522,10 +4545,10 @@ import AuthGuard from "../components/AuthGuard.astro";
       function configurarCierreModalesLinkapsis() {
         const modales = [
           { id: "modal-subir-revanchas", nombre: "Subir Revanchas" },
-          { id: "modal-subir-canchas", nombre: "Subir Canchas" }
+          { id: "modal-subir-canchas", nombre: "Subir Canchas" },
         ];
 
-        modales.forEach(modalInfo => {
+        modales.forEach((modalInfo) => {
           const modal = document.getElementById(modalInfo.id);
           if (!modal) {
             console.warn(`Modal ${modalInfo.nombre} no encontrado`);
@@ -4534,7 +4557,7 @@ import AuthGuard from "../components/AuthGuard.astro";
 
           const closeBtn = modal.querySelector(".close-btn");
           const cancelBtn = modal.querySelector(".btn-cancel");
-          
+
           // Cerrar con botón X
           if (closeBtn) {
             closeBtn.addEventListener("click", () => {
@@ -4542,15 +4565,17 @@ import AuthGuard from "../components/AuthGuard.astro";
               modal.classList.remove("show");
             });
           }
-          
+
           // Cerrar con botón Cancelar/Cerrar
           if (cancelBtn) {
             cancelBtn.addEventListener("click", () => {
-              console.log(`Cerrando modal ${modalInfo.nombre} (botón Cancelar)`);
+              console.log(
+                `Cerrando modal ${modalInfo.nombre} (botón Cancelar)`,
+              );
               modal.classList.remove("show");
             });
           }
-          
+
           // Cerrar al hacer click en el backdrop (fuera del modal-content)
           modal.addEventListener("click", (e) => {
             if (e.target === modal) {
@@ -6917,9 +6942,15 @@ import AuthGuard from "../components/AuthGuard.astro";
         const maxDate = new Date(Math.max(...allDates));
         const timeRange = maxDate - minDate || 86400000; // Mínimo 1 día
 
-        const containerWidth = container.parentElement.offsetWidth - 40; // 10px + 10px + margen pequeño
+        // Usar el ancho real del contenedor y calcular márgenes en porcentaje
+        const totalWidth = container.parentElement.offsetWidth;
+        const marginLeftPercent = 0.02; // 2% a la izquierda
+        const marginRightPercent = 0.05; // 5% a la derecha (más espacio para la flecha)
+        const marginLeft = totalWidth * marginLeftPercent;
+        const marginRight = totalWidth * marginRightPercent;
+        const containerWidth = totalWidth - marginLeft - marginRight; // Ancho útil sin márgenes
         const containerHeight = container.parentElement.offsetHeight;
-        const startX = 20; // Coherente con left: 10px del eje
+        const startX = marginLeft; // Comenzar después del margen izquierdo
         const centerY = containerHeight / 2;
 
         // Agrupar eventos por posición X para evitar superposición
