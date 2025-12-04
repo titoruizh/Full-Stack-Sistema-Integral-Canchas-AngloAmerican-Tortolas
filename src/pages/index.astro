@@ -3199,6 +3199,66 @@ import AuthGuard from "../components/AuthGuard.astro";
         background: #f1f5f9;
       }
 
+      /* === TABLA DE RESUMEN POR SECTOR === */
+      .tabla-resumen-sectores {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 2rem;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .tabla-resumen-sectores thead {
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      }
+
+      .tabla-resumen-sectores thead th {
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.05em;
+      }
+
+      .tabla-resumen-sectores thead th:first-child {
+        text-align: left;
+        padding-left: 1.5rem;
+      }
+
+      .tabla-resumen-sectores tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.2s;
+      }
+
+      .tabla-resumen-sectores tbody tr:hover {
+        background: #faf5ff;
+      }
+
+      .tabla-resumen-sectores tbody td {
+        padding: 0.875rem 1rem;
+        text-align: center;
+        color: #475569;
+        font-size: 0.95rem;
+      }
+
+      .tabla-resumen-sectores tbody td:first-child {
+        text-align: left;
+        font-weight: 700;
+        color: #7c3aed;
+        padding-left: 1.5rem;
+        background: #faf5ff;
+        font-size: 1rem;
+      }
+
+      .tabla-resumen-sectores .parametro-label {
+        font-weight: 600;
+        color: #64748b;
+        padding-left: 2.5rem !important;
+        font-size: 0.9rem;
+      }
       /* === ESTILOS PARA FORMULARIO DE SUBIR CANCHAS === */
       .form-row {
         display: grid;
@@ -8587,6 +8647,106 @@ import AuthGuard from "../components/AuthGuard.astro";
           );
         }
         resumenContainer.innerHTML = tablaResumenHTML;
+
+        // Calcular estadísticas por sector
+        const sectoresUnicos = [
+          ...new Set(datos.map((row) => row.sector)),
+        ].sort();
+
+        const calcularEstadisticasPorSector = (sector, campo) => {
+          const datosSector = datos.filter((row) => row.sector === sector);
+          const valoresValidos = datosSector
+            .map((row) => parseFloat(row[campo]))
+            .filter((val) => !isNaN(val) && val !== null && val !== undefined);
+
+          if (valoresValidos.length === 0) {
+            return { min: null, pkMin: null, max: null, pkMax: null };
+          }
+
+          const min = Math.min(...valoresValidos);
+          const max = Math.max(...valoresValidos);
+
+          const rowMin = datosSector.find(
+            (row) => parseFloat(row[campo]) === min,
+          );
+          const pkMin = rowMin ? rowMin.pk : null;
+
+          const rowMax = datosSector.find(
+            (row) => parseFloat(row[campo]) === max,
+          );
+          const pkMax = rowMax ? rowMax.pk : null;
+
+          return { min, pkMin, max, pkMax };
+        };
+
+        // Generar tabla de resumen por sectores
+        let tablaSectoresHTML = `
+          <table class="tabla-resumen-sectores">
+            <thead>
+              <tr>
+                <th colspan="7">Resumen por Sector - ${config.nombre} - ${fecha || "Sin fecha"}</th>
+              </tr>
+              <tr style="background: #6d28d9;">
+                <th>SECTOR</th>
+                <th colspan="2">REVANCHA (m)</th>
+                <th colspan="2">ANCHO (m)</th>
+                <th colspan="2">CORONAMIENTO (m)</th>
+              </tr>
+              <tr style="background: #7c3aed;">
+                <th></th>
+                <th>MIN (PK)</th>
+                <th>MAX (PK)</th>
+                <th>MIN (PK)</th>
+                <th>MAX (PK)</th>
+                <th>MIN (PK)</th>
+                <th>MAX (PK)</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+        sectoresUnicos.forEach((sector) => {
+          const statsRevancha = calcularEstadisticasPorSector(
+            sector,
+            "revancha",
+          );
+          const statsAncho = calcularEstadisticasPorSector(sector, "ancho");
+          const statsCoronamiento = calcularEstadisticasPorSector(
+            sector,
+            "coronamiento",
+          );
+
+          tablaSectoresHTML += `
+              <tr>
+                <td>Sector ${sector}</td>
+                <td>${statsRevancha.min !== null ? statsRevancha.min.toFixed(3) + " (" + statsRevancha.pkMin + ")" : "-"}</td>
+                <td>${statsRevancha.max !== null ? statsRevancha.max.toFixed(3) + " (" + statsRevancha.pkMax + ")" : "-"}</td>
+                <td>${statsAncho.min !== null ? statsAncho.min.toFixed(3) + " (" + statsAncho.pkMin + ")" : "-"}</td>
+                <td>${statsAncho.max !== null ? statsAncho.max.toFixed(3) + " (" + statsAncho.pkMax + ")" : "-"}</td>
+                <td>${statsCoronamiento.min !== null ? statsCoronamiento.min.toFixed(3) + " (" + statsCoronamiento.pkMin + ")" : "-"}</td>
+                <td>${statsCoronamiento.max !== null ? statsCoronamiento.max.toFixed(3) + " (" + statsCoronamiento.pkMax + ")" : "-"}</td>
+              </tr>`;
+        });
+
+        tablaSectoresHTML += `
+            </tbody>
+          </table>
+        `;
+
+        // Crear o actualizar contenedor para tabla de resumen por sectores
+        let sectoresContainer = document.getElementById(
+          "resumen-sectores-container",
+        );
+        if (!sectoresContainer) {
+          sectoresContainer = document.createElement("div");
+          sectoresContainer.id = "resumen-sectores-container";
+          sectoresContainer.style.marginTop = "1.5rem";
+          // Insertar después del contenedor de resumen general
+          resumenContainer.parentNode.insertBefore(
+            sectoresContainer,
+            resumenContainer.nextSibling,
+          );
+        }
+        sectoresContainer.innerHTML = tablaSectoresHTML;
 
         previewDiv.style.display = "block";
       }
