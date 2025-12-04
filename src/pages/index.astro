@@ -5062,11 +5062,7 @@ import AuthGuard from "../components/AuthGuard.astro";
               // AngloAmerican puede actuar cuando:
               // - Cancha creada (enviar a Besalco)
               // - Cancha validada (cerrar)
-              // - Cancha en proceso en AngloAmerican (cerrar)
-              tieneAccion =
-                estado === "Creada" ||
-                estado === "Validada" ||
-                (estado === "En Proceso" && empresaActual === "AngloAmerican");
+              tieneAccion = estado === "Creada" || estado === "Validada";
               break;
 
             case "Besalco":
@@ -5143,31 +5139,41 @@ import AuthGuard from "../components/AuthGuard.astro";
       // Actualizar dashboard de estados con contadores
       function actualizarContadorResultados(mostradas, total) {
         // === ACTUALIZAR WIDGETS ORIGINALES (SIDEBAR) ===
-        // Contar acciones disponibles
+        // Contar acciones disponibles para la empresa logueada
         const accionesDisponibles = canchasFiltradas.filter((cancha) => {
           const estado = cancha.estado_actual;
           const empresaActual = cancha.empresa_actual;
 
+          if (!empresaLogueada) return false;
+
           let tieneAccion = false;
-          switch (empresaActual) {
+          const empresaNombre = empresaLogueada.nombre;
+
+          switch (empresaNombre) {
             case "AngloAmerican":
-              tieneAccion =
-                estado === "Creada" ||
-                estado === "Validada" ||
-                estado === "Rechazada, en Espera";
+              // AngloAmerican puede actuar cuando:
+              // - Cancha creada (enviar a Besalco)
+              // - Cancha validada (cerrar)
+              tieneAccion = estado === "Creada" || estado === "Validada";
               break;
             case "Besalco":
+              // Besalco puede actuar cuando:
+              // - Está en espera (recién asignada o rechazada)
+              // - Está en proceso (trabajando activamente)
               tieneAccion =
                 (estado === "En Espera" && empresaActual === "Besalco") ||
+                (estado === "En Proceso" && empresaActual === "Besalco") ||
                 (estado === "Rechazada, en Espera" &&
                   empresaActual === "Besalco");
               break;
             case "Linkapsis":
+              // Linkapsis puede actuar cuando está en espera o en proceso
               tieneAccion =
                 (estado === "En Espera" && empresaActual === "Linkapsis") ||
                 (estado === "En Proceso" && empresaActual === "Linkapsis");
               break;
             case "LlayLlay":
+              // LlayLlay puede actuar cuando está en espera o en proceso
               tieneAccion =
                 (estado === "En Espera" && empresaActual === "LlayLlay") ||
                 (estado === "En Proceso" && empresaActual === "LlayLlay");
