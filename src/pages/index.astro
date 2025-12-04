@@ -2363,6 +2363,176 @@ import AuthGuard from "../components/AuthGuard.astro";
         }
       }
 
+      /* === ESTILOS PARA HEADER DEL MAPA === */
+      .dashboard-map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .map-header-left {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .map-header-controls {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      /* Filtro de Muros */
+      .map-filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .filter-label {
+        font-weight: 600;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+
+      .map-filter-select {
+        appearance: none;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 1rem;
+        transition: all 0.2s ease;
+        min-width: 140px;
+      }
+
+      .map-filter-select:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .map-filter-select:focus {
+        outline: none;
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+      }
+
+      .map-filter-select option {
+        background-color: #1e293b;
+        color: white;
+      }
+
+      /* Toggle Revanchas */
+      .map-toggle-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .toggle-label {
+        font-weight: 600;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+
+      /* Toggle Switch Moderno (ON/OFF) */
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 28px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider-round {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: 0.3s;
+        border-radius: 28px;
+      }
+
+      .toggle-slider-round:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .toggle-switch input:checked + .toggle-slider-round {
+        background-color: #10b981;
+        border-color: #10b981;
+      }
+
+      .toggle-switch input:checked + .toggle-slider-round:before {
+        transform: translateX(24px);
+      }
+
+      .toggle-switch input:focus + .toggle-slider-round {
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      }
+
+      /* Símbolos ON/OFF */
+      .toggle-slider-round:after {
+        content: "O";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+        transition: 0.3s;
+      }
+
+      .toggle-switch input:checked + .toggle-slider-round:after {
+        content: "I";
+        left: 8px;
+        right: auto;
+        color: white;
+      }
+
+      /* Responsive para controles del mapa */
+      @media (max-width: 768px) {
+        .dashboard-map-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .map-header-controls {
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+
       /* === REDISEÑO FILTROS (V2) === */
       .toggle-container {
         position: relative;
@@ -3658,10 +3828,33 @@ import AuthGuard from "../components/AuthGuard.astro";
       <!-- === MAPA DASHBOARD === -->
       <div class="dashboard-map-section">
         <div class="dashboard-map-header">
-          <h3 class="dashboard-map-title">🗺️ Vista de Mapa</h3>
-          <p class="dashboard-map-subtitle" id="map-subtitle">
-            Mostrando todas las canchas
-          </p>
+          <div class="map-header-left">
+            <h3 class="dashboard-map-title">🗺️ Vista de Mapa</h3>
+            <p class="dashboard-map-subtitle" id="map-subtitle">
+              Mostrando todas las canchas
+            </p>
+          </div>
+          <div class="map-header-controls">
+            <!-- Filtro de Muros -->
+            <div class="map-filter-group">
+              <label for="map-muro-filter" class="filter-label">Muro:</label>
+              <select id="map-muro-filter" class="map-filter-select">
+                <option value="">Todos</option>
+                <option value="Principal">Principal</option>
+                <option value="Este">Este</option>
+                <option value="Oeste">Oeste</option>
+              </select>
+            </div>
+
+            <!-- Toggle Revanchas -->
+            <div class="map-toggle-group">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-revanchas" />
+                <span class="toggle-slider-round"></span>
+              </label>
+              <span class="toggle-label">Revanchas</span>
+            </div>
+          </div>
         </div>
         <div class="dashboard-map-container" id="dashboard-map-container">
           <div class="dashboard-map-loading">Cargando mapa...</div>
@@ -4746,9 +4939,102 @@ import AuthGuard from "../components/AuthGuard.astro";
         // Configurar botones de paginación
         configurarPaginacion();
 
+        // Configurar controles del mapa
+        configurarControlesMapa();
+
         // Inicializar slider de filtros
         setTimeout(updateSliderPosition, 100);
         window.addEventListener("resize", updateSliderPosition);
+      }
+
+      // Configurar controles del header del mapa
+      function configurarControlesMapa() {
+        const mapMuroFilter = document.getElementById("map-muro-filter");
+        const toggleRevanchas = document.getElementById("toggle-revanchas");
+        const mapSubtitle = document.getElementById("map-subtitle");
+
+        // Filtro de muros del mapa
+        if (mapMuroFilter) {
+          mapMuroFilter.addEventListener("change", (e) => {
+            const muroSeleccionado = e.target.value;
+            console.log("🗺️ Filtro de muro cambiado:", muroSeleccionado);
+
+            // Actualizar subtítulo
+            if (mapSubtitle) {
+              if (muroSeleccionado) {
+                mapSubtitle.textContent = `Mostrando canchas del Muro ${muroSeleccionado}`;
+              } else {
+                mapSubtitle.textContent = "Mostrando todas las canchas";
+              }
+            }
+
+            // Recargar el iframe del mapa con el filtro aplicado
+            recargarMapaConFiltro(muroSeleccionado);
+          });
+        }
+
+        // Toggle de Revanchas
+        if (toggleRevanchas) {
+          toggleRevanchas.addEventListener("change", (e) => {
+            const activado = e.target.checked;
+            console.log("📊 Revanchas toggle:", activado ? "ON" : "OFF");
+            // TODO: Implementar visualización de revanchas en el mapa
+            if (activado) {
+              console.log(
+                "✅ Función de revanchas activada (pendiente de implementar)",
+              );
+            } else {
+              console.log("❌ Función de revanchas desactivada");
+            }
+          });
+        }
+      }
+
+      // Recargar el mapa con el filtro de muro aplicado
+      function recargarMapaConFiltro(muro) {
+        const mapContainer = document.getElementById("dashboard-map-container");
+        if (!mapContainer) return;
+
+        // Mostrar indicador de carga
+        mapContainer.innerHTML =
+          '<div class="dashboard-map-loading">Cargando mapa...</div>';
+
+        // Construir URL del mapa con filtro
+        let mapUrl = "/mapbox-window?dashboardMode=true";
+
+        // Obtener IDs de todas las canchas filtradas
+        const canchaIds = canchasFiltradas.map((c) => c.id).join(",");
+        if (canchaIds) {
+          mapUrl += `&canchaIds=${canchaIds}`;
+        }
+
+        // Agregar filtro de muro si está seleccionado
+        if (muro) {
+          // Convertir nombre completo a código (Principal -> MP, Este -> ME, Oeste -> MO)
+          const muroCodigo =
+            muro === "Principal"
+              ? "MP"
+              : muro === "Este"
+                ? "ME"
+                : muro === "Oeste"
+                  ? "MO"
+                  : muro;
+          mapUrl += `&muro=${muroCodigo}`;
+        }
+
+        console.log("🌐 Recargando mapa con URL:", mapUrl);
+
+        // Crear nuevo iframe
+        setTimeout(() => {
+          const iframe = document.createElement("iframe");
+          iframe.src = mapUrl;
+          iframe.style.width = "100%";
+          iframe.style.height = "100%";
+          iframe.style.border = "none";
+
+          mapContainer.innerHTML = "";
+          mapContainer.appendChild(iframe);
+        }, 300);
       }
 
       // Configurar event listeners de paginación
@@ -8340,15 +8626,15 @@ import AuthGuard from "../components/AuthGuard.astro";
             try {
               mostrarMensaje("Procesando archivo...", "info");
               const resultado = await procesarArchivoRevanchas(file, tipoMuro);
-              
+
               // Guardar datos en variables globales
               datosRevanchasActuales = resultado.datos;
               fechaRevanchasActual = resultado.fecha;
               archivoRevanchasActual = file;
-              
+
               mostrarPreview(resultado.datos, tipoMuro, resultado.fecha);
               mostrarMensaje("Archivo procesado correctamente", "exito");
-              
+
               if (btnProcesar) {
                 btnProcesar.disabled = false;
                 btnProcesar.style.opacity = "1";
@@ -8372,8 +8658,12 @@ import AuthGuard from "../components/AuthGuard.astro";
         if (btnProcesar) {
           btnProcesar.addEventListener("click", async () => {
             const tipoMuro = tipoMuroSelect?.value;
-            
-            if (!tipoMuro || !datosRevanchasActuales || !archivoRevanchasActual) {
+
+            if (
+              !tipoMuro ||
+              !datosRevanchasActuales ||
+              !archivoRevanchasActual
+            ) {
               mostrarMensaje("No hay datos para procesar", "error");
               return;
             }
@@ -8407,7 +8697,9 @@ import AuthGuard from "../components/AuthGuard.astro";
                   muro: tipoMuro,
                   fechaMedicion: fechaISO,
                   archivoNombre: archivoRevanchasActual.name,
-                  archivoTipo: archivoRevanchasActual.name.endsWith(".csv") ? "CSV" : "XLSX",
+                  archivoTipo: archivoRevanchasActual.name.endsWith(".csv")
+                    ? "CSV"
+                    : "XLSX",
                   datos: datosRevanchasActuales,
                   usuarioId: usuarioActual?.id || null,
                 }),
@@ -8416,13 +8708,21 @@ import AuthGuard from "../components/AuthGuard.astro";
               const resultado = await response.json();
 
               if (response.ok) {
-                mostrarMensaje(`✅ ${resultado.mensaje} (${resultado.data.totalRegistros} registros guardados)`, "exito");
-                
-                console.log("📊 Estadísticas calculadas:", resultado.data.estadisticas);
-                
+                mostrarMensaje(
+                  `✅ ${resultado.mensaje} (${resultado.data.totalRegistros} registros guardados)`,
+                  "exito",
+                );
+
+                console.log(
+                  "📊 Estadísticas calculadas:",
+                  resultado.data.estadisticas,
+                );
+
                 // Cerrar modal después de 2 segundos
                 setTimeout(() => {
-                  const modal = document.getElementById("modal-subir-revanchas");
+                  const modal = document.getElementById(
+                    "modal-subir-revanchas",
+                  );
                   if (modal) {
                     modal.classList.remove("show");
                     // Limpiar todo
@@ -8446,7 +8746,10 @@ import AuthGuard from "../components/AuthGuard.astro";
               }
             } catch (error) {
               console.error("Error guardando datos:", error);
-              mostrarMensaje("❌ Error al comunicarse con el servidor", "error");
+              mostrarMensaje(
+                "❌ Error al comunicarse con el servidor",
+                "error",
+              );
             } finally {
               btnProcesar.disabled = false;
               btnProcesar.textContent = "Procesar Datos";
