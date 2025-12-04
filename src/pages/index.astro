@@ -3100,6 +3100,105 @@ import AuthGuard from "../components/AuthGuard.astro";
         color: #1e40af;
       }
 
+      /* === CONTENEDOR CON SCROLL SOLO PARA TABLA PRINCIPAL === */
+      .tabla-datos-scroll {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .tabla-datos-scroll::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .tabla-datos-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+      }
+
+      .tabla-datos-scroll::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+      }
+
+      .tabla-datos-scroll::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      }
+
+      /* === COLORES CONDICIONALES PARA VALORES === */
+      .valor-verde {
+        background-color: #d1fae5 !important;
+        color: #065f46 !important;
+        font-weight: 600;
+      }
+
+      .valor-amarillo {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        font-weight: 600;
+      }
+
+      .valor-rojo {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        font-weight: 600;
+      }
+
+      /* === TABLA DE RESUMEN ESTADÍSTICO === */
+      .tabla-resumen {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 2rem;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .tabla-resumen thead {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      }
+
+      .tabla-resumen thead th {
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+      }
+
+      .tabla-resumen thead th:first-child {
+        text-align: left;
+        padding-left: 1.5rem;
+      }
+
+      .tabla-resumen tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.2s;
+      }
+
+      .tabla-resumen tbody tr:hover {
+        background: #f8fafc;
+      }
+
+      .tabla-resumen tbody td {
+        padding: 0.875rem 1rem;
+        text-align: center;
+        color: #475569;
+        font-size: 0.95rem;
+      }
+
+      .tabla-resumen tbody td:first-child {
+        text-align: left;
+        font-weight: 600;
+        color: #1e293b;
+        padding-left: 1.5rem;
+        background: #f1f5f9;
+      }
+
       /* === ESTILOS PARA FORMULARIO DE SUBIR CANCHAS === */
       .form-row {
         display: grid;
@@ -8334,45 +8433,161 @@ import AuthGuard from "../components/AuthGuard.astro";
           <strong>📅 Fecha:</strong> ${fecha || "No disponible"}
         `;
 
-        // Renderizar tabla
+        // Función para obtener clase de color según el valor y columna
+        const obtenerClaseColor = (valor, columna) => {
+          const num = parseFloat(valor);
+          if (isNaN(num)) return "";
+
+          switch (columna) {
+            case "revancha":
+              if (num > 3.5) return "valor-verde";
+              if (num >= 3.0 && num <= 3.5) return "valor-amarillo";
+              if (num < 3.0) return "valor-rojo";
+              break;
+            case "ancho":
+              if (num > 18) return "valor-verde";
+              if (num >= 15 && num <= 18) return "valor-amarillo";
+              if (num < 15) return "valor-rojo";
+              break;
+            case "distGeoCoronamiento":
+              if (num > 1) return ""; // Sin color
+              if (num >= 0.5 && num <= 1) return "valor-amarillo";
+              if (num < 0.5) return "valor-rojo";
+              break;
+            default:
+              return "";
+          }
+          return "";
+        };
+
+        // Renderizar tabla principal con scroll independiente y colores condicionales
         const tablaHTML = `
-          <table class="tabla-revanchas">
+          <div class="tabla-datos-scroll">
+            <table class="tabla-revanchas">
+              <thead>
+                <tr>
+                  <th>Sector</th>
+                  <th>Coronamiento</th>
+                  <th>Revancha</th>
+                  <th>Lama</th>
+                  <th>Ancho</th>
+                  <th>PK</th>
+                  <th>Geomembrana</th>
+                  <th>Dist Geo-Lama</th>
+                  <th>Dist Geo-Coronamiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${datos
+                  .map(
+                    (row) => `
+                  <tr class="sector-${row.sector}">
+                    <td class="sector-col">Sector ${row.sector}</td>
+                    <td>${formatValue(row.coronamiento)}</td>
+                    <td class="${obtenerClaseColor(row.revancha, "revancha")}">${formatValue(row.revancha, true)}</td>
+                    <td>${formatValue(row.lama)}</td>
+                    <td class="${obtenerClaseColor(row.ancho, "ancho")}">${formatValue(row.ancho)}</td>
+                    <td>${formatValue(row.pk)}</td>
+                    <td>${formatValue(row.geomembrana)}</td>
+                    <td>${formatValue(row.distGeoLama, true)}</td>
+                    <td class="${obtenerClaseColor(row.distGeoCoronamiento, "distGeoCoronamiento")}">${formatValue(row.distGeoCoronamiento, true)}</td>
+                  </tr>
+                `,
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        // Calcular estadísticas para la tabla de resumen
+        const calcularEstadisticas = (campo) => {
+          const valoresValidos = datos
+            .map((row) => parseFloat(row[campo]))
+            .filter((val) => !isNaN(val) && val !== null && val !== undefined);
+
+          if (valoresValidos.length === 0) {
+            return { min: null, pkMin: null, max: null, pkMax: null };
+          }
+
+          const min = Math.min(...valoresValidos);
+          const max = Math.max(...valoresValidos);
+
+          // Encontrar el PK correspondiente al valor mínimo
+          const rowMin = datos.find((row) => parseFloat(row[campo]) === min);
+          const pkMin = rowMin ? rowMin.pk : null;
+
+          // Encontrar el PK correspondiente al valor máximo
+          const rowMax = datos.find((row) => parseFloat(row[campo]) === max);
+          const pkMax = rowMax ? rowMax.pk : null;
+
+          return { min, pkMin, max, pkMax };
+        };
+
+        const statsRevancha = calcularEstadisticas("revancha");
+        const statsAncho = calcularEstadisticas("ancho");
+        const statsCoronamiento = calcularEstadisticas("coronamiento");
+
+        // Generar tabla de resumen (sin clases de color)
+        const tablaResumenHTML = `
+          <table class="tabla-resumen">
             <thead>
               <tr>
-                <th>Sector</th>
-                <th>Coronamiento</th>
-                <th>Revancha</th>
-                <th>Lama</th>
-                <th>Ancho</th>
-                <th>PK</th>
-                <th>Geomembrana</th>
-                <th>Dist Geo-Lama</th>
-                <th>Dist Geo-Coronamiento</th>
+                <th colspan="5">Resumen ${config.nombre} - ${fecha || "Sin fecha"}</th>
+              </tr>
+              <tr>
+                <th>PARÁMETROS</th>
+                <th>MIN</th>
+                <th>PK MIN</th>
+                <th>MAX</th>
+                <th>PK MAX</th>
               </tr>
             </thead>
             <tbody>
-              ${datos
-                .map(
-                  (row) => `
-                <tr class="sector-${row.sector}">
-                  <td class="sector-col">Sector ${row.sector}</td>
-                  <td>${formatValue(row.coronamiento)}</td>
-                  <td>${formatValue(row.revancha, true)}</td>
-                  <td>${formatValue(row.lama)}</td>
-                  <td>${formatValue(row.ancho)}</td>
-                  <td>${formatValue(row.pk)}</td>
-                  <td>${formatValue(row.geomembrana)}</td>
-                  <td>${formatValue(row.distGeoLama, true)}</td>
-                  <td>${formatValue(row.distGeoCoronamiento, true)}</td>
-                </tr>
-              `,
-                )
-                .join("")}
+              <tr>
+                <td>REVANCHA (m)</td>
+                <td>${statsRevancha.min !== null ? statsRevancha.min.toFixed(3) : "-"}</td>
+                <td>${statsRevancha.pkMin !== null ? statsRevancha.pkMin : "-"}</td>
+                <td>${statsRevancha.max !== null ? statsRevancha.max.toFixed(3) : "-"}</td>
+                <td>${statsRevancha.pkMax !== null ? statsRevancha.pkMax : "-"}</td>
+              </tr>
+              <tr>
+                <td>ANCHO (m)</td>
+                <td>${statsAncho.min !== null ? statsAncho.min.toFixed(3) : "-"}</td>
+                <td>${statsAncho.pkMin !== null ? statsAncho.pkMin : "-"}</td>
+                <td>${statsAncho.max !== null ? statsAncho.max.toFixed(3) : "-"}</td>
+                <td>${statsAncho.pkMax !== null ? statsAncho.pkMax : "-"}</td>
+              </tr>
+              <tr>
+                <td>COTA CORONAMIENTO (m)</td>
+                <td>${statsCoronamiento.min !== null ? statsCoronamiento.min.toFixed(3) : "-"}</td>
+                <td>${statsCoronamiento.pkMin !== null ? statsCoronamiento.pkMin : "-"}</td>
+                <td>${statsCoronamiento.max !== null ? statsCoronamiento.max.toFixed(3) : "-"}</td>
+                <td>${statsCoronamiento.pkMax !== null ? statsCoronamiento.pkMax : "-"}</td>
+              </tr>
             </tbody>
           </table>
         `;
 
+        // Insertar tabla principal en su contenedor
         tablaDiv.innerHTML = tablaHTML;
+
+        // Crear o actualizar contenedor para tabla de resumen (fuera del scroll)
+        let resumenContainer = document.getElementById(
+          "resumen-revanchas-container",
+        );
+        if (!resumenContainer) {
+          resumenContainer = document.createElement("div");
+          resumenContainer.id = "resumen-revanchas-container";
+          resumenContainer.style.marginTop = "1.5rem";
+          // Insertar después del contenedor de la tabla principal
+          tablaDiv.parentNode.insertBefore(
+            resumenContainer,
+            tablaDiv.nextSibling,
+          );
+        }
+        resumenContainer.innerHTML = tablaResumenHTML;
+
         previewDiv.style.display = "block";
       }
 
