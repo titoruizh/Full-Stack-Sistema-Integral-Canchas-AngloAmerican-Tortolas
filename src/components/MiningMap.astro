@@ -1752,6 +1752,59 @@ console.log("🏗️ MiningMap iniciado con:", {
             return R * c;
           };
 
+          // Calculate bearing between two coordinates
+          const getBearing = (coord1, coord2) => {
+            const lat1 = (coord1[1] * Math.PI) / 180;
+            const lat2 = (coord2[1] * Math.PI) / 180;
+            const deltaLon = ((coord2[0] - coord1[0]) * Math.PI) / 180;
+
+            const y = Math.sin(deltaLon) * Math.cos(lat2);
+            const x =
+              Math.cos(lat1) * Math.sin(lat2) -
+              Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
+
+            return (Math.atan2(y, x) * 180) / Math.PI;
+          };
+
+          // Generate perpendicular line coordinates
+          const getPerpendicularLine = (point, bearing, length, direction) => {
+            // direction: 1 for right (+90°), -1 for left (-90°)
+            const perpBearing = bearing + 90 * direction;
+            const lat = point[1];
+            const lon = point[0];
+
+            // Convert to radians
+            const brng = (perpBearing * Math.PI) / 180;
+            const latRad = (lat * Math.PI) / 180;
+            const lonRad = (lon * Math.PI) / 180;
+
+            // Calculate endpoint
+            const R = 6371000; // Earth radius in meters
+            const newLat = Math.asin(
+              Math.sin(latRad) * Math.cos(length / R) +
+                Math.cos(latRad) * Math.sin(length / R) * Math.cos(brng),
+            );
+            const newLon =
+              lonRad +
+              Math.atan2(
+                Math.sin(brng) * Math.sin(length / R) * Math.cos(latRad),
+                Math.cos(length / R) - Math.sin(latRad) * Math.sin(newLat),
+              );
+
+            return [
+              point,
+              [(newLon * 180) / Math.PI, (newLat * 180) / Math.PI],
+            ];
+          };
+
+          // Get color for ancho value
+          const getAnchoColor = (ancho) => {
+            const val = parseFloat(ancho);
+            if (val > 18) return "#10b981"; // Verde
+            if (val >= 15) return "#eab308"; // Amarillo
+            return "#ef4444"; // Rojo
+          };
+
           const lineFeatures = [];
           const MAX_DISTANCE = 100;
 
@@ -1782,6 +1835,98 @@ console.log("🏗️ MiningMap iniciado con:", {
             }
           }
 
+          // Generate perpendicular width lines
+          // Group PKs by wall
+          const pksByWall = {
+            Principal: [],
+            Este: [],
+            Oeste: [],
+          };
+
+          enrichedFeatures.forEach((feature) => {
+            const muro = feature.properties.muro;
+            if (pksByWall[muro]) {
+              pksByWall[muro].push(feature);
+            }
+          });
+
+          // Sort each wall by PK number
+          Object.keys(pksByWall).forEach((wall) => {
+            pksByWall[wall].sort((a, b) => {
+              const pkA = parseFloat(a.properties.pk.replace("+", "."));
+              const pkB = parseFloat(b.properties.pk.replace("+", "."));
+              return pkA - pkB;
+            });
+          });
+
+          console.log("🔍 PKs by wall:", {
+            Principal: pksByWall.Principal.length,
+            Este: pksByWall.Este.length,
+            Oeste: pksByWall.Oeste.length,
+          });
+          console.log(
+            "Sample feature muro:",
+            enrichedFeatures[0]?.properties?.muro,
+          );
+
+          // Generate perpendicular lines
+          const widthLines = [];
+          const lineLength = 33; // meters - 2/3 of original 50m
+
+          Object.entries(pksByWall).forEach(([wall, features]) => {
+            const direction = wall === "Oeste" ? -1 : 1; // Oeste left, Principal/Este right
+
+            for (let i = 0; i < features.length; i++) {
+              const current = features[i];
+              let bearing;
+
+              if (i < features.length - 1) {
+                // Not the last point: use bearing to next point
+                const next = features[i + 1];
+                bearing = getBearing(
+                  current.geometry.coordinates,
+                  next.geometry.coordinates,
+                );
+              } else {
+                // Last point: use bearing from previous segment
+                if (i > 0) {
+                  const prev = features[i - 1];
+                  bearing = getBearing(
+                    prev.geometry.coordinates,
+                    current.geometry.coordinates,
+                  );
+                } else {
+                  // Solo hay un punto, skip
+                  continue;
+                }
+              }
+
+              const lineCoords = getPerpendicularLine(
+                current.geometry.coordinates,
+                bearing,
+                lineLength,
+                direction,
+              );
+
+              widthLines.push({
+                type: "Feature",
+                geometry: {
+                  type: "LineString",
+                  coordinates: lineCoords,
+                },
+                properties: {
+                  ancho: current.properties.ancho,
+                  color: getAnchoColor(current.properties.ancho),
+                  pk: current.properties.pk,
+                  muro: wall,
+                },
+              });
+            }
+          });
+
+          console.log("✅ Width Lines Generated:", widthLines.length, "lines");
+          console.log("Sample:", widthLines[0]);
+
           // 2. Agregar Sources
           map.addSource("revanchas-source", {
             type: "geojson",
@@ -1791,6 +1936,11 @@ console.log("🏗️ MiningMap iniciado con:", {
           map.addSource("revanchas-lines", {
             type: "geojson",
             data: { type: "FeatureCollection", features: lineFeatures },
+          });
+
+          map.addSource("width-lines", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: widthLines },
           });
 
           // 3. Agregar Capas (Diseño Elegante)
@@ -1805,6 +1955,18 @@ console.log("🏗️ MiningMap iniciado con:", {
               "line-width": 1.5, // Visible pero fino
               "line-opacity": 0.4, // Recuperamos visibilidad
               "line-blur": 0.5, // Menos blur para definición
+            },
+          });
+
+          // Width Lines (Ancho visualization)
+          map.addLayer({
+            id: "width-lines-layer",
+            type: "line",
+            source: "width-lines",
+            paint: {
+              "line-color": ["get", "color"],
+              "line-width": 3,
+              "line-opacity": 0.9,
             },
           });
 
