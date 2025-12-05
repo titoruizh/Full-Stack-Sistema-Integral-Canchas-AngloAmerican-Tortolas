@@ -4975,16 +4975,59 @@ import AuthGuard from "../components/AuthGuard.astro";
 
         // Toggle de Revanchas
         if (toggleRevanchas) {
-          toggleRevanchas.addEventListener("change", (e) => {
+          toggleRevanchas.addEventListener("change", async (e) => {
             const activado = e.target.checked;
             console.log("📊 Revanchas toggle:", activado ? "ON" : "OFF");
-            // TODO: Implementar visualización de revanchas en el mapa
+            
+            const mapContainer = document.getElementById("dashboard-map-container");
+            const iframe = mapContainer?.querySelector("iframe");
+            
+            if (!iframe || !iframe.contentWindow) {
+              console.log("⚠️ Iframe del mapa no disponible");
+              return;
+            }
+
             if (activado) {
-              console.log(
-                "✅ Función de revanchas activada (pendiente de implementar)",
-              );
+              try {
+                console.log("🔄 Cargando revanchas georreferenciadas...");
+                
+                // Obtener filtro de muro actual
+                const muroFiltro = mapMuroFilter?.value || '';
+                
+                // Construir URL con filtros
+                let apiUrl = '/api/revanchas/georreferenciadas?soloUltimas=true&formato=geojson';
+                if (muroFiltro) {
+                  apiUrl += `&muro=${muroFiltro}`;
+                }
+                
+                // Cargar datos de revanchas georreferenciadas
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                  throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const geojsonData = await response.json();
+                console.log(`✅ ${geojsonData.features.length} revanchas georreferenciadas cargadas`);
+                
+                // Enviar datos al iframe del mapa
+                iframe.contentWindow.postMessage({
+                  type: 'mostrar-revanchas',
+                  data: geojsonData
+                }, '*');
+                
+                console.log("📤 Datos de revanchas enviados al mapa");
+              } catch (error) {
+                console.error("❌ Error al cargar revanchas:", error);
+                alert("Error al cargar revanchas georreferenciadas");
+                // Desmarcar el toggle en caso de error
+                e.target.checked = false;
+              }
             } else {
-              console.log("❌ Función de revanchas desactivada");
+              // Ocultar capa de revanchas
+              iframe.contentWindow.postMessage({
+                type: 'ocultar-revanchas'
+              }, '*');
+              console.log("📤 Comando de ocultar revanchas enviado al mapa");
             }
           });
         }
