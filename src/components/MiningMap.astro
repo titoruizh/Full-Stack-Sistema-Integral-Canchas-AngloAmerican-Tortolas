@@ -343,7 +343,7 @@ console.log("🏗️ MiningMap iniciado con:", {
                 "📊 Mostrando revanchas georreferenciadas:",
                 geojsonData,
               );
-              mostrarRevanchasEnMapa(geojsonData);
+              mostrarRevanchasEnMapaElegante(geojsonData);
             } else if (event.data.type === "ocultar-revanchas") {
               console.log("❌ Ocultando revanchas");
               ocultarRevanchasEnMapa();
@@ -1127,7 +1127,9 @@ console.log("🏗️ MiningMap iniciado con:", {
       // =====================================================
 
       // Mostrar revanchas en el mapa con visualización moderna
-      function mostrarRevanchasEnMapa(geojsonData) {
+      function mostrarRevanchasEnMapa_UNUSED(geojsonData) {
+        const pulseLayers = []; // Fix lint error
+        return; // Unused
         try {
           if (!map) {
             console.log("⚠️ Mapa no inicializado");
@@ -1286,8 +1288,10 @@ console.log("🏗️ MiningMap iniciado con:", {
             },
           });
 
-          // CAPAS DE ONDAS EXPANSIVAS TIPO SONAR (4 capas para efecto degradado)
-          // Onda 4 - Más externa (se desvanece completamente)
+          // CAPAS DE ONDAS EXPANSIVAS TIPO SONAR ELEGANTE
+          // Diseño sutil y profesional - opacidades muy reducidas
+
+          // Onda 4 - Más externa (casi invisible, efecto de disipación)
           map.addLayer({
             id: "revanchas-pulse-4",
             type: "circle",
@@ -1298,88 +1302,19 @@ console.log("🏗️ MiningMap iniciado con:", {
                 ["linear"],
                 ["zoom"],
                 12,
-                20,
                 16,
-                35,
+                16,
+                28,
                 20,
-                60,
+                48,
               ],
               "circle-color": ["get", "dynamic_color"],
-              "circle-opacity": 0.05,
-              "circle-blur": 1,
+              "circle-opacity": 0.02,
+              "circle-blur": 1.5,
             },
           });
 
-          // Onda 3
-          map.addLayer({
-            id: "revanchas-pulse-3",
-            type: "circle",
-            source: "revanchas-source",
-            paint: {
-              "circle-radius": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                12,
-                15,
-                16,
-                26,
-                20,
-                45,
-              ],
-              "circle-color": ["get", "dynamic_color"],
-              "circle-opacity": 0.1,
-              "circle-blur": 0.9,
-            },
-          });
-
-          // Onda 2
-          map.addLayer({
-            id: "revanchas-pulse-2",
-            type: "circle",
-            source: "revanchas-source",
-            paint: {
-              "circle-radius": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                12,
-                10,
-                16,
-                18,
-                20,
-                32,
-              ],
-              "circle-color": ["get", "dynamic_color"],
-              "circle-opacity": 0.2,
-              "circle-blur": 0.7,
-            },
-          });
-
-          // Onda 1 - Más interna
-          map.addLayer({
-            id: "revanchas-pulse-1",
-            type: "circle",
-            source: "revanchas-source",
-            paint: {
-              "circle-radius": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                12,
-                6,
-                16,
-                12,
-                20,
-                22,
-              ],
-              "circle-color": ["get", "dynamic_color"],
-              "circle-opacity": 0.35,
-              "circle-blur": 0.5,
-            },
-          });
-
-          // Glow central (muy sutil, sin punto definido)
+          // Núcleo central - muy sutil, marca la posición real
           map.addLayer({
             id: "revanchas-glow-inner",
             type: "circle",
@@ -1390,14 +1325,14 @@ console.log("🏗️ MiningMap iniciado con:", {
                 ["linear"],
                 ["zoom"],
                 12,
-                3,
+                2,
                 16,
-                6,
+                4,
                 20,
-                12,
+                8,
               ],
               "circle-color": ["get", "dynamic_color"],
-              "circle-opacity": 0.6,
+              "circle-opacity": 0.4,
               "circle-blur": 0.8,
             },
           });
@@ -1424,53 +1359,63 @@ console.log("🏗️ MiningMap iniciado con:", {
             minzoom: 15,
           });
 
-          // Animación de pulso tipo SONAR (4 ondas con fases diferentes)
-          let pulsePhase = 0;
-          function animateSonarPulse() {
+          // ANIMACIÓN SONAR REAL - Ondas que viajan del centro hacia afuera
+          let sonarPhase = 0;
+          function animateElegantSonar() {
             if (!map.getLayer("revanchas-pulse-1")) return;
 
-            pulsePhase = (pulsePhase + 0.015) % 1; // Velocidad del pulso
+            // Velocidad lenta para efecto "radar"
+            sonarPhase = (sonarPhase + 0.004) % 1;
 
-            // Cada onda tiene un desfase para crear efecto expansivo
-            const wave1 = Math.sin(pulsePhase * Math.PI * 2);
-            const wave2 = Math.sin((pulsePhase + 0.25) * Math.PI * 2);
-            const wave3 = Math.sin((pulsePhase + 0.5) * Math.PI * 2);
-            const wave4 = Math.sin((pulsePhase + 0.75) * Math.PI * 2);
+            // Configuración de expansión por nivel de zoom
+            // Radio máximo al que llega la onda antes de desaparecer
+            const maxRadiusStops = [
+              12,
+              20, // Zoom 12 -> 20px radio
+              16,
+              60, // Zoom 16 -> 60px radio
+              20,
+              120, // Zoom 20 -> 120px radio
+            ];
 
-            // Opacidades que pulsan y se desvanecen
-            const opacity1 = 0.35 + wave1 * 0.15;
-            const opacity2 = 0.2 + wave2 * 0.1;
-            const opacity3 = 0.1 + wave3 * 0.08;
-            const opacity4 = 0.05 + wave4 * 0.04;
+            pulseLayers.forEach((layerId, index) => {
+              // Calcular fase individual para esta capa (0.0 a 1.0)
+              // Desfase equitativo: 0, 0.25, 0.5, 0.75
+              const layerPhase = (sonarPhase + index / pulseLayers.length) % 1;
 
-            try {
-              map.setPaintProperty(
-                "revanchas-pulse-1",
-                "circle-opacity",
-                opacity1,
-              );
-              map.setPaintProperty(
-                "revanchas-pulse-2",
-                "circle-opacity",
-                opacity2,
-              );
-              map.setPaintProperty(
-                "revanchas-pulse-3",
-                "circle-opacity",
-                opacity3,
-              );
-              map.setPaintProperty(
-                "revanchas-pulse-4",
-                "circle-opacity",
-                opacity4,
-              );
-            } catch (e) {
-              // Capa no visible, ignorar
-            }
+              // Opacidad: Empieza en 0.2 y baja a 0
+              // Usamos una curva suave: (1 - t)^1.5 para que dure un poco más visible al principio
+              const opacity = 0.2 * Math.pow(1 - layerPhase, 1.5);
 
-            requestAnimationFrame(animateSonarPulse);
+              // Radio: Crece linealmente de 0 a MaxRadius
+              // Multiplicamos el radio base (calculado por zoom) por la fase
+              const radiusExpression = [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                maxRadiusStops[0],
+                maxRadiusStops[1] * layerPhase,
+                maxRadiusStops[2],
+                maxRadiusStops[3] * layerPhase,
+                maxRadiusStops[4],
+                maxRadiusStops[5] * layerPhase,
+              ];
+
+              try {
+                map.setPaintProperty(layerId, "circle-opacity", opacity);
+                map.setPaintProperty(
+                  layerId,
+                  "circle-radius",
+                  radiusExpression,
+                );
+              } catch (e) {
+                // Ignorar errores si la capa no está lista
+              }
+            });
+
+            requestAnimationFrame(animateElegantSonar);
           }
-          animateSonarPulse();
+          animateElegantSonar();
 
           // Popup mejorado al hacer clic en el área de la onda
           map.on("click", "revanchas-pulse-1", (e) => {
@@ -1592,6 +1537,11 @@ console.log("🏗️ MiningMap iniciado con:", {
             "revanchas-pulse-3",
             "revanchas-pulse-4",
             "revanchas-connections",
+            // Nombres antiguos por si acaso
+            "revanchas-pulse-outer",
+            "revanchas-pulse-inner",
+            "revanchas-point",
+            "revanchas-layer",
           ];
 
           layersToRemove.forEach((layerId) => {
@@ -1750,6 +1700,309 @@ console.log("🏗️ MiningMap iniciado con:", {
           showError(
             "Error al cargar el área de la cancha: " + (error as Error).message,
           );
+        }
+      }
+
+      // NUEVA IMPLEMENTACIÓN ELEGANTE DE REVANCHAS
+      function mostrarRevanchasEnMapaElegante(geojsonData) {
+        console.log(
+          "🚀 EJECUTANDO mostrarRevanchasEnMapaElegante (Versión Híbrida Profesional)",
+        );
+        try {
+          if (!map) return;
+
+          // Limpiar capas anteriores primero
+          ocultarRevanchasEnMapa();
+
+          console.log(
+            "📊 Mostrando revanchas (Diseño Elegante):",
+            geojsonData.features.length,
+          );
+
+          // 1. Preparar datos (Colores y Líneas)
+          const getColorByRevancha = (revancha) => {
+            if (!revancha || revancha === 0) return "#94a3b8";
+            if (revancha > 3.5) return "#10b981";
+            if (revancha >= 3.0) return "#fbbf24";
+            return "#ef4444";
+          };
+
+          const enrichedFeatures = geojsonData.features.map((feature) => ({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              dynamic_color: getColorByRevancha(feature.properties.revancha),
+            },
+          }));
+
+          // Calcular líneas de conexión
+          const getDistance = (coord1, coord2) => {
+            const R = 6371000;
+            const lat1 = (coord1[1] * Math.PI) / 180;
+            const lat2 = (coord2[1] * Math.PI) / 180;
+            const deltaLat = ((coord2[1] - coord1[1]) * Math.PI) / 180;
+            const deltaLon = ((coord2[0] - coord1[0]) * Math.PI) / 180;
+            const a =
+              Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+              Math.cos(lat1) *
+                Math.cos(lat2) *
+                Math.sin(deltaLon / 2) *
+                Math.sin(deltaLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+          };
+
+          const lineFeatures = [];
+          const MAX_DISTANCE = 100;
+
+          for (let i = 0; i < enrichedFeatures.length; i++) {
+            const current = enrichedFeatures[i];
+            for (let j = i + 1; j < enrichedFeatures.length; j++) {
+              const next = enrichedFeatures[j];
+              const distance = getDistance(
+                current.geometry.coordinates,
+                next.geometry.coordinates,
+              );
+              if (distance <= MAX_DISTANCE) {
+                lineFeatures.push({
+                  type: "Feature",
+                  geometry: {
+                    type: "LineString",
+                    coordinates: [
+                      current.geometry.coordinates,
+                      next.geometry.coordinates,
+                    ],
+                  },
+                  properties: {
+                    from_color: current.properties.dynamic_color,
+                    to_color: next.properties.dynamic_color,
+                  },
+                });
+              }
+            }
+          }
+
+          // 2. Agregar Sources
+          map.addSource("revanchas-source", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: enrichedFeatures },
+          });
+
+          map.addSource("revanchas-lines", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: lineFeatures },
+          });
+
+          // 3. Agregar Capas (Diseño Elegante)
+
+          // Líneas de conexión (Sutiles)
+          map.addLayer({
+            id: "revanchas-connections",
+            type: "line",
+            source: "revanchas-lines",
+            paint: {
+              "line-color": ["get", "from_color"],
+              "line-width": 1.5, // Visible pero fino
+              "line-opacity": 0.4, // Recuperamos visibilidad
+              "line-blur": 0.5, // Menos blur para definición
+            },
+          });
+
+          // Capas de Pulso (4 capas idénticas para animación)
+          const pulseLayers = [
+            "revanchas-pulse-1",
+            "revanchas-pulse-2",
+            "revanchas-pulse-3",
+            "revanchas-pulse-4",
+          ];
+          pulseLayers.forEach((id) => {
+            map.addLayer({
+              id: id,
+              type: "circle",
+              source: "revanchas-source",
+              paint: {
+                "circle-radius": 0,
+                "circle-color": ["get", "dynamic_color"], // Recuperamos relleno sutil
+                "circle-stroke-color": ["get", "dynamic_color"],
+                "circle-stroke-width": 1.5,
+                "circle-stroke-opacity": 0,
+                "circle-opacity": 0,
+                "circle-blur": 0.5, // Un toque de suavidad (no neon)
+              },
+            });
+          });
+
+          // Glow Central (Posición real)
+          map.addLayer({
+            id: "revanchas-glow-inner",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                4,
+                16,
+                8,
+                20,
+                16,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.9,
+              "circle-blur": 0.3, // Suave pero definido
+              // Borde eliminado por petición del usuario
+            },
+          });
+
+          // Etiquetas
+          map.addLayer({
+            id: "revanchas-labels",
+            type: "symbol",
+            source: "revanchas-source",
+            layout: {
+              "text-field": ["get", "pk"],
+              "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+              "text-size": 11,
+              "text-offset": [0, 1.2],
+              "text-anchor": "top",
+            },
+            paint: {
+              "text-color": "#ffffff",
+              "text-halo-color": "rgba(0,0,0,0.7)",
+              "text-halo-width": 1,
+              "text-halo-blur": 0.5,
+              "text-opacity": 0.9,
+            },
+            minzoom: 15,
+          });
+
+          // 4. Animación Elegante
+          let sonarPhase = 0;
+          function animateElegantSonar() {
+            if (!map.getLayer("revanchas-pulse-1")) return;
+
+            sonarPhase = (sonarPhase + 0.005) % 1;
+
+            // Radios invertidos: Pequeños lejos (solo color), Grandes cerca (ondas expansivas)
+            const maxRadiusStops = [15, 50, 100];
+
+            pulseLayers.forEach((layerId, index) => {
+              const layerPhase = (sonarPhase + index / pulseLayers.length) % 1;
+
+              // Opacidad del borde (más fuerte)
+              const strokeOpacity = 0.8 * Math.pow(1 - layerPhase, 1.5);
+
+              // Opacidad del relleno (muy sutil, para dar cuerpo)
+              const fillOpacity = 0.2 * Math.pow(1 - layerPhase, 2);
+
+              // Ancho del borde se mantiene elegante
+              const strokeWidth = 2 * (1 - layerPhase * 0.5);
+
+              const radiusExpression = [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                10,
+                0, // Zoom alejado: sin onda
+                15,
+                0, // Zoom medio-alejado: sin onda
+                16,
+                10 * layerPhase, // ~100m: empieza a aparecer
+                17,
+                30 * layerPhase, // ~50m: onda visible
+                18,
+                50 * layerPhase, // ~30m: onda moderada
+                19,
+                80 * layerPhase, // ~15m: onda grande
+                20,
+                120 * layerPhase, // Zoom máximo: onda completa
+              ];
+
+              try {
+                // Efecto Neon Suave: Solo relleno con blur, sin borde
+                map.setPaintProperty(
+                  layerId,
+                  "circle-radius",
+                  radiusExpression,
+                );
+                map.setPaintProperty(
+                  layerId,
+                  "circle-opacity",
+                  0.8 * Math.pow(1 - layerPhase, 1.2),
+                );
+                map.setPaintProperty(layerId, "circle-blur", 0.1);
+                map.setPaintProperty(layerId, "circle-stroke-width", 0);
+                map.setPaintProperty(layerId, "circle-stroke-opacity", 0);
+              } catch (e) {}
+            });
+            requestAnimationFrame(animateElegantSonar);
+          }
+          animateElegantSonar();
+
+          // 5. Interacción (Popup)
+          map.on("click", "revanchas-glow-inner", (e) => {
+            const feature = e.features[0];
+            const props = feature.properties;
+
+            const html = `
+              <div class="p-0 font-sans min-w-[200px]">
+                <div class="bg-slate-900 text-white p-3 rounded-t-lg border-b border-slate-700 flex justify-between items-center">
+                  <h3 class="font-bold text-lg m-0">PK ${props.pk}</h3>
+                  <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">${props.muro} - ${props.sector}</span>
+                </div>
+                <div class="p-4 bg-white rounded-b-lg shadow-lg">
+                   <div class="grid grid-cols-2 gap-3 text-sm">
+                      <div class="flex flex-col">
+                        <span class="text-slate-500 text-xs uppercase tracking-wider mb-1">Revancha</span>
+                        <span class="font-bold text-lg" style="color: ${props.dynamic_color}">${props.revancha}m</span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="text-slate-500 text-xs uppercase tracking-wider mb-1">Ancho</span>
+                        <span class="font-bold text-slate-800">${props.ancho}m</span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="text-slate-500 text-xs uppercase tracking-wider mb-1">Coronamiento</span>
+                        <span class="font-bold text-slate-800">${props.coronamiento}m</span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="text-slate-500 text-xs uppercase tracking-wider mb-1">Lama</span>
+                        <span class="font-bold text-slate-800">${props.lama}m</span>
+                      </div>
+                   </div>
+                </div>
+              </div>
+             `;
+
+            new mapboxgl.Popup({ maxWidth: "340px", closeButton: false })
+              .setLngLat(e.lngLat)
+              .setHTML(html)
+              .addTo(map);
+          });
+
+          // Cursor
+          map.on(
+            "mouseenter",
+            "revanchas-glow-inner",
+            () => (map.getCanvas().style.cursor = "pointer"),
+          );
+          map.on(
+            "mouseleave",
+            "revanchas-glow-inner",
+            () => (map.getCanvas().style.cursor = ""),
+          );
+
+          // 6. Fit Bounds
+          if (geojsonData.features.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            geojsonData.features.forEach((f) =>
+              bounds.extend(f.geometry.coordinates),
+            );
+            map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 2000 });
+          }
+        } catch (e) {
+          console.error("Error en revanchas elegantes:", e);
         }
       }
 
