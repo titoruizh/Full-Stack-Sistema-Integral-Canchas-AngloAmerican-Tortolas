@@ -3,15 +3,27 @@
 
 // Props del componente
 interface Props {
-  muroFilter?: string
-  drawingMode?: boolean
-  canchaId?: string
-  dashboardMode?: boolean
-  canchaIds?: string
+  muroFilter?: string;
+  drawingMode?: boolean;
+  canchaId?: string;
+  dashboardMode?: boolean;
+  canchaIds?: string;
 }
 
-const { muroFilter, drawingMode = false, canchaId, dashboardMode = false, canchaIds } = Astro.props
-console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, canchaId, dashboardMode, canchaIds })
+const {
+  muroFilter,
+  drawingMode = false,
+  canchaId,
+  dashboardMode = false,
+  canchaIds,
+} = Astro.props;
+console.log("🏗️ MiningMap iniciado con:", {
+  muroFilter,
+  drawingMode,
+  canchaId,
+  dashboardMode,
+  canchaIds,
+});
 ---
 
 <style>
@@ -29,7 +41,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     width: 100%;
     height: 100%;
   }
-  
+
   .map-controls {
     position: absolute;
     top: 16px;
@@ -39,7 +51,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .control-panel {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -48,17 +60,23 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     min-width: 200px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
   }
-  
+
   .control-group {
     margin-bottom: 16px;
   }
-  
+
   .control-group:last-child {
     margin-bottom: 0;
   }
-  
+
   .control-label {
     display: block;
     margin-bottom: 8px;
@@ -68,7 +86,7 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  
+
   .control-select {
     width: 100%;
     padding: 10px 12px;
@@ -81,16 +99,16 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  
+
   .control-select:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  .loading { 
-    position: absolute; 
-    z-index: 1001; 
+  .loading {
+    position: absolute;
+    z-index: 1001;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -104,9 +122,9 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
     color: #374151;
   }
 
-  .error { 
-    position: absolute; 
-    z-index: 1001; 
+  .error {
+    position: absolute;
+    z-index: 1001;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
@@ -121,9 +139,16 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
   }
 </style>
 
-<div class="map-container" data-muro-filter={muroFilter || ''} data-drawing-mode={drawingMode.toString()} data-cancha-id={canchaId || ''} data-dashboard-mode={dashboardMode.toString()} data-cancha-ids={canchaIds || ''}>
+<div
+  class="map-container"
+  data-muro-filter={muroFilter || ""}
+  data-drawing-mode={drawingMode.toString()}
+  data-cancha-id={canchaId || ""}
+  data-dashboard-mode={dashboardMode.toString()}
+  data-cancha-ids={canchaIds || ""}
+>
   <div id="map"></div>
-  
+
   <div class="map-controls">
     <div class="control-panel">
       <div class="control-group">
@@ -137,11 +162,11 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
       </div>
     </div>
   </div>
-  
+
   <div id="loading" class="loading" style="display: none;">
     Cargando mapa...
   </div>
-  
+
   <div id="error" class="error" style="display: none;"></div>
 </div>
 
@@ -149,9 +174,10 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
   // Importar usando dynamic import para evitar problemas de módulos
   async function initMapbox() {
     try {
-      const mapboxgl = await import('mapbox-gl');
-      const { POLYGON_STYLES, convertGeometry, calculateBounds, utmToWgs84 } = await import('../utils/mapbox.js');
-      const { GISDataManager, RasterManager } = await import('../utils/gis.js');
+      const mapboxgl = await import("mapbox-gl");
+      const { POLYGON_STYLES, convertGeometry, calculateBounds, utmToWgs84 } =
+        await import("../utils/mapbox.js");
+      const { GISDataManager, RasterManager } = await import("../utils/gis.js");
 
       let map;
       let gisManager;
@@ -161,97 +187,110 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
         center: [-70.7376, -33.1193],
         zoom: 14.6, // Zoom moderado - un poco más alejado que el original
         bounds: [
-          [-70.772, -33.142],     // Límite suroeste
-          [-70.703, -33.102615]   // Límite noreste: 33° 06' 09.414625"
-        ]
+          [-70.772, -33.142], // Límite suroeste
+          [-70.703, -33.102615], // Límite noreste: 33° 06' 09.414625"
+        ],
       };
 
-      const mapElement = document.getElementById('map');
-      const loadingElement = document.getElementById('loading');
-      const errorElement = document.getElementById('error');
+      const mapElement = document.getElementById("map");
+      const loadingElement = document.getElementById("loading");
+      const errorElement = document.getElementById("error");
 
       function setLoading(loading) {
         if (loadingElement) {
-          loadingElement.style.display = loading ? 'block' : 'none';
+          loadingElement.style.display = loading ? "block" : "none";
         }
       }
 
       function showError(message) {
         if (errorElement) {
           errorElement.textContent = message;
-          errorElement.style.display = 'block';
-          setTimeout(() => { errorElement.style.display = 'none'; }, 5000);
+          errorElement.style.display = "block";
+          setTimeout(() => {
+            errorElement.style.display = "none";
+          }, 5000);
         }
       }
 
       async function getMapboxToken() {
         try {
-          const response = await fetch('/mapbox-gis/token.txt');
+          const response = await fetch("/mapbox-gis/token.txt");
           if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
           }
           const token = await response.text();
           const cleanToken = token.trim();
-          
+
           // Validar que el token tenga el formato correcto
-          if (!cleanToken.startsWith('pk.')) {
-            throw new Error('Token de Mapbox inválido - debe comenzar con "pk."');
+          if (!cleanToken.startsWith("pk.")) {
+            throw new Error(
+              'Token de Mapbox inválido - debe comenzar con "pk."',
+            );
           }
-          
-          console.log('🔐 Token validado correctamente:', cleanToken.substring(0, 20) + '...');
+
+          console.log(
+            "🔐 Token validado correctamente:",
+            cleanToken.substring(0, 20) + "...",
+          );
           return cleanToken;
         } catch (error) {
-          console.error('Error loading Mapbox token:', error);
-          throw new Error('No se pudo cargar el token de Mapbox: ' + error.message);
+          console.error("Error loading Mapbox token:", error);
+          throw new Error(
+            "No se pudo cargar el token de Mapbox: " + error.message,
+          );
         }
       }
 
       async function initializeMap() {
         try {
           setLoading(true);
-          
+
           // Verificar si estamos en modo de dibujo y obtener canchaId
-          const mapContainer = document.querySelector('.map-container');
-          const isDrawingMode = mapContainer?.getAttribute('data-drawing-mode') === 'true';
-          const canchaId = mapContainer?.getAttribute('data-cancha-id');
-          console.log('🎨 Modo de dibujo activo:', isDrawingMode);
-          console.log('🏷️ Cancha ID:', canchaId);
-          
+          const mapContainer = document.querySelector(".map-container");
+          const isDrawingMode =
+            mapContainer?.getAttribute("data-drawing-mode") === "true";
+          const canchaId = mapContainer?.getAttribute("data-cancha-id");
+          console.log("🎨 Modo de dibujo activo:", isDrawingMode);
+          console.log("🏷️ Cancha ID:", canchaId);
+
           // CRÍTICO: Establecer el token ANTES de crear el mapa
           const token = await getMapboxToken();
-          console.log('🔐 Token de Mapbox obtenido:', token ? 'Sí' : 'No');
-          console.log('🔑 Token completo:', token);
-          
+          console.log("🔐 Token de Mapbox obtenido:", token ? "Sí" : "No");
+          console.log("🔑 Token completo:", token);
+
           // Establecer el token en mapboxgl ANTES de crear el mapa
           mapboxgl.accessToken = token;
-          
+
           // Verificar que el token se estableció correctamente
-          console.log('✅ Token establecido en mapboxgl:', mapboxgl.accessToken);
+          console.log(
+            "✅ Token establecido en mapboxgl:",
+            mapboxgl.accessToken,
+          );
 
           map = new mapboxgl.Map({
-            container: 'map',
-            style: { 
+            container: "map",
+            style: {
               version: 8,
-              glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf', // Habilitar renderizado de texto
-              sources: {}, 
-              layers: [ 
-                { 
-                  id: 'background', 
-                  type: 'background', 
-                  paint: { 'background-color': '#f0f0f0' } // Fondo gris neutro
-                } 
-              ] 
+              glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf", // Habilitar renderizado de texto
+              sources: {},
+              layers: [
+                {
+                  id: "background",
+                  type: "background",
+                  paint: { "background-color": "#f0f0f0" }, // Fondo gris neutro
+                },
+              ],
             },
             center: MAP_CONFIG.center,
             zoom: MAP_CONFIG.zoom,
             maxBounds: MAP_CONFIG.bounds,
-            accessToken: token // También pasar explícitamente el token
+            accessToken: token, // También pasar explícitamente el token
           });
 
           map.addControl(new mapboxgl.NavigationControl());
           map.addControl(new mapboxgl.ScaleControl());
 
-          await new Promise((resolve) => map.on('load', resolve));
+          await new Promise((resolve) => map.on("load", resolve));
 
           gisManager = new GISDataManager();
           await loadGISData();
@@ -269,265 +308,307 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
           }
 
           // Verificar si estamos en modo dashboard
-          const isDashboardMode = mapContainer?.getAttribute('data-dashboard-mode') === 'true';
-          const canchaIdsStr = mapContainer?.getAttribute('data-cancha-ids') || '';
-          
+          const isDashboardMode =
+            mapContainer?.getAttribute("data-dashboard-mode") === "true";
+          const canchaIdsStr =
+            mapContainer?.getAttribute("data-cancha-ids") || "";
+
           if (isDashboardMode && canchaIdsStr) {
             // Modo dashboard: cargar múltiples canchas
-            console.log('🎯 Modo Dashboard activo - Cargando múltiples canchas');
+            console.log(
+              "🎯 Modo Dashboard activo - Cargando múltiples canchas",
+            );
             await loadMultipleCanchas(canchaIdsStr);
-          } else if (canchaId && canchaId !== '') {
+          } else if (canchaId && canchaId !== "") {
             // Modo individual: cargar una sola cancha
             await loadCanchaPolygon(canchaId);
           }
 
           setLoading(false);
-          console.log('🎉 Mapa inicializado completamente con todas las funcionalidades');
-          
+          console.log(
+            "🎉 Mapa inicializado completamente con todas las funcionalidades",
+          );
+
           // Escuchar mensajes del parent para interacciones dinámicas
-          window.addEventListener('message', (event) => {
-            console.log('📨 Mensaje recibido:', event.data.type);
-            
-            if (event.data.type === 'zoom-to-cancha') {
+          window.addEventListener("message", (event) => {
+            console.log("📨 Mensaje recibido:", event.data.type);
+
+            if (event.data.type === "zoom-to-cancha") {
               const canchaId = event.data.canchaId;
-              console.log('🔍 Haciendo zoom a cancha:', canchaId);
+              console.log("🔍 Haciendo zoom a cancha:", canchaId);
               zoomToCanchaInDashboard(canchaId);
-            }
-            else if (event.data.type === 'mostrar-revanchas') {
+            } else if (event.data.type === "mostrar-revanchas") {
               const geojsonData = event.data.data;
-              console.log('📊 Mostrando revanchas georreferenciadas:', geojsonData);
+              console.log(
+                "📊 Mostrando revanchas georreferenciadas:",
+                geojsonData,
+              );
               mostrarRevanchasEnMapa(geojsonData);
-            }
-            else if (event.data.type === 'ocultar-revanchas') {
-              console.log('❌ Ocultando revanchas');
+            } else if (event.data.type === "ocultar-revanchas") {
+              console.log("❌ Ocultando revanchas");
               ocultarRevanchasEnMapa();
             }
           });
-          
         } catch (err) {
-          console.error('Error initializing map', err);
-          showError('Error al inicializar el mapa: ' + (err.message || err));
+          console.error("Error initializing map", err);
+          showError("Error al inicializar el mapa: " + (err.message || err));
           setLoading(false);
         }
       }
 
       async function loadGISData() {
         try {
-          console.log('🔄 Iniciando carga de datos GIS...');
-          
-          // Cargar geojson estático desde public/mapbox-gis/
-          const polygonsResponse = await fetch('/mapbox-gis/poligonos.geojson');
-          if (!polygonsResponse.ok) throw new Error('No se pudo cargar poligonos');
-          const polygonsData = await polygonsResponse.json();
-          console.log('📄 Polígonos cargados:', polygonsData.features?.length || 0);
+          console.log("🔄 Iniciando carga de datos GIS...");
 
-          const sectorsResponse = await fetch('/mapbox-gis/sectores.geojson');
-          if (!sectorsResponse.ok) throw new Error('No se pudo cargar sectores');
+          // Cargar geojson estático desde public/mapbox-gis/
+          const polygonsResponse = await fetch("/mapbox-gis/poligonos.geojson");
+          if (!polygonsResponse.ok)
+            throw new Error("No se pudo cargar poligonos");
+          const polygonsData = await polygonsResponse.json();
+          console.log(
+            "📄 Polígonos cargados:",
+            polygonsData.features?.length || 0,
+          );
+
+          const sectorsResponse = await fetch("/mapbox-gis/sectores.geojson");
+          if (!sectorsResponse.ok)
+            throw new Error("No se pudo cargar sectores");
           const sectorsData = await sectorsResponse.json();
-          console.log('📄 Sectores cargados:', sectorsData.features?.length || 0);
+          console.log(
+            "📄 Sectores cargados:",
+            sectorsData.features?.length || 0,
+          );
 
           const convertedPolygons = {
             ...polygonsData,
-            features: polygonsData.features.map(f => ({ 
-              ...f, 
-              geometry: convertGeometry(f.geometry), 
-              properties: { 
-                ...f.properties, 
-                tipo: f.properties.NAME || f.properties.tipo || 'otros' 
-              } 
-            }))
+            features: polygonsData.features.map((f) => ({
+              ...f,
+              geometry: convertGeometry(f.geometry),
+              properties: {
+                ...f.properties,
+                tipo: f.properties.NAME || f.properties.tipo || "otros",
+              },
+            })),
           };
 
           const convertedSectors = {
             ...sectorsData,
-            features: sectorsData.features.map(f => ({ 
-              ...f, 
-              geometry: convertGeometry(f.geometry), 
-              properties: { 
-                ...f.properties, 
-                sector: f.properties.NAME || f.properties.sector || 'S1', 
-                muro: (f.properties.NAME || f.properties.sector || '').split('_')[0] || 'MP' 
-              } 
-            }))
+            features: sectorsData.features.map((f) => ({
+              ...f,
+              geometry: convertGeometry(f.geometry),
+              properties: {
+                ...f.properties,
+                sector: f.properties.NAME || f.properties.sector || "S1",
+                muro:
+                  (f.properties.NAME || f.properties.sector || "").split(
+                    "_",
+                  )[0] || "MP",
+              },
+            })),
           };
 
-          const allFeatures = [...convertedPolygons.features, ...convertedSectors.features];
+          const allFeatures = [
+            ...convertedPolygons.features,
+            ...convertedSectors.features,
+          ];
           mapBounds = calculateBounds(allFeatures);
 
-          map.addSource('poligonos', { type: 'geojson', data: convertedPolygons });
-          map.addSource('sectores', { type: 'geojson', data: convertedSectors });
+          map.addSource("poligonos", {
+            type: "geojson",
+            data: convertedPolygons,
+          });
+          map.addSource("sectores", {
+            type: "geojson",
+            data: convertedSectors,
+          });
 
           // Agregar fuente raster del ortomosaico usando TileServer GL (puerto 8081)
-          if (!map.getSource('ortomosaico')) {
-            console.log('🗺️ Configurando fuente del ortomosaico con TileServer GL...');
-            
+          if (!map.getSource("ortomosaico")) {
+            console.log(
+              "🗺️ Configurando fuente del ortomosaico con TileServer GL...",
+            );
+
             // Probar diferentes URLs del tileserver
             const tileUrls = [
-              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.jpg',
-              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.png',
-              'http://localhost:8081/data/mapbase/{z}/{x}/{y}.webp',
-              'http://localhost:8081/data/mapbase/tiles/{z}/{x}/{y}.jpg'
+              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.jpg",
+              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.png",
+              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.webp",
+              "http://localhost:8081/data/mapbase/tiles/{z}/{x}/{y}.jpg",
             ];
-            
+
             const tileUrl = tileUrls[0]; // Empezar con la primera
-            console.log('📡 URL de tiles configurada:', tileUrl);
-            console.log('📡 URLs alternativas disponibles:', tileUrls);
-            
-            map.addSource('ortomosaico', {
-              type: 'raster',
+            console.log("📡 URL de tiles configurada:", tileUrl);
+            console.log("📡 URLs alternativas disponibles:", tileUrls);
+
+            map.addSource("ortomosaico", {
+              type: "raster",
               tiles: [tileUrl],
               tileSize: 256,
               minzoom: 10,
               maxzoom: 20,
-              bounds: [-70.772, -33.142, -70.703, -33.096]
+              bounds: [-70.772, -33.142, -70.703, -33.096],
             });
-            console.log('✅ Fuente de ortomosaico agregada');
+            console.log("✅ Fuente de ortomosaico agregada");
           }
 
           // PRIMERA CAPA: Ortomosaico como base (debajo de todo)
-          if (!map.getLayer('raster-layer')) {
-            console.log('🗺️ Agregando capa de ortomosaico...');
-            map.addLayer({ 
-              id: 'raster-layer', 
-              type: 'raster', 
-              source: 'ortomosaico', 
-              paint: { 'raster-opacity': 1.0 } 
+          if (!map.getLayer("raster-layer")) {
+            console.log("🗺️ Agregando capa de ortomosaico...");
+            map.addLayer({
+              id: "raster-layer",
+              type: "raster",
+              source: "ortomosaico",
+              paint: { "raster-opacity": 1.0 },
             });
-            console.log('✅ Capa de ortomosaico agregada como base');
-            
+            console.log("✅ Capa de ortomosaico agregada como base");
+
             // Escuchar errores específicos de la capa de tiles
-            map.on('sourcedata', function(e) {
-              if (e.sourceId === 'ortomosaico') {
-                console.log('📡 Estado de fuente ortomosaico:', e.type, e.isSourceLoaded);
+            map.on("sourcedata", function (e) {
+              if (e.sourceId === "ortomosaico") {
+                console.log(
+                  "📡 Estado de fuente ortomosaico:",
+                  e.type,
+                  e.isSourceLoaded,
+                );
               }
             });
-            
-            map.on('error', function(e) {
-              if (e.error && e.error.message && e.error.message.includes('ortomosaico')) {
-                console.error('❌ Error específico del ortomosaico:', e.error);
+
+            map.on("error", function (e) {
+              if (
+                e.error &&
+                e.error.message &&
+                e.error.message.includes("ortomosaico")
+              ) {
+                console.error("❌ Error específico del ortomosaico:", e.error);
               }
             });
           }
 
           // SEGUNDA CAPA: Contornos de sectores (VISIBLE, sin relleno)
-          map.addLayer({ 
-            id: 'sectors-stroke', 
-            type: 'line', 
-            source: 'sectores', 
-            paint: { 
-              'line-color': '#ffffff', 
-              'line-width': 2,
-              'line-dasharray': [2, 2]
-            } 
+          map.addLayer({
+            id: "sectors-stroke",
+            type: "line",
+            source: "sectores",
+            paint: {
+              "line-color": "#ffffff",
+              "line-width": 2,
+              "line-dasharray": [2, 2],
+            },
           });
 
           // TERCERA CAPA: Contornos de polígonos (OCULTOS por defecto)
-          map.addLayer({ 
-            id: 'polygons-stroke', 
-            type: 'line', 
-            source: 'poligonos', 
-            layout: { visibility: 'none' }, 
-            paint: { 'line-color': '#ff7f00', 'line-width': 2, 'line-opacity': 0.8 } 
+          map.addLayer({
+            id: "polygons-stroke",
+            type: "line",
+            source: "poligonos",
+            layout: { visibility: "none" },
+            paint: {
+              "line-color": "#ff7f00",
+              "line-width": 2,
+              "line-opacity": 0.8,
+            },
           });
 
           // ETIQUETAS: Nombres de sectores (aparecen solo desde zoom de 100m o menos)
           map.addLayer({
-            id: 'sectores-labels',
-            type: 'symbol',
-            source: 'sectores',
+            id: "sectores-labels",
+            type: "symbol",
+            source: "sectores",
             minzoom: 15, // Aparecen solo cuando el zoom es >= 100m de escala
             layout: {
-              'text-field': ['get', 'NAME'],
-              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-              'text-size': 18,
-              'text-offset': [0, 0],
-              'text-anchor': 'center',
-              'text-letter-spacing': 0.05,
-              'text-allow-overlap': false,
-              'text-ignore-placement': false,
-              'symbol-avoid-edges': true,
-              'symbol-placement': 'point',
-              visibility: 'visible'
+              "text-field": ["get", "NAME"],
+              "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+              "text-size": 18,
+              "text-offset": [0, 0],
+              "text-anchor": "center",
+              "text-letter-spacing": 0.05,
+              "text-allow-overlap": false,
+              "text-ignore-placement": false,
+              "symbol-avoid-edges": true,
+              "symbol-placement": "point",
+              visibility: "visible",
             },
             paint: {
-              'text-color': '#ffffff',
-              'text-halo-color': '#000000',
-              'text-halo-width': 2.5,
-              'text-halo-blur': 1,
-              'text-opacity': 1
-            }
+              "text-color": "#ffffff",
+              "text-halo-color": "#000000",
+              "text-halo-width": 2.5,
+              "text-halo-blur": 1,
+              "text-opacity": 1,
+            },
           });
 
           // ETIQUETAS: Nombres de polígonos (halo azul profesional, desaparecen con zoom cercano)
           map.addLayer({
-            id: 'poligonos-labels',
-            type: 'symbol',
-            source: 'poligonos',
-            filter: ['!=', ['get', 'NAME'], 'Otros'],
+            id: "poligonos-labels",
+            type: "symbol",
+            source: "poligonos",
+            filter: ["!=", ["get", "NAME"], "Otros"],
             minzoom: 0,
             maxzoom: 15.5, // Desaparecen cuando el zoom es mayor a ~75m de escala
             layout: {
-              'text-field': [
-                'concat',
+              "text-field": [
+                "concat",
                 [
-                  'case',
-                  ['==', ['slice', ['get', 'NAME'], 0, 2], 'MO'], 'Muro Oeste',
-                  ['==', ['slice', ['get', 'NAME'], 0, 2], 'MP'], 'Muro Principal',
-                  ['==', ['slice', ['get', 'NAME'], 0, 2], 'ME'], 'Muro Este',
-                  ['get', 'NAME']
+                  "case",
+                  ["==", ["slice", ["get", "NAME"], 0, 2], "MO"],
+                  "Muro Oeste",
+                  ["==", ["slice", ["get", "NAME"], 0, 2], "MP"],
+                  "Muro Principal",
+                  ["==", ["slice", ["get", "NAME"], 0, 2], "ME"],
+                  "Muro Este",
+                  ["get", "NAME"],
                 ],
-                ['slice', ['get', 'NAME'], 2]
+                ["slice", ["get", "NAME"], 2],
               ],
-              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-              'text-size': 18,
-              'text-offset': [0, 0],
-              'text-anchor': 'center',
-              'text-letter-spacing': 0.05,
-              'text-allow-overlap': false,
-              'text-ignore-placement': false,
-              visibility: 'visible'
+              "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+              "text-size": 18,
+              "text-offset": [0, 0],
+              "text-anchor": "center",
+              "text-letter-spacing": 0.05,
+              "text-allow-overlap": false,
+              "text-ignore-placement": false,
+              visibility: "visible",
             },
             paint: {
-              'text-color': '#ffffff',
-              'text-halo-color': '#2563eb',
-              'text-halo-width': 3,
-              'text-halo-blur': 1,
-              'text-opacity': 1
-            }
+              "text-color": "#ffffff",
+              "text-halo-color": "#2563eb",
+              "text-halo-width": 3,
+              "text-halo-blur": 1,
+              "text-opacity": 1,
+            },
           });
 
-          console.log('✅ Todas las capas configuradas correctamente');
+          console.log("✅ Todas las capas configuradas correctamente");
           setupControls();
-
         } catch (error) {
-          console.error('❌ Error loading GIS data:', error);
-          console.error('❌ Stack trace:', error.stack);
-          showError('Error al cargar datos GIS: ' + (error.message || error));
-          
+          console.error("❌ Error loading GIS data:", error);
+          console.error("❌ Stack trace:", error.stack);
+          showError("Error al cargar datos GIS: " + (error.message || error));
+
           // No fallar completamente, intentar continuar sin datos GIS
-          console.log('⚠️ Continuando sin datos GIS...');
+          console.log("⚠️ Continuando sin datos GIS...");
         }
       }
 
       // Configurar filtro de muros y navegación automática
       function setupControls() {
-        const muroFilterSelect = document.getElementById('muro-filter');
+        const muroFilterSelect = document.getElementById("muro-filter");
         if (!muroFilterSelect) return;
 
         // Bounds específicos para cada muro en coordenadas UTM 19S
         const MURO_BOUNDS_UTM = {
           MP: {
             southwest: [336060.6, 6333765.9],
-            northeast: [338308.8, 6335338.4]
+            northeast: [338308.8, 6335338.4],
           },
           ME: {
-            southwest: [339617.2, 6333366.6], 
-            northeast: [340188.5, 6334496.9]
+            southwest: [339617.2, 6333366.6],
+            northeast: [340188.5, 6334496.9],
           },
           MO: {
             southwest: [335507.8, 6332334.6],
-            northeast: [336515.2, 6333501.7]
-          }
+            northeast: [336515.2, 6333501.7],
+          },
         };
 
         // Variable para controlar si el mapa está bloqueado
@@ -536,71 +617,79 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
 
         // Función para aplicar filtro de muro
         function applyMuroFilter(filter) {
-          console.log('🎯 Aplicando filtro de muro:', filter);
-          
-          if (filter && filter !== 'todos') {
+          console.log("🎯 Aplicando filtro de muro:", filter);
+
+          if (filter && filter !== "todos") {
             // Mostrar capas de polígonos y aplicar filtro
-            map.setLayoutProperty('polygons-stroke', 'visibility', 'visible');
-            map.setFilter('polygons-stroke', ['==', ['get', 'tipo'], filter]);
+            map.setLayoutProperty("polygons-stroke", "visibility", "visible");
+            map.setFilter("polygons-stroke", ["==", ["get", "tipo"], filter]);
             // Las etiquetas ya están siempre visibles, solo aplicar filtro
-            map.setFilter('poligonos-labels', ['all', ['!=', ['get', 'NAME'], 'Otros'], ['==', ['get', 'tipo'], filter]]);
-            
+            map.setFilter("poligonos-labels", [
+              "all",
+              ["!=", ["get", "NAME"], "Otros"],
+              ["==", ["get", "tipo"], filter],
+            ]);
+
             // Centrar en las coordenadas específicas del muro usando UTM
             if (MURO_BOUNDS_UTM[filter]) {
               const bounds = MURO_BOUNDS_UTM[filter];
               const sw = utmToWgs84(bounds.southwest[0], bounds.southwest[1]);
               const ne = utmToWgs84(bounds.northeast[0], bounds.northeast[1]);
-              
+
               // Bloquear el mapa en estos límites
               mapLocked = true;
               currentLockedBounds = [sw, ne];
-              
+
               // Aplicar restricción de límites al mapa
               map.setMaxBounds([
                 [sw[0] - 0.001, sw[1] - 0.001], // Agregar un pequeño margen
-                [ne[0] + 0.001, ne[1] + 0.001]
+                [ne[0] + 0.001, ne[1] + 0.001],
               ]);
-              
+
               map.fitBounds([sw, ne], {
                 padding: 80,
                 duration: 2000, // Transición más suave y lenta
-                easing: (t) => t * (2 - t) // Easing suave
+                easing: (t) => t * (2 - t), // Easing suave
               });
-              
+
               console.log(`🔒 Mapa bloqueado en muro ${filter}:`, [sw, ne]);
             }
           } else {
             // Desbloquear el mapa y volver a la vista general
             mapLocked = false;
             currentLockedBounds = null;
-            
+
             // Remover restricción de límites
             map.setMaxBounds(null);
-            
+
             // Ocultar polígonos y volver a la vista general
-            map.setLayoutProperty('polygons-stroke', 'visibility', 'none');
+            map.setLayoutProperty("polygons-stroke", "visibility", "none");
             // Restaurar filtro de etiquetas para mostrar todas (excepto "Otros")
-            map.setFilter('poligonos-labels', ['!=', ['get', 'NAME'], 'Otros']);
-            
+            map.setFilter("poligonos-labels", ["!=", ["get", "NAME"], "Otros"]);
+
             // Volver a la vista general
             map.fitBounds(MAP_CONFIG.bounds, {
               padding: 50,
               duration: 1500, // Transición más suave
-              easing: (t) => t * (2 - t) // Easing suave
+              easing: (t) => t * (2 - t), // Easing suave
             });
-            console.log('🔓 Mapa desbloqueado - Volviendo a vista general');
+            console.log("🔓 Mapa desbloqueado - Volviendo a vista general");
           }
         }
 
         // Aplicar filtro automático si se recibió como prop
-        const mapContainer = document.querySelector('.map-container');
-        const autoMuroFilter = mapContainer?.getAttribute('data-muro-filter') || '';
-        if (autoMuroFilter && autoMuroFilter !== '') {
-          console.log('🤖 Aplicando filtro automático de muro:', autoMuroFilter);
+        const mapContainer = document.querySelector(".map-container");
+        const autoMuroFilter =
+          mapContainer?.getAttribute("data-muro-filter") || "";
+        if (autoMuroFilter && autoMuroFilter !== "") {
+          console.log(
+            "🤖 Aplicando filtro automático de muro:",
+            autoMuroFilter,
+          );
           // Ocultar el selector de filtro ya que es automático
-          const controlPanel = muroFilterSelect.closest('.control-panel');
+          const controlPanel = muroFilterSelect.closest(".control-panel");
           if (controlPanel) {
-            (controlPanel as HTMLElement).style.display = 'none';
+            (controlPanel as HTMLElement).style.display = "none";
           }
           // Aplicar el filtro automáticamente
           setTimeout(() => {
@@ -608,138 +697,165 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
           }, 1000); // Esperar un poco para que el mapa esté listo
         } else {
           // Configurar el event listener para el filtro manual
-          muroFilterSelect.addEventListener('change', (e) => {
+          muroFilterSelect.addEventListener("change", (e) => {
             const filter = (e.target as HTMLSelectElement).value;
             applyMuroFilter(filter);
           });
         }
 
-        console.log('🎮 Controles de filtro configurados');
+        console.log("🎮 Controles de filtro configurados");
       }
 
       // Configurar eventos del mouse
       function setupMapEvents() {
-        map.on('mouseenter', ['polygons-stroke', 'sectors-stroke'], () => {
-          map.getCanvas().style.cursor = 'pointer';
+        map.on("mouseenter", ["polygons-stroke", "sectors-stroke"], () => {
+          map.getCanvas().style.cursor = "pointer";
         });
 
-        map.on('mouseleave', ['polygons-stroke', 'sectors-stroke'], () => {
-          map.getCanvas().style.cursor = '';
+        map.on("mouseleave", ["polygons-stroke", "sectors-stroke"], () => {
+          map.getCanvas().style.cursor = "";
         });
-        
-        console.log('🖱️ Eventos del mapa configurados');
+
+        console.log("🖱️ Eventos del mapa configurados");
       }
 
       // Configurar herramientas de dibujo
       async function setupDrawingTools() {
         try {
-          console.log('🎨 Configurando herramientas de dibujo...');
-          
+          console.log("🎨 Configurando herramientas de dibujo...");
+
           // Importar MapboxDraw desde el paquete instalado
-          const MapboxDraw = (await import('@mapbox/mapbox-gl-draw')).default;
-          
+          const MapboxDraw = (await import("@mapbox/mapbox-gl-draw")).default;
+
           // Crear instancia de draw con configuración personalizada
           const draw = new MapboxDraw({
             displayControlsDefault: false,
             controls: {
               polygon: true,
-              trash: true
+              trash: true,
             },
-            defaultMode: 'draw_polygon',
+            defaultMode: "draw_polygon",
             styles: [
               // Estilo para polígonos activos (mientras se dibujan)
               {
-                'id': 'gl-draw-polygon-fill-inactive',
-                'type': 'fill',
-                'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-                'paint': {
-                  'fill-color': '#3b82f6',
-                  'fill-opacity': 0.2
-                }
+                id: "gl-draw-polygon-fill-inactive",
+                type: "fill",
+                filter: [
+                  "all",
+                  ["==", "$type", "Polygon"],
+                  ["!=", "mode", "static"],
+                ],
+                paint: {
+                  "fill-color": "#3b82f6",
+                  "fill-opacity": 0.2,
+                },
               },
               {
-                'id': 'gl-draw-polygon-stroke-inactive',
-                'type': 'line',
-                'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-                'layout': {
-                  'line-cap': 'round',
-                  'line-join': 'round'
+                id: "gl-draw-polygon-stroke-inactive",
+                type: "line",
+                filter: [
+                  "all",
+                  ["==", "$type", "Polygon"],
+                  ["!=", "mode", "static"],
+                ],
+                layout: {
+                  "line-cap": "round",
+                  "line-join": "round",
                 },
-                'paint': {
-                  'line-color': '#3b82f6',
-                  'line-width': 3
-                }
+                paint: {
+                  "line-color": "#3b82f6",
+                  "line-width": 3,
+                },
               },
               // Estilo para vértices
               {
-                'id': 'gl-draw-polygon-and-line-vertex-inactive',
-                'type': 'circle',
-                'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
-                'paint': {
-                  'circle-radius': 5,
-                  'circle-color': '#ffffff',
-                  'circle-stroke-color': '#3b82f6',
-                  'circle-stroke-width': 2
-                }
-              }
-            ]
+                id: "gl-draw-polygon-and-line-vertex-inactive",
+                type: "circle",
+                filter: [
+                  "all",
+                  ["==", "meta", "vertex"],
+                  ["==", "$type", "Point"],
+                ],
+                paint: {
+                  "circle-radius": 5,
+                  "circle-color": "#ffffff",
+                  "circle-stroke-color": "#3b82f6",
+                  "circle-stroke-width": 2,
+                },
+              },
+            ],
           });
-          
+
           // Agregar el control al mapa
-          map.addControl(draw, 'top-left');
-          
+          map.addControl(draw, "top-left");
+
           // Configurar eventos del draw
-          map.on('draw.create', function(e) {
+          map.on("draw.create", function (e) {
             const coordinates = e.features[0].geometry.coordinates[0];
-            console.log('✅ Polígono creado:', coordinates);
-            
+            console.log("✅ Polígono creado:", coordinates);
+
             // Enviar las coordenadas al parent window
             if (window.parent) {
-              window.parent.postMessage({
-                type: 'polygon-drawn',
-                coordinates: coordinates
-              }, '*');
+              window.parent.postMessage(
+                {
+                  type: "polygon-drawn",
+                  coordinates: coordinates,
+                },
+                "*",
+              );
             }
-            
+
             // Limpiar otros polígonos (solo uno a la vez)
             const allFeatures = draw.getAll();
             if (allFeatures.features.length > 1) {
               // Mantener solo el último polígono dibujado
-              const latestFeature = allFeatures.features[allFeatures.features.length - 1];
+              const latestFeature =
+                allFeatures.features[allFeatures.features.length - 1];
               draw.deleteAll();
               draw.add(latestFeature);
             }
           });
-          
-          map.on('draw.update', function(e) {
+
+          map.on("draw.update", function (e) {
             const coordinates = e.features[0].geometry.coordinates[0];
-            console.log('📝 Polígono actualizado:', coordinates);
-            
+            console.log("📝 Polígono actualizado:", coordinates);
+
             // Enviar las coordenadas actualizadas al parent window
             if (window.parent) {
-              window.parent.postMessage({
-                type: 'polygon-drawn',
-                coordinates: coordinates
-              }, '*');
+              window.parent.postMessage(
+                {
+                  type: "polygon-drawn",
+                  coordinates: coordinates,
+                },
+                "*",
+              );
             }
           });
-          
-          map.on('draw.delete', function() {
-            console.log('🗑️ Polígono eliminado');
-            
+
+          map.on("draw.delete", function () {
+            console.log("🗑️ Polígono eliminado");
+
             // Notificar al parent que se eliminó el polígono
             if (window.parent) {
-              window.parent.postMessage({
-                type: 'polygon-deleted'
-              }, '*');
+              window.parent.postMessage(
+                {
+                  type: "polygon-deleted",
+                },
+                "*",
+              );
             }
           });
-          
-          console.log('✅ Herramientas de dibujo configuradas exitosamente');
-          
+
+          console.log("✅ Herramientas de dibujo configuradas exitosamente");
         } catch (error) {
-          console.error('❌ Error al configurar herramientas de dibujo:', error);
-          showError('Error al cargar herramientas de dibujo: ' + (error as Error).message);
+          console.error(
+            "❌ Error al configurar herramientas de dibujo:",
+            error,
+          );
+          showError(
+            "Error al cargar herramientas de dibujo: " +
+              (error as Error).message,
+          );
         }
       }
 
@@ -747,79 +863,102 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
       async function loadMultipleCanchas(canchaIdsStr) {
         try {
           // Parsear los IDs
-          const ids = canchaIdsStr.split(',').map(id => id.trim()).filter(id => id);
-          
+          const ids = canchaIdsStr
+            .split(",")
+            .map((id) => id.trim())
+            .filter((id) => id);
+
           if (ids.length === 0) {
-            console.log('⚠️ No hay canchas para mostrar');
+            console.log("⚠️ No hay canchas para mostrar");
             return;
           }
-          
-          console.log('🔍 Cargando múltiples canchas:', ids);
-          
+
+          console.log("🔍 Cargando múltiples canchas:", ids);
+
           // Cargar todas las canchas en paralelo
-          const promises = ids.map(id => fetch(`/api/canchas/${id}`).then(r => r.json()));
+          const promises = ids.map((id) =>
+            fetch(`/api/canchas/${id}`).then((r) => r.json()),
+          );
           const responses = await Promise.all(promises);
-          
+
           // Filtrar canchas válidas con polígonos
           const canchasConPoligono = responses
-            .filter(data => data.success && data.cancha && data.cancha.poligono_coordenadas && Array.isArray(data.cancha.poligono_coordenadas))
-            .map(data => data.cancha);
-          
-          console.log(`📊 ${canchasConPoligono.length} de ${ids.length} canchas tienen polígonos`);
-          
+            .filter(
+              (data) =>
+                data.success &&
+                data.cancha &&
+                data.cancha.poligono_coordenadas &&
+                Array.isArray(data.cancha.poligono_coordenadas),
+            )
+            .map((data) => data.cancha);
+
+          console.log(
+            `📊 ${canchasConPoligono.length} de ${ids.length} canchas tienen polígonos`,
+          );
+
           // Debug: mostrar estado de cada cancha
-          canchasConPoligono.forEach(cancha => {
-            console.log(`🏷️ Cancha ${cancha.nombre}: Estado ID = ${cancha.estado_actual_id}, Estado = ${cancha.estado_actual}`);
+          canchasConPoligono.forEach((cancha) => {
+            console.log(
+              `🏷️ Cancha ${cancha.nombre}: Estado ID = ${cancha.estado_actual_id}, Estado = ${cancha.estado_actual}`,
+            );
           });
-          
+
           if (canchasConPoligono.length === 0) {
-            console.log('⚠️ Ninguna cancha tiene polígono definido');
+            console.log("⚠️ Ninguna cancha tiene polígono definido");
             return;
           }
-          
+
           // Crear GeoJSON con todos los polígonos
-          const features = canchasConPoligono.map(cancha => ({
-            type: 'Feature',
+          const features = canchasConPoligono.map((cancha) => ({
+            type: "Feature",
             geometry: {
-              type: 'Polygon',
-              coordinates: [cancha.poligono_coordenadas]
+              type: "Polygon",
+              coordinates: [cancha.poligono_coordenadas],
             },
             properties: {
               cancha_id: cancha.id,
               cancha_nombre: cancha.nombre,
-              estado_actual: cancha.estado_actual || 'Sin estado',
+              estado_actual: cancha.estado_actual || "Sin estado",
               estado_actual_id: cancha.estado_actual_id || 1,
-              empresa_actual: cancha.empresa_actual || 'Sin empresa',
-              tipo: 'cancha_area'
-            }
+              empresa_actual: cancha.empresa_actual || "Sin empresa",
+              tipo: "cancha_area",
+            },
           }));
-          
+
           const polygonsGeoJSON = {
-            type: 'FeatureCollection',
-            features: features
+            type: "FeatureCollection",
+            features: features,
           };
-          
+
           // Debug: mostrar el GeoJSON generado
-          console.log('🗺️ GeoJSON generado:', JSON.stringify(polygonsGeoJSON, null, 2));
-          console.log('🎨 Estados de las features:', features.map(f => ({ 
-            nombre: f.properties.cancha_nombre, 
-            estado_id: f.properties.estado_actual_id,
-            estado_nombre: f.properties.estado_actual
-          })));
-          
+          console.log(
+            "🗺️ GeoJSON generado:",
+            JSON.stringify(polygonsGeoJSON, null, 2),
+          );
+          console.log(
+            "🎨 Estados de las features:",
+            features.map((f) => ({
+              nombre: f.properties.cancha_nombre,
+              estado_id: f.properties.estado_actual_id,
+              estado_nombre: f.properties.estado_actual,
+            })),
+          );
+
           // Remover fuentes anteriores si existen
-          if (map.getSource('canchas-dashboard')) {
-            map.getLayer('canchas-dashboard-fill') && map.removeLayer('canchas-dashboard-fill');
-            map.getLayer('canchas-dashboard-stroke') && map.removeLayer('canchas-dashboard-stroke');
-            map.removeSource('canchas-dashboard');
+          if (map.getSource("canchas-dashboard")) {
+            map.getLayer("canchas-dashboard-fill") &&
+              map.removeLayer("canchas-dashboard-fill");
+            map.getLayer("canchas-dashboard-stroke") &&
+              map.removeLayer("canchas-dashboard-stroke");
+            map.removeSource("canchas-dashboard");
           }
-          
+
           // Agregar fuente con todos los polígonos
-          map.addSource('canchas-dashboard', {
-            type: 'geojson',
-            data: polygonsGeoJSON
+          map.addSource("canchas-dashboard", {
+            type: "geojson",
+            data: polygonsGeoJSON,
           });
-          
+
           // Agregar capas con estilos dinámicos según estado
           // Estados:
           // 1: Creada - Azul con borde azul
@@ -828,464 +967,786 @@ console.log('🏗️ MiningMap iniciado con:', { muroFilter, drawingMode, cancha
           // 4: Validada - Verde con borde amarillo
           // 8: Rechazada, en Espera - Rojo con borde amarillo
           // 6: Cerrada - Verde con borde verde
-          
-          console.log('🎨 Aplicando colores a las capas del mapa...');
-          console.log('📊 Distribución de estados:', features.reduce((acc, f) => {
-            const estadoId = f.properties.estado_actual_id;
-            acc[estadoId] = (acc[estadoId] || 0) + 1;
-            return acc;
-          }, {}));
-          
+
+          console.log("🎨 Aplicando colores a las capas del mapa...");
+          console.log(
+            "📊 Distribución de estados:",
+            features.reduce((acc, f) => {
+              const estadoId = f.properties.estado_actual_id;
+              acc[estadoId] = (acc[estadoId] || 0) + 1;
+              return acc;
+            }, {}),
+          );
+
           map.addLayer({
-            id: 'canchas-dashboard-fill',
-            type: 'fill',
-            source: 'canchas-dashboard',
+            id: "canchas-dashboard-fill",
+            type: "fill",
+            source: "canchas-dashboard",
             paint: {
-              'fill-color': [
-                'match',
-                ['get', 'estado_actual_id'],
-                1, '#3b82f6',  // Creada: Azul
-                7, '#fbbf24',  // En Espera: Amarillo
-                2, '#fbbf24',  // En Proceso: Amarillo - ID 2
-                4, '#10b981',  // Validada: Verde
-                8, '#ef4444',  // Rechazada, en Espera: Rojo
-                6, '#10b981',  // Cerrada: Verde
-                '#3b82f6'      // Default: Azul
+              "fill-color": [
+                "match",
+                ["get", "estado_actual_id"],
+                1,
+                "#3b82f6", // Creada: Azul
+                7,
+                "#fbbf24", // En Espera: Amarillo
+                2,
+                "#fbbf24", // En Proceso: Amarillo - ID 2
+                4,
+                "#10b981", // Validada: Verde
+                8,
+                "#ef4444", // Rechazada, en Espera: Rojo
+                6,
+                "#10b981", // Cerrada: Verde
+                "#3b82f6", // Default: Azul
               ],
-              'fill-opacity': 0.3
-            }
+              "fill-opacity": 0.3,
+            },
           });
-          
-          console.log('✅ Capa de relleno agregada con colores dinámicos');
-          
+
+          console.log("✅ Capa de relleno agregada con colores dinámicos");
+
           map.addLayer({
-            id: 'canchas-dashboard-stroke',
-            type: 'line',
-            source: 'canchas-dashboard',
+            id: "canchas-dashboard-stroke",
+            type: "line",
+            source: "canchas-dashboard",
             paint: {
-              'line-color': [
-                'match',
-                ['get', 'estado_actual_id'],
-                1, '#2563eb',  // Creada: Azul
-                7, '#f59e0b',  // En Espera: Amarillo más oscuro
-                2, '#10b981',  // En Proceso: Verde - ID 2
-                4, '#fbbf24',  // Validada: Amarillo
-                8, '#fbbf24',  // Rechazada, en Espera: Amarillo
-                6, '#059669',  // Cerrada: Verde oscuro
-                '#2563eb'      // Default: Azul
+              "line-color": [
+                "match",
+                ["get", "estado_actual_id"],
+                1,
+                "#2563eb", // Creada: Azul
+                7,
+                "#f59e0b", // En Espera: Amarillo más oscuro
+                2,
+                "#10b981", // En Proceso: Verde - ID 2
+                4,
+                "#fbbf24", // Validada: Amarillo
+                8,
+                "#fbbf24", // Rechazada, en Espera: Amarillo
+                6,
+                "#059669", // Cerrada: Verde oscuro
+                "#2563eb", // Default: Azul
               ],
-              'line-width': 2,
-              'line-opacity': 0.8
-            }
+              "line-width": 2,
+              "line-opacity": 0.8,
+            },
           });
-          
-          console.log('✅ Capa de borde agregada con colores dinámicos');
-          
+
+          console.log("✅ Capa de borde agregada con colores dinámicos");
+
           // NO hacer zoom automático - mantener vista general
           // El zoom se hará solo cuando el usuario haga doble-click en una fila de la tabla
-          console.log('✅ Mapa cargado en vista general (sin auto-zoom)');
-          
+          console.log("✅ Mapa cargado en vista general (sin auto-zoom)");
+
           // Agregar popup al hacer click
-          map.on('click', 'canchas-dashboard-fill', (e) => {
+          map.on("click", "canchas-dashboard-fill", (e) => {
             const feature = e.features[0];
             const props = feature.properties;
-            
+
             new mapboxgl.Popup()
               .setLngLat(e.lngLat)
-              .setHTML(`
+              .setHTML(
+                `
                 <div style="padding: 0.5rem;">
                   <h4 style="margin: 0 0 0.5rem 0; font-weight: 700;">${props.cancha_nombre}</h4>
                   <p style="margin: 0.25rem 0;"><strong>Estado:</strong> ${props.estado_actual}</p>
                   <p style="margin: 0.25rem 0;"><strong>Empresa:</strong> ${props.empresa_actual}</p>
                 </div>
-              `)
+              `,
+              )
               .addTo(map);
           });
-          
+
           // Cambiar cursor al pasar sobre las canchas
-          map.on('mouseenter', 'canchas-dashboard-fill', () => {
-            map.getCanvas().style.cursor = 'pointer';
+          map.on("mouseenter", "canchas-dashboard-fill", () => {
+            map.getCanvas().style.cursor = "pointer";
           });
-          
-          map.on('mouseleave', 'canchas-dashboard-fill', () => {
-            map.getCanvas().style.cursor = '';
+
+          map.on("mouseleave", "canchas-dashboard-fill", () => {
+            map.getCanvas().style.cursor = "";
           });
-          
-          console.log('✅ Múltiples canchas mostradas exitosamente');
-          
+
+          console.log("✅ Múltiples canchas mostradas exitosamente");
         } catch (error) {
-          console.error('❌ Error al cargar múltiples canchas:', error);
-          showError('Error al cargar las áreas de las canchas: ' + (error as Error).message);
+          console.error("❌ Error al cargar múltiples canchas:", error);
+          showError(
+            "Error al cargar las áreas de las canchas: " +
+              (error as Error).message,
+          );
         }
       }
-      
+
       // Hacer zoom a una cancha específica en el dashboard
       function zoomToCanchaInDashboard(canchaId) {
         try {
-          const source = map.getSource('canchas-dashboard');
+          const source = map.getSource("canchas-dashboard");
           if (!source) {
-            console.log('⚠️ Fuente de canchas no disponible');
+            console.log("⚠️ Fuente de canchas no disponible");
             return;
           }
-          
+
           // Obtener los features del source
           const data = source._data;
           if (!data || !data.features) return;
-          
+
           // Encontrar la cancha específica
-          const canchaFeature = data.features.find(f => f.properties.cancha_id == canchaId);
-          
+          const canchaFeature = data.features.find(
+            (f) => f.properties.cancha_id == canchaId,
+          );
+
           if (!canchaFeature) {
-            console.log('⚠️ Cancha no encontrada en el mapa:', canchaId);
+            console.log("⚠️ Cancha no encontrada en el mapa:", canchaId);
             return;
           }
-          
+
           // Calcular bounds del polígono de la cancha
           const coords = canchaFeature.geometry.coordinates[0];
-          const bounds = coords.reduce((bounds, coord) => {
-            return bounds.extend(coord);
-          }, new mapboxgl.LngLatBounds(coords[0], coords[0]));
-          
+          const bounds = coords.reduce(
+            (bounds, coord) => {
+              return bounds.extend(coord);
+            },
+            new mapboxgl.LngLatBounds(coords[0], coords[0]),
+          );
+
           // Hacer zoom con animación
           map.fitBounds(bounds, {
             padding: 100,
             duration: 1500,
-            easing: (t) => t * (2 - t)
+            easing: (t) => t * (2 - t),
           });
-          
-          console.log('✅ Zoom completado a cancha:', canchaId);
-          
+
+          console.log("✅ Zoom completado a cancha:", canchaId);
         } catch (error) {
-          console.error('❌ Error al hacer zoom a cancha:', error);
+          console.error("❌ Error al hacer zoom a cancha:", error);
         }
       }
 
       // =====================================================
       // FUNCIONES PARA VISUALIZAR REVANCHAS GEORREFERENCIADAS
       // =====================================================
-      
-      // Mostrar revanchas en el mapa
+
+      // Mostrar revanchas en el mapa con visualización moderna
       function mostrarRevanchasEnMapa(geojsonData) {
         try {
           if (!map) {
-            console.log('⚠️ Mapa no inicializado');
+            console.log("⚠️ Mapa no inicializado");
             return;
           }
-          
-          console.log('📊 Mostrando', geojsonData.features.length, 'revanchas en el mapa');
-          
-          // Agregar source de revanchas si no existe
-          if (!map.getSource('revanchas-source')) {
-            map.addSource('revanchas-source', {
-              type: 'geojson',
-              data: geojsonData
-            });
-          } else {
-            // Actualizar datos si ya existe
-            map.getSource('revanchas-source').setData(geojsonData);
-          }
-          
-          // Crear capa de círculos con colores según revancha
-          if (!map.getLayer('revanchas-circles')) {
-            map.addLayer({
-              id: 'revanchas-circles',
-              type: 'circle',
-              source: 'revanchas-source',
-              paint: {
-                'circle-radius': [
-                  'interpolate',
-                  ['linear'],
-                  ['zoom'],
-                  12, 4,
-                  16, 8,
-                  20, 16
-                ],
-                'circle-color': [
-                  'match',
-                  ['get', 'color_revancha'],
-                  'verde', '#10b981',
-                  'amarillo', '#f59e0b',
-                  'rojo', '#ef4444',
-                  '#6b7280' // gris por defecto
-                ],
-                'circle-opacity': 0.8,
-                'circle-stroke-width': 2,
-                'circle-stroke-color': '#ffffff'
+
+          console.log(
+            "📊 Mostrando",
+            geojsonData.features.length,
+            "revanchas en el mapa",
+          );
+
+          // Función para determinar color según estado de revancha
+          // Según documentación: Verde >3.5m (OK), Amarillo 3.0-3.5m (Precaución), Rojo <3.0m (Crítico)
+          const getColorByRevancha = (revancha) => {
+            if (!revancha || revancha === 0) return "#94a3b8"; // Gris - Sin datos
+            if (revancha > 3.5) return "#10b981"; // Verde - OK (>3.5m)
+            if (revancha >= 3.0) return "#fbbf24"; // Amarillo - Precaución (3.0-3.5m)
+            return "#ef4444"; // Rojo - Crítico (<3.0m)
+          };
+
+          // Enriquecer features con colores dinámicos
+          const enrichedFeatures = geojsonData.features.map((feature) => ({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              dynamic_color: getColorByRevancha(feature.properties.revancha),
+            },
+          }));
+
+          // Función para calcular distancia entre dos puntos (Haversine)
+          const getDistance = (coord1, coord2) => {
+            const R = 6371000; // Radio de la Tierra en metros
+            const lat1 = (coord1[1] * Math.PI) / 180;
+            const lat2 = (coord2[1] * Math.PI) / 180;
+            const deltaLat = ((coord2[1] - coord1[1]) * Math.PI) / 180;
+            const deltaLon = ((coord2[0] - coord1[0]) * Math.PI) / 180;
+
+            const a =
+              Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+              Math.cos(lat1) *
+                Math.cos(lat2) *
+                Math.sin(deltaLon / 2) *
+                Math.sin(deltaLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+          };
+
+          // Crear líneas de conexión basadas en DISTANCIA (máximo 100m entre puntos)
+          const lineFeatures = [];
+          const MAX_DISTANCE = 100; // metros
+
+          for (let i = 0; i < enrichedFeatures.length; i++) {
+            const current = enrichedFeatures[i];
+
+            // Buscar puntos cercanos (dentro de 100m)
+            for (let j = i + 1; j < enrichedFeatures.length; j++) {
+              const next = enrichedFeatures[j];
+              const distance = getDistance(
+                current.geometry.coordinates,
+                next.geometry.coordinates,
+              );
+
+              // Solo conectar si están a menos de 100m
+              if (distance <= MAX_DISTANCE) {
+                lineFeatures.push({
+                  type: "Feature",
+                  geometry: {
+                    type: "LineString",
+                    coordinates: [
+                      current.geometry.coordinates,
+                      next.geometry.coordinates,
+                    ],
+                  },
+                  properties: {
+                    from_pk: current.properties.pk,
+                    to_pk: next.properties.pk,
+                    from_color: current.properties.dynamic_color,
+                    to_color: next.properties.dynamic_color,
+                    distance: distance,
+                  },
+                });
               }
-            });
+            }
           }
-          
-          // Crear capa de etiquetas de PKs
-          if (!map.getLayer('revanchas-labels')) {
-            map.addLayer({
-              id: 'revanchas-labels',
-              type: 'symbol',
-              source: 'revanchas-source',
-              layout: {
-                'text-field': ['get', 'pk'],
-                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                'text-size': 10,
-                'text-offset': [0, 1.5],
-                'text-anchor': 'top'
-              },
-              paint: {
-                'text-color': '#1f2937',
-                'text-halo-color': '#ffffff',
-                'text-halo-width': 2
-              },
-              minzoom: 15
-            });
+
+          console.log(
+            `🔗 ${lineFeatures.length} conexiones creadas basadas en distancia (<100m)`,
+          );
+
+          const enrichedGeoJSON = {
+            type: "FeatureCollection",
+            features: enrichedFeatures,
+          };
+
+          const linesGeoJSON = {
+            type: "FeatureCollection",
+            features: lineFeatures,
+          };
+
+          // Limpiar capas existentes
+          if (map.getLayer("revanchas-labels"))
+            map.removeLayer("revanchas-labels");
+          if (map.getLayer("revanchas-glow-inner"))
+            map.removeLayer("revanchas-glow-inner");
+          if (map.getLayer("revanchas-pulse-1"))
+            map.removeLayer("revanchas-pulse-1");
+          if (map.getLayer("revanchas-pulse-2"))
+            map.removeLayer("revanchas-pulse-2");
+          if (map.getLayer("revanchas-pulse-3"))
+            map.removeLayer("revanchas-pulse-3");
+          if (map.getLayer("revanchas-pulse-4"))
+            map.removeLayer("revanchas-pulse-4");
+          if (map.getLayer("revanchas-connections"))
+            map.removeLayer("revanchas-connections");
+          if (map.getSource("revanchas-source"))
+            map.removeSource("revanchas-source");
+          if (map.getSource("revanchas-lines"))
+            map.removeSource("revanchas-lines");
+
+          // Agregar sources
+          map.addSource("revanchas-source", {
+            type: "geojson",
+            data: enrichedGeoJSON,
+          });
+
+          map.addSource("revanchas-lines", {
+            type: "geojson",
+            data: linesGeoJSON,
+          });
+
+          // CAPA 1: Líneas de conexión con degradado
+          map.addLayer({
+            id: "revanchas-connections",
+            type: "line",
+            source: "revanchas-lines",
+            paint: {
+              "line-color": ["get", "from_color"],
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                1.5,
+                16,
+                3,
+                20,
+                5,
+              ],
+              "line-opacity": 0.6,
+              "line-blur": 1,
+            },
+            layout: {
+              "line-cap": "round",
+              "line-join": "round",
+            },
+          });
+
+          // CAPAS DE ONDAS EXPANSIVAS TIPO SONAR (4 capas para efecto degradado)
+          // Onda 4 - Más externa (se desvanece completamente)
+          map.addLayer({
+            id: "revanchas-pulse-4",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                20,
+                16,
+                35,
+                20,
+                60,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.05,
+              "circle-blur": 1,
+            },
+          });
+
+          // Onda 3
+          map.addLayer({
+            id: "revanchas-pulse-3",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                15,
+                16,
+                26,
+                20,
+                45,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.1,
+              "circle-blur": 0.9,
+            },
+          });
+
+          // Onda 2
+          map.addLayer({
+            id: "revanchas-pulse-2",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                10,
+                16,
+                18,
+                20,
+                32,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.2,
+              "circle-blur": 0.7,
+            },
+          });
+
+          // Onda 1 - Más interna
+          map.addLayer({
+            id: "revanchas-pulse-1",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                6,
+                16,
+                12,
+                20,
+                22,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.35,
+              "circle-blur": 0.5,
+            },
+          });
+
+          // Glow central (muy sutil, sin punto definido)
+          map.addLayer({
+            id: "revanchas-glow-inner",
+            type: "circle",
+            source: "revanchas-source",
+            paint: {
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                12,
+                3,
+                16,
+                6,
+                20,
+                12,
+              ],
+              "circle-color": ["get", "dynamic_color"],
+              "circle-opacity": 0.6,
+              "circle-blur": 0.8,
+            },
+          });
+
+          // Etiquetas (solo visibles en zoom cercano)
+          map.addLayer({
+            id: "revanchas-labels",
+            type: "symbol",
+            source: "revanchas-source",
+            layout: {
+              "text-field": ["get", "pk"],
+              "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+              "text-size": 11,
+              "text-offset": [0, 0],
+              "text-anchor": "center",
+            },
+            paint: {
+              "text-color": "#ffffff",
+              "text-halo-color": ["get", "dynamic_color"],
+              "text-halo-width": 3,
+              "text-halo-blur": 1.5,
+              "text-opacity": 0.9,
+            },
+            minzoom: 15,
+          });
+
+          // Animación de pulso tipo SONAR (4 ondas con fases diferentes)
+          let pulsePhase = 0;
+          function animateSonarPulse() {
+            if (!map.getLayer("revanchas-pulse-1")) return;
+
+            pulsePhase = (pulsePhase + 0.015) % 1; // Velocidad del pulso
+
+            // Cada onda tiene un desfase para crear efecto expansivo
+            const wave1 = Math.sin(pulsePhase * Math.PI * 2);
+            const wave2 = Math.sin((pulsePhase + 0.25) * Math.PI * 2);
+            const wave3 = Math.sin((pulsePhase + 0.5) * Math.PI * 2);
+            const wave4 = Math.sin((pulsePhase + 0.75) * Math.PI * 2);
+
+            // Opacidades que pulsan y se desvanecen
+            const opacity1 = 0.35 + wave1 * 0.15;
+            const opacity2 = 0.2 + wave2 * 0.1;
+            const opacity3 = 0.1 + wave3 * 0.08;
+            const opacity4 = 0.05 + wave4 * 0.04;
+
+            try {
+              map.setPaintProperty(
+                "revanchas-pulse-1",
+                "circle-opacity",
+                opacity1,
+              );
+              map.setPaintProperty(
+                "revanchas-pulse-2",
+                "circle-opacity",
+                opacity2,
+              );
+              map.setPaintProperty(
+                "revanchas-pulse-3",
+                "circle-opacity",
+                opacity3,
+              );
+              map.setPaintProperty(
+                "revanchas-pulse-4",
+                "circle-opacity",
+                opacity4,
+              );
+            } catch (e) {
+              // Capa no visible, ignorar
+            }
+
+            requestAnimationFrame(animateSonarPulse);
           }
-          
-          // Agregar popup al hacer clic en un punto
-          map.on('click', 'revanchas-circles', (e) => {
+          animateSonarPulse();
+
+          // Popup mejorado al hacer clic en el área de la onda
+          map.on("click", "revanchas-pulse-1", (e) => {
             const feature = e.features[0];
             const props = feature.properties;
-            
+
+            // Determinar badge de estado según documentación
+            let estadoBadge = "";
+            const revancha = parseFloat(props.revancha) || 0;
+            if (revancha === 0) {
+              estadoBadge = `<span style="background: #94a3b8; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 11px;">⚪ SIN DATOS</span>`;
+            } else if (revancha > 3.5) {
+              estadoBadge = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 11px;">✅ OK</span>`;
+            } else if (revancha >= 3.0) {
+              estadoBadge = `<span style="background: #fbbf24; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 11px;">⚠️ PRECAUCIÓN</span>`;
+            } else {
+              estadoBadge = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 11px;">🔴 CRÍTICO</span>`;
+            }
+
             const html = `
-              <div style="font-family: Inter, sans-serif; min-width: 200px;">
-                <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1f2937;">
-                  ${props.muro} - ${props.sector} - ${props.pk}
-                </h3>
-                <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                  📅 ${new Date(props.fecha_medicion).toLocaleDateString('es-CL')}
+              <div style="padding: 12px; min-width: 260px; font-family: 'Inter', sans-serif;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                  <h3 style="margin: 0; color: ${props.dynamic_color}; font-size: 18px; font-weight: bold;">
+                    📍 ${props.muro} - ${props.sector}
+                  </h3>
+                  ${estadoBadge}
                 </div>
-                <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-                  <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 4px 0; font-weight: 500;">Revancha:</td>
-                    <td style="padding: 4px 0; text-align: right; color: ${props.color_revancha === 'verde' ? '#10b981' : props.color_revancha === 'amarillo' ? '#f59e0b' : '#ef4444'}; font-weight: 600;">
-                      ${props.revancha?.toFixed(3)} m
-                    </td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 4px 0; font-weight: 500;">Ancho:</td>
-                    <td style="padding: 4px 0; text-align: right;">${props.ancho?.toFixed(3)} m</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 4px 0; font-weight: 500;">Coronamiento:</td>
-                    <td style="padding: 4px 0; text-align: right;">${props.coronamiento?.toFixed(3)} m</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 4px 0; font-weight: 500;">Lama:</td>
-                    <td style="padding: 4px 0; text-align: right;">${props.lama?.toFixed(3)} m</td>
-                  </tr>
-                </table>
+                
+                <div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                  <div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">
+                    <strong style="color: #334155;">PK:</strong> ${props.pk}
+                  </div>
+                  <div style="font-size: 12px; color: #94a3b8;">
+                    📅 ${new Date(props.fecha_medicion).toLocaleDateString("es-CL")}
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
+                  <div style="background: ${revancha > 0 ? "#fef2f2" : "#f9fafb"}; padding: 8px; border-radius: 6px; border-left: 3px solid ${revancha > 0 ? "#ef4444" : "#e5e7eb"};">
+                    <strong style="color: #64748b;">Revancha:</strong><br>
+                    <span style="color: ${revancha > 0 ? "#ef4444" : "#94a3b8"}; font-weight: bold; font-size: 14px;">${revancha.toFixed(3)} m</span>
+                  </div>
+                  <div style="background: ${props.ancho > 0 ? "#eff6ff" : "#f9fafb"}; padding: 8px; border-radius: 6px; border-left: 3px solid ${props.ancho > 0 ? "#3b82f6" : "#e5e7eb"};">
+                    <strong style="color: #64748b;">Ancho:</strong><br>
+                    <span style="color: ${props.ancho > 0 ? "#3b82f6" : "#94a3b8"}; font-weight: bold; font-size: 14px;">${parseFloat(props.ancho || 0).toFixed(3)} m</span>
+                  </div>
+                  <div style="background: ${props.coronamiento > 0 ? "#faf5ff" : "#f9fafb"}; padding: 8px; border-radius: 6px; border-left: 3px solid ${props.coronamiento > 0 ? "#8b5cf6" : "#e5e7eb"};">
+                    <strong style="color: #64748b;">Coronamiento:</strong><br>
+                    <span style="color: ${props.coronamiento > 0 ? "#8b5cf6" : "#94a3b8"}; font-weight: bold; font-size: 14px;">${parseFloat(props.coronamiento || 0).toFixed(3)} m</span>
+                  </div>
+                  <div style="background: ${props.lama > 0 ? "#ecfeff" : "#f9fafb"}; padding: 8px; border-radius: 6px; border-left: 3px solid ${props.lama > 0 ? "#06b6d4" : "#e5e7eb"};">
+                    <strong style="color: #64748b;">Lama:</strong><br>
+                    <span style="color: ${props.lama > 0 ? "#06b6d4" : "#94a3b8"}; font-weight: bold; font-size: 14px;">${parseFloat(props.lama || 0).toFixed(3)} m</span>
+                  </div>
+                </div>
               </div>
             `;
-            
-            new mapboxgl.Popup()
+
+            new mapboxgl.Popup({ maxWidth: "340px" })
               .setLngLat(e.lngLat)
               .setHTML(html)
               .addTo(map);
           });
-          
-          // Cambiar cursor al hover
-          map.on('mouseenter', 'revanchas-circles', () => {
-            map.getCanvas().style.cursor = 'pointer';
+
+          // Cambiar cursor al hover sobre las ondas
+          map.on("mouseenter", "revanchas-pulse-1", () => {
+            map.getCanvas().style.cursor = "pointer";
           });
-          
-          map.on('mouseleave', 'revanchas-circles', () => {
-            map.getCanvas().style.cursor = '';
+
+          map.on("mouseleave", "revanchas-pulse-1", () => {
+            map.getCanvas().style.cursor = "";
           });
-          
+
           // Ajustar zoom automáticamente a todos los puntos
           if (geojsonData.features && geojsonData.features.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
-            
-            geojsonData.features.forEach(feature => {
+
+            geojsonData.features.forEach((feature) => {
               if (feature.geometry && feature.geometry.coordinates) {
                 bounds.extend(feature.geometry.coordinates);
               }
             });
-            
-            // Hacer zoom con padding para que se vean todos los puntos
+
             map.fitBounds(bounds, {
-              padding: {
-                top: 80,
-                bottom: 80,
-                left: 80,
-                right: 80
-              },
+              padding: { top: 80, bottom: 80, left: 80, right: 80 },
               duration: 2000,
               easing: (t) => t * (2 - t),
-              maxZoom: 14
+              maxZoom: 14,
             });
-            
-            console.log('✅ Zoom ajustado a', geojsonData.features.length, 'revanchas');
+
+            console.log(
+              "✅ Zoom ajustado a",
+              geojsonData.features.length,
+              "revanchas",
+            );
           }
-          
-          console.log('✅ Capa de revanchas agregada exitosamente');
-          
+
+          console.log(
+            "✅ Capa de revanchas con efectos visuales modernos agregada exitosamente",
+          );
         } catch (error) {
-          console.error('❌ Error al mostrar revanchas:', error);
+          console.error("❌ Error al mostrar revanchas:", error);
         }
       }
-      
+
       // Ocultar revanchas del mapa
       function ocultarRevanchasEnMapa() {
         try {
           if (!map) return;
-          
+
           // Remover capas
-          if (map.getLayer('revanchas-labels')) {
-            map.removeLayer('revanchas-labels');
+          if (map.getLayer("revanchas-labels")) {
+            map.removeLayer("revanchas-labels");
           }
-          if (map.getLayer('revanchas-circles')) {
-            map.removeLayer('revanchas-circles');
+          if (map.getLayer("revanchas-circles")) {
+            map.removeLayer("revanchas-circles");
           }
-          
+
           // Remover source
-          if (map.getSource('revanchas-source')) {
-            map.removeSource('revanchas-source');
+          if (map.getSource("revanchas-source")) {
+            map.removeSource("revanchas-source");
           }
-          
-          console.log('✅ Capas de revanchas removidas');
-          
+
+          console.log("✅ Capas de revanchas removidas");
         } catch (error) {
-          console.error('❌ Error al ocultar revanchas:', error);
+          console.error("❌ Error al ocultar revanchas:", error);
         }
       }
 
       // Cargar y mostrar el polígono de una cancha específica
       async function loadCanchaPolygon(canchaId) {
         try {
-          console.log('🔍 Cargando polígono de cancha:', canchaId);
-          
+          console.log("🔍 Cargando polígono de cancha:", canchaId);
+
           // Hacer petición al API para obtener los datos de la cancha
           const response = await fetch(`/api/canchas/${canchaId}`);
           if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
           }
-          
+
           const data = await response.json();
-          console.log('📊 Respuesta completa de la API:', data);
-          
+          console.log("📊 Respuesta completa de la API:", data);
+
           if (!data.success || !data.cancha) {
-            console.error('❌ Error en respuesta de API:', data);
+            console.error("❌ Error en respuesta de API:", data);
             return;
           }
-          
+
           const cancha = data.cancha;
-          console.log('📄 Datos de cancha extraídos:', {
+          console.log("📄 Datos de cancha extraídos:", {
             id: cancha.id,
             nombre: cancha.nombre,
             poligono_presente: !!cancha.poligono_coordenadas,
             tipo_poligono: typeof cancha.poligono_coordenadas,
             es_array: Array.isArray(cancha.poligono_coordenadas),
             longitud: cancha.poligono_coordenadas?.length || 0,
-            primeros_puntos: cancha.poligono_coordenadas?.slice(0, 3) || []
+            primeros_puntos: cancha.poligono_coordenadas?.slice(0, 3) || [],
           });
-          
+
           // Verificar si la cancha tiene polígono
-          if (!cancha.poligono_coordenadas || !Array.isArray(cancha.poligono_coordenadas)) {
-            console.log('⚠️ Esta cancha no tiene polígono definido');
+          if (
+            !cancha.poligono_coordenadas ||
+            !Array.isArray(cancha.poligono_coordenadas)
+          ) {
+            console.log("⚠️ Esta cancha no tiene polígono definido");
             return;
           }
-          
+
           // Crear GeoJSON del polígono
           const polygonGeoJSON = {
-            type: 'FeatureCollection',
-            features: [{
-              type: 'Feature',
-              geometry: {
-                type: 'Polygon',
-                coordinates: [cancha.poligono_coordenadas]
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                geometry: {
+                  type: "Polygon",
+                  coordinates: [cancha.poligono_coordenadas],
+                },
+                properties: {
+                  cancha_id: cancha.id,
+                  cancha_nombre: cancha.nombre,
+                  estado_actual_id: cancha.estado_actual_id || 1,
+                  tipo: "cancha_area",
+                },
               },
-              properties: {
-                cancha_id: cancha.id,
-                cancha_nombre: cancha.nombre,
-                estado_actual_id: cancha.estado_actual_id || 1,
-                tipo: 'cancha_area'
-              }
-            }]
+            ],
           };
-          
+
           // Agregar fuente del polígono al mapa
-          if (map.getSource('cancha-polygon')) {
-            map.removeSource('cancha-polygon');
+          if (map.getSource("cancha-polygon")) {
+            map.removeSource("cancha-polygon");
           }
-          
-          map.addSource('cancha-polygon', {
-            type: 'geojson',
-            data: polygonGeoJSON
+
+          map.addSource("cancha-polygon", {
+            type: "geojson",
+            data: polygonGeoJSON,
           });
-          
+
           // Determinar colores según el estado
           const estadoId = cancha.estado_actual_id || 1;
-          let fillColor = '#3b82f6';  // Default: Azul (Creada)
-          let strokeColor = '#2563eb'; // Default: Azul oscuro
-          
-          switch(estadoId) {
+          let fillColor = "#3b82f6"; // Default: Azul (Creada)
+          let strokeColor = "#2563eb"; // Default: Azul oscuro
+
+          switch (estadoId) {
             case 1: // Creada
-              fillColor = '#3b82f6';
-              strokeColor = '#2563eb';
+              fillColor = "#3b82f6";
+              strokeColor = "#2563eb";
               break;
             case 7: // En Espera
-              fillColor = '#fbbf24';
-              strokeColor = '#f59e0b';
+              fillColor = "#fbbf24";
+              strokeColor = "#f59e0b";
               break;
             case 2: // En Proceso - ID 2
-              fillColor = '#fbbf24';
-              strokeColor = '#10b981';
+              fillColor = "#fbbf24";
+              strokeColor = "#10b981";
               break;
             case 4: // Validada
-              fillColor = '#10b981';
-              strokeColor = '#fbbf24';
+              fillColor = "#10b981";
+              strokeColor = "#fbbf24";
               break;
             case 8: // Rechazada, en Espera
-              fillColor = '#ef4444';
-              strokeColor = '#fbbf24';
+              fillColor = "#ef4444";
+              strokeColor = "#fbbf24";
               break;
             case 6: // Cerrada
-              fillColor = '#10b981';
-              strokeColor = '#059669';
+              fillColor = "#10b981";
+              strokeColor = "#059669";
               break;
           }
-          
+
           // Agregar capas del polígono con colores dinámicos
           map.addLayer({
-            id: 'cancha-polygon-fill',
-            type: 'fill',
-            source: 'cancha-polygon',
+            id: "cancha-polygon-fill",
+            type: "fill",
+            source: "cancha-polygon",
             paint: {
-              'fill-color': fillColor,
-              'fill-opacity': 0.3
-            }
+              "fill-color": fillColor,
+              "fill-opacity": 0.3,
+            },
           });
-          
+
           map.addLayer({
-            id: 'cancha-polygon-stroke',
-            type: 'line',
-            source: 'cancha-polygon',
+            id: "cancha-polygon-stroke",
+            type: "line",
+            source: "cancha-polygon",
             paint: {
-              'line-color': strokeColor,
-              'line-width': 3,
-              'line-opacity': 0.8
-            }
+              "line-color": strokeColor,
+              "line-width": 3,
+              "line-opacity": 0.8,
+            },
           });
-          
+
           // No hacer zoom al polígono individual - dejar que el filtro de muro maneje la vista
-          console.log('✅ Polígono de cancha mostrado exitosamente - zoom manejado por filtro de muro');
-          
+          console.log(
+            "✅ Polígono de cancha mostrado exitosamente - zoom manejado por filtro de muro",
+          );
         } catch (error) {
-          console.error('❌ Error al cargar polígono de cancha:', error);
-          showError('Error al cargar el área de la cancha: ' + (error as Error).message);
+          console.error("❌ Error al cargar polígono de cancha:", error);
+          showError(
+            "Error al cargar el área de la cancha: " + (error as Error).message,
+          );
         }
       }
 
       // Inicializar cuando el DOM esté listo
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeMap);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeMap);
       } else {
         initializeMap();
       }
-
     } catch (error) {
-      console.error('Error loading Mapbox dependencies:', error);
-      const errorElement = document.getElementById('error');
+      console.error("Error loading Mapbox dependencies:", error);
+      const errorElement = document.getElementById("error");
       if (errorElement) {
-        errorElement.textContent = 'Error al cargar dependencias del mapa';
-        errorElement.style.display = 'block';
+        errorElement.textContent = "Error al cargar dependencias del mapa";
+        errorElement.style.display = "block";
       }
     }
   }
