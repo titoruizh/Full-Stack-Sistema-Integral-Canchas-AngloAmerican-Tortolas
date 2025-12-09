@@ -1536,6 +1536,10 @@ console.log("🏗️ MiningMap iniciado con:", {
             "revanchas-pulse-2",
             "revanchas-pulse-3",
             "revanchas-pulse-4",
+            "width-lines-layer",
+            "width-pulse-1",
+            "width-pulse-2",
+            "width-pulse-3",
             "revanchas-connections",
             // Nombres antiguos por si acaso
             "revanchas-pulse-outer",
@@ -1560,6 +1564,11 @@ console.log("🏗️ MiningMap iniciado con:", {
           if (map.getSource("revanchas-lines")) {
             map.removeSource("revanchas-lines");
             console.log("  ✓ Source revanchas-lines removido");
+          }
+
+          if (map.getSource("width-lines")) {
+            map.removeSource("width-lines");
+            console.log("  ✓ Source width-lines removido");
           }
 
           console.log("✅ Todas las capas de revanchas removidas exitosamente");
@@ -1970,6 +1979,27 @@ console.log("🏗️ MiningMap iniciado con:", {
             },
           });
 
+          // Width Lines Pulse Layers (for sonar animation)
+          const widthPulseLayers = [
+            "width-pulse-1",
+            "width-pulse-2",
+            "width-pulse-3",
+          ];
+          widthPulseLayers.forEach((id) => {
+            map.addLayer({
+              id: id,
+              type: "line",
+              source: "width-lines",
+              paint: {
+                "line-color": ["get", "color"],
+                "line-width": 3,
+                "line-opacity": 0.3,
+              },
+            });
+          });
+
+          console.log("✅ Width pulse layers created:", widthPulseLayers);
+
           // Capas de Pulso (4 capas idénticas para animación)
           const pulseLayers = [
             "revanchas-pulse-1",
@@ -2099,6 +2129,38 @@ console.log("🏗️ MiningMap iniciado con:", {
                 map.setPaintProperty(layerId, "circle-stroke-opacity", 0);
               } catch (e) {}
             });
+
+            // Animar width lines (efecto sonar en líneas)
+            if (widthPulseLayers && widthPulseLayers.length > 0) {
+              widthPulseLayers.forEach((layerId, index) => {
+                const layerPhase =
+                  (sonarPhase + index / widthPulseLayers.length) % 1;
+
+                // Opacidad más alta para mejor visibilidad
+                const opacity = 0.9 * Math.pow(1 - layerPhase, 1.0);
+
+                // Ancho que crece MUCHO MÁS - efecto sonar muy visible
+                const widthGrowth = layerPhase * 15; // Crece hasta 15px adicionales!
+
+                try {
+                  map.setPaintProperty(
+                    layerId,
+                    "line-width",
+                    3 + widthGrowth, // Empieza en 3px y crece
+                  );
+                  map.setPaintProperty(layerId, "line-opacity", opacity);
+                  map.setPaintProperty(layerId, "line-blur", layerPhase * 3); // Blur que crece
+                } catch (e) {
+                  if (index === 0)
+                    console.error("Error setting width line properties:", e);
+                }
+              });
+            } else {
+              console.warn(
+                "⚠️ widthPulseLayers not available in animation function",
+              );
+            }
+
             requestAnimationFrame(animateElegantSonar);
           }
           animateElegantSonar();

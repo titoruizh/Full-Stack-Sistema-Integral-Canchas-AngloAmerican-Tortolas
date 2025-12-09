@@ -7876,29 +7876,48 @@ import AuthGuard from "../components/AuthGuard.astro";
 
             // Mapeo de nombres amigables para timeline
             const NOMBRES_ACCIONES_TIMELINE = {
-              // AngloAmerican
+              // AngloAmerican - Botón "CREAR CANCHA"
               crear_cancha: "Creación de Cancha",
               crear_cancha_con_poligono: "Creación de Cancha",
+              
+              // AngloAmerican - Botón "ENVIAR A BESALCO"
               enviar_besalco: "Envío a Besalco",
+              
+              // AngloAmerican - Botón "CERRAR CANCHA"
               cerrar_cancha: "Cierre de Cancha",
 
-              // Tomar trabajo (genérico - cualquier empresa)
+              // Besalco - Botón "RECEPCIONAR TRABAJO"
+              recepcionar_besalco: "Trabajo recepcionado por Besalco",
+              
+              // Besalco - Botón "GESTIONAR" (finalizar y enviar a Linkapsis)
+              finalizar_besalco: "Trabajo finalizado por Besalco",
+              
+              // Besalco - Botón "RECHAZAR"
+              rechazar_besalco: "Trabajo rechazado por Besalco",
+
+              // Linkapsis - Botón "RECEPCIONAR TRABAJO"
+              recepcionar_linkapsis: "Trabajo recepcionado por Linkapsis",
+              
+              // Linkapsis - Botón "GESTIONAR" (validar espesores y enviar a LlayLlay)
+              validar_linkapsis: "Espesores validados por Linkapsis",
+              
+              // Linkapsis - Botón "RECHAZAR"
+              rechazar_linkapsis: "Espesores rechazados por Linkapsis",
+
+              // LlayLlay - Botón "RECEPCIONAR TRABAJO"
+              recepcionar_llay_llay: "Trabajo recepcionado por LlayLlay",
+              
+              // LlayLlay - Botón "GESTIONAR" (validar densidad y enviar a AA)
+              validar_llay_llay: "Densidad validada por LlayLlay",
+              
+              // LlayLlay - Botón "RECHAZAR"
+              rechazar_llay_llay: "Densidad rechazada por LlayLlay",
+
+              // Genérico - Cualquier botón "RECHAZAR"
+              rechazar_cancha: "Cancha rechazada",
+              
+              // Tomar trabajo (si se usa)
               tomar_trabajo: "Trabajo tomado",
-
-              // Besalco
-              recepcionar_besalco: "Trabajo tomado por Besalco",
-              finalizar_besalco: "Finalización de trabajo por Besalco",
-              rechazar_besalco: "Rechazo de trabajo por Besalco",
-
-              // Linkapsis
-              recepcionar_linkapsis: "Trabajo tomado por Linkapsis",
-              validar_linkapsis: "Validación de espesores por Linkapsis",
-              rechazar_linkapsis: "Rechazo de espesores por Linkapsis",
-
-              // LlayLlay
-              recepcionar_llay_llay: "Trabajo tomado por LlayLlay",
-              validar_llay_llay: "Validación de densidad por LlayLlay",
-              rechazar_llay_llay: "Rechazo de densidad por LlayLlay",
             };
 
             const accionRaw = transicion.accion || "Sin acción";
