@@ -1,0 +1,17 @@
+# Tileserver para mapbase.mbtiles
+FROM node:18-alpine
+
+# Instalar tileserver-gl-light
+RUN npm install -g tileserver-gl-light
+
+# Crear directorio de datos
+WORKDIR /data
+
+# Copiar el archivo mbtiles
+COPY public/mapbase.mbtiles /data/mapbase.mbtiles
+
+# Exponer puerto
+EXPOSE 8081
+
+# Ejecutar tileserver
+CMD ["tileserver-gl-light", "/data/mapbase.mbtiles", "--port", "8081"]

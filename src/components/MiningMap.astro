@@ -422,23 +422,17 @@ console.log("🏗️ MiningMap iniciado con:", {
             data: convertedSectors,
           });
 
-          // Agregar fuente raster del ortomosaico usando TileServer GL (puerto 8081)
+          // Agregar fuente raster del ortomosaico usando TileServer GL
           if (!map.getSource("ortomosaico")) {
             console.log(
               "🗺️ Configurando fuente del ortomosaico con TileServer GL...",
             );
 
-            // Probar diferentes URLs del tileserver
-            const tileUrls = [
-              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.jpg",
-              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.png",
-              "http://localhost:8081/data/mapbase/{z}/{x}/{y}.webp",
-              "http://localhost:8081/data/mapbase/tiles/{z}/{x}/{y}.jpg",
-            ];
-
-            const tileUrl = tileUrls[0]; // Empezar con la primera
+            // Usar variable de entorno para tileserver (local: localhost:8081, producción: Render)
+            const tileserverUrl = import.meta.env.PUBLIC_TILESERVER_URL || "http://localhost:8081";
+            const tileUrl = `${tileserverUrl}/data/mapbase/{z}/{x}/{y}.jpg`;
+            
             console.log("📡 URL de tiles configurada:", tileUrl);
-            console.log("📡 URLs alternativas disponibles:", tileUrls);
 
             map.addSource("ortomosaico", {
               type: "raster",
@@ -1536,10 +1530,6 @@ console.log("🏗️ MiningMap iniciado con:", {
             "revanchas-pulse-2",
             "revanchas-pulse-3",
             "revanchas-pulse-4",
-            "width-lines-layer",
-            "width-pulse-1",
-            "width-pulse-2",
-            "width-pulse-3",
             "revanchas-connections",
             // Nombres antiguos por si acaso
             "revanchas-pulse-outer",
@@ -1564,11 +1554,6 @@ console.log("🏗️ MiningMap iniciado con:", {
           if (map.getSource("revanchas-lines")) {
             map.removeSource("revanchas-lines");
             console.log("  ✓ Source revanchas-lines removido");
-          }
-
-          if (map.getSource("width-lines")) {
-            map.removeSource("width-lines");
-            console.log("  ✓ Source width-lines removido");
           }
 
           console.log("✅ Todas las capas de revanchas removidas exitosamente");
@@ -2131,35 +2116,25 @@ console.log("🏗️ MiningMap iniciado con:", {
             });
 
             // Animar width lines (efecto sonar en líneas)
-            if (widthPulseLayers && widthPulseLayers.length > 0) {
-              widthPulseLayers.forEach((layerId, index) => {
-                const layerPhase =
-                  (sonarPhase + index / widthPulseLayers.length) % 1;
+            widthPulseLayers.forEach((layerId, index) => {
+              const layerPhase =
+                (sonarPhase + index / widthPulseLayers.length) % 1;
 
-                // Opacidad más alta para mejor visibilidad
-                const opacity = 0.9 * Math.pow(1 - layerPhase, 1.0);
+              // Opacidad que se desvanece más lentamente
+              const opacity = 0.8 * Math.pow(1 - layerPhase, 1.2);
 
-                // Ancho que crece MUCHO MÁS - efecto sonar muy visible
-                const widthGrowth = layerPhase * 15; // Crece hasta 15px adicionales!
+              // Ancho que crece mucho más - efecto sonar expandiéndose
+              const widthGrowth = layerPhase * 8; // Crece hasta 8x el ancho original
 
-                try {
-                  map.setPaintProperty(
-                    layerId,
-                    "line-width",
-                    3 + widthGrowth, // Empieza en 3px y crece
-                  );
-                  map.setPaintProperty(layerId, "line-opacity", opacity);
-                  map.setPaintProperty(layerId, "line-blur", layerPhase * 3); // Blur que crece
-                } catch (e) {
-                  if (index === 0)
-                    console.error("Error setting width line properties:", e);
-                }
-              });
-            } else {
-              console.warn(
-                "⚠️ widthPulseLayers not available in animation function",
-              );
-            }
+              try {
+                map.setPaintProperty(
+                  layerId,
+                  "line-width",
+                  3 + widthGrowth, // Empieza en 3px y crece
+                );
+                map.setPaintProperty(layerId, "line-opacity", opacity);
+              } catch (e) {}
+            });
 
             requestAnimationFrame(animateElegantSonar);
           }
