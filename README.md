@@ -2,13 +2,35 @@
 
 ## 🎯 Descripción
 
-Sistema completo de gestión de canchas que maneja el flujo de trabajo entre AngloAmerican, Besalco, Linkapsis y LlayLlay. Incluye trazabilidad completa, validaciones y rechazos con historial.
+Sistema completo de gestión de canchas georreferenciadas que maneja el flujo de trabajo entre AngloAmerican, Besalco, Linkapsis y LlayLlay. Incluye:
 
-## 🏗️ Arquitectura
+- 📍 Sistema de PKs georreferenciados con Mapbox
+- 🔄 Flujo de trabajo con trazabilidad completa
+- ✅ Validaciones y rechazos con historial
+- 🔐 Sistema de autenticación y roles
+- 🗺️ Visualización de mapas y polígonos
 
-- **Frontend**: Astro (Single Page Application)
-- **Backend**: Supabase (PostgreSQL + APIs REST)
-- **Estilo**: CSS vanilla con diseño responsivo
+## 📚 Documentación
+
+Toda la documentación del proyecto está organizada en [`/docs`](docs/):
+
+- **[Índice de Documentación](docs/INDEX.md)** - Punto de entrada a toda la documentación
+- **[Arquitectura del Sistema](docs/ARCHITECTURE.md)** - Visión general de la arquitectura
+- **[Estándares de Código](docs/CODE_STANDARDS.md)** - Guía de desarrollo
+
+### Enlaces Rápidos
+- [Flujos de Trabajo](docs/flujos/) - Diagramas y descripciones de flujos
+- [Integraciones](docs/integraciones/) - Mapbox, TileServer, etc.
+- [Base de Datos](docs/database/) - Esquemas, migraciones y queries
+- [Instrucciones](docs/instrucciones/) - Guías paso a paso
+
+## 🏗️ Stack Tecnológico
+
+- **Frontend**: Astro 5.x (SSR + Client Islands)
+- **Backend**: Supabase (PostgreSQL + Edge Functions)
+- **Mapas**: Mapbox GL JS + TileServer
+- **Estilos**: CSS vanilla con diseño responsivo
+- **Deploy**: Vercel (Frontend) + Docker (TileServer)
 
 ## � Flujo de Trabajo
 
@@ -45,9 +67,61 @@ Sistema completo de gestión de canchas que maneja el flujo de trabajo entre Ang
 - **historial_cancha**: Trazabilidad completa de cambios
 - **validaciones**: Registro de validaciones/rechazos específicos
 
-## 🚀 Instalación y Configuración
+## 🚀 Inicio Rápido
 
 ### Prerrequisitos
+
+- Node.js 18+ 
+- pnpm (recomendado) o npm
+- Cuenta de Supabase
+- API Key de Mapbox (opcional para desarrollo)
+
+### Instalación
+
+```bash
+# Clonar el repositorio
+git clone <repo-url>
+cd canchas-anglo2
+
+# Instalar dependencias
+pnpm install
+
+# Configurar variables de entorno (ver docs/SETUP.md)
+cp .env.example .env
+
+# Ejecutar en desarrollo
+pnpm dev
+
+# Construir para producción
+pnpm build
+```
+
+### Configuración Inicial
+
+Ver [Guía de Configuración Completa](docs/SETUP.md) para:
+- Configuración de Supabase
+- Setup de Mapbox y TileServer
+- Variables de entorno
+- Despliegue en Vercel
+
+## 📖 Para Desarrolladores
+
+Si vas a trabajar en este proyecto o colaborar:
+
+1. Lee [CONTRIBUTING.md](CONTRIBUTING.md) para guías de contribución
+2. Revisa [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) para estándares de código
+3. Familiarízate con la [Arquitectura](docs/ARCHITECTURE.md)
+4. Consulta la documentación de componentes en [`docs/componentes/`](docs/componentes/)
+
+## 🔗 Enlaces Útiles
+
+- **Dashboard Supabase**: https://chzlwqxjdcydnndrnfjk.supabase.co
+- **Producción**: (añadir URL de Vercel)
+- **Documentación API**: [docs/api/](docs/api/)
+
+## 📝 Licencia
+
+(Añadir información de licencia)
 
 - Node.js 18+
 - pnpm (o npm/yarn)
@@ -153,6 +227,55 @@ Ejemplos:
 - Confirmaciones para acciones críticas
 - Mensajes de éxito/error claros
 - Loading states durante operaciones
+
+## 📂 Estructura del Proyecto
+
+```
+canchas-anglo2/
+├── src/
+│   ├── pages/              # Rutas y páginas
+│   │   ├── index.astro     # Dashboard principal
+│   │   ├── login.astro     # Autenticación
+│   │   └── api/            # Endpoints API
+│   ├── components/         # Componentes reutilizables
+│   ├── lib/                # Librerías (Supabase, etc.)
+│   ├── utils/              # Utilidades (mapbox, auth, etc.)
+│   └── styles/             # Estilos globales
+├── public/                 # Archivos estáticos
+│   └── mapbox-gis/         # GeoJSON y token Mapbox
+├── docs/                   # 📚 Documentación completa
+│   ├── INDEX.md            # Índice de documentación
+│   ├── ARCHITECTURE.md     # Arquitectura del sistema
+│   ├── CODE_STANDARDS.md   # Estándares de código
+│   ├── SETUP.md            # Guía de instalación
+│   ├── componentes/        # Docs de componentes
+│   ├── api/                # Docs de APIs
+│   ├── database/           # Scripts SQL
+│   ├── flujos/             # Diagramas de flujo
+│   └── integraciones/      # Mapbox, TileServer, etc.
+├── CONTRIBUTING.md         # Guía de contribución
+└── README.md               # Este archivo
+```
+
+## 🎯 Proyecto Reorganizado y Profesionalizado
+
+**Fecha**: Diciembre 2025
+
+Este proyecto ha sido **reorganizado y documentado profesionalmente** para:
+
+✅ **Facilitar el crecimiento** - Estructura escalable y clara  
+✅ **Mejorar colaboración** - Estándares consistentes  
+✅ **Optimizar IA** - Documentación estructurada para mejores respuestas  
+✅ **Acelerar onboarding** - Nuevos desarrolladores entienden rápido  
+
+Ver [docs/REORGANIZACION.md](docs/REORGANIZACION.md) para detalles de los cambios.
+
+### ¿Por dónde empezar?
+
+1. **Nuevos al proyecto**: [docs/INDEX.md](docs/INDEX.md)
+2. **Instalar y configurar**: [docs/SETUP.md](docs/SETUP.md)
+3. **Contribuir**: [CONTRIBUTING.md](CONTRIBUTING.md)
+4. **Desarrollar**: [docs/CODE_STANDARDS.md](docs/CODE_STANDARDS.md)
 
 ---
 
