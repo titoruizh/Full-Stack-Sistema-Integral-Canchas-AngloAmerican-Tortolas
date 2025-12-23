@@ -87,14 +87,24 @@ export interface MedicionData {
   espesor?: number
   unidad?: string
   coordenadas?: Coordenadas
-  tipo_trabajo?: TipoTrabajo
+  tipoTrabajo?: 'corte' | 'relleno' | 'mejoramiento_sello' | null  // Selección única
+  tipoDeposito?: 'hidraulico' | 'mecanico' | null
   
   // Mediciones de LlayLlay  
   densidad?: number
+  numeroFicha?: string | null  // Número de ficha interno de LlayLlay
+  
+  // Mediciones de Besalco
+  maquinarias?: string | null  // Maquinarias utilizadas (texto libre por ahora)
+  
+  // Metadatos
+  isRevalidacion?: boolean
   
   // Mediciones legacy (compatibilidad)
   espesores?: number[]
   promedio?: number
+  tipo_trabajo?: TipoTrabajo  // Legacy - mantener para compatibilidad
+  tipo_deposito?: 'hidraulico' | 'mecanico' | null  // Legacy
 }
 
 export interface Coordenadas {
@@ -113,6 +123,7 @@ export interface Punto {
 export interface TipoTrabajo {
   corte: boolean
   relleno: boolean
+  mejoramiento_sello: boolean
 }
 
 // Nuevas interfaces para sistema de usuarios y roles
@@ -461,7 +472,7 @@ export class CanchaService {
     )
   }
 
-  static async finalizarBesalco(canchaId: number, observaciones?: string, usuario?: any): Promise<void> {
+  static async finalizarBesalco(canchaId: number, observaciones?: string, usuario?: any): Promise<number | null> {
     // Obtener estado actual
     const { data: canchaActual } = await supabase
       .from('canchas')
@@ -495,9 +506,15 @@ export class CanchaService {
       validacionData.usuario_validador_nombre = usuario.nombre_completo
     }
 
-    await supabase
+    const { data: validacion, error: validacionError } = await supabase
       .from('validaciones')
       .insert(validacionData)
+      .select('id')
+      .single()
+    
+    if (validacionError) {
+      console.error('Error al crear validación:', validacionError)
+    }
     
     // Registrar transición: finalizar Besalco
     await this.registrarTransicion(
@@ -510,6 +527,9 @@ export class CanchaService {
       observaciones || 'Trabajo de Besalco finalizado, enviado a Linkapsis',
       usuario?.id
     )
+
+    // Retornar el ID de la validación creada
+    return validacion?.id || null
   }
 
   // Validar por Linkapsis
@@ -520,7 +540,7 @@ export class CanchaService {
     mediciones?: MedicionData,
     esRevalidacion: boolean = false,
     usuario?: any
-  ): Promise<void> {
+  ): Promise<number | null> {
     // Obtener estado actual
     const { data: canchaActual } = await supabase
       .from('canchas')
@@ -528,6 +548,8 @@ export class CanchaService {
       .eq('id', canchaId)
       .single()
     
+    let validacionId: number | null = null;
+
     if (validar) {
       // Pasar a LlayLlay en estado "En Espera"
       await supabase
@@ -555,9 +577,16 @@ export class CanchaService {
         validacionData.usuario_validador_nombre = usuario.nombre_completo
       }
 
-      await supabase
+      const { data: validacion, error: validacionError } = await supabase
         .from('validaciones')
         .insert(validacionData)
+        .select('id')
+        .single()
+      
+      if (validacionError) {
+        console.error('Error al crear validación:', validacionError)
+      }
+      validacionId = validacion?.id || null
       
       // Registrar transición: validación Linkapsis
       await this.registrarTransicion(
@@ -595,9 +624,16 @@ export class CanchaService {
         rechazoData.usuario_validador_nombre = usuario.nombre_completo
       }
 
-      await supabase
+      const { data: validacion, error: validacionError } = await supabase
         .from('validaciones')
         .insert(rechazoData)
+        .select('id')
+        .single()
+      
+      if (validacionError) {
+        console.error('Error al crear validación:', validacionError)
+      }
+      validacionId = validacion?.id || null
       
       // Registrar transición: rechazo Linkapsis
       await this.registrarTransicion(
@@ -611,6 +647,8 @@ export class CanchaService {
         usuario?.id
       )
     }
+
+    return validacionId
   }
 
   // Validar por LlayLlay
@@ -621,7 +659,7 @@ export class CanchaService {
     mediciones?: MedicionData,
     esRevalidacion: boolean = false,
     usuario?: any
-  ): Promise<void> {
+  ): Promise<number | null> {
     // Obtener estado actual
     const { data: canchaActual } = await supabase
       .from('canchas')
@@ -629,6 +667,8 @@ export class CanchaService {
       .eq('id', canchaId)
       .single()
     
+    let validacionId: number | null = null;
+
     if (validar) {
       // Devolver a AngloAmerican con estado "Validada"
       await supabase
@@ -690,9 +730,17 @@ export class CanchaService {
       validacionData.usuario_validador_nombre = usuario.nombre_completo
     }
 
-    await supabase
+    const { data: validacion, error: validacionError } = await supabase
       .from('validaciones')
       .insert(validacionData)
+      .select('id')
+      .single()
+    
+    if (validacionError) {
+      console.error('Error al crear validación:', validacionError)
+    }
+
+    return validacion?.id || null
   }
 
   // Cerrar cancha (AngloAmerican)

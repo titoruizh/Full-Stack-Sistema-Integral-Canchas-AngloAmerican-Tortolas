@@ -1,4 +1,4 @@
-import { CanchaService } from '../../../../lib/supabase'
+﻿import { CanchaService } from '../../../../lib/supabase'
 import type { APIRoute } from 'astro'
 
 export const POST: APIRoute = async ({ params, request }) => {
@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     const canchaId = parseInt(params.id!)
     const { accion, observaciones, mediciones, usuario, empresa } = await request.json()
     
-    console.log('API Debug - Acción recibida:', accion)
+    console.log('API Debug - Acci├│n recibida:', accion)
     console.log('API Debug - Observaciones:', observaciones)
     console.log('API Debug - Mediciones:', mediciones)
     console.log('API Debug - Usuario:', usuario)
@@ -22,8 +22,6 @@ export const POST: APIRoute = async ({ params, request }) => {
       })
     }
     
-    let validacionId: number | null = null
-    
     switch (accion) {
       case 'tomar_trabajo':
         console.log('API Debug - Tomando trabajo para empresa:', empresa)
@@ -33,7 +31,7 @@ export const POST: APIRoute = async ({ params, request }) => {
         await CanchaService.enviarABesalco(canchaId)
         break
       case 'finalizar_besalco':
-        validacionId = await CanchaService.finalizarBesalco(canchaId, observaciones, usuario)
+        await CanchaService.finalizarBesalco(canchaId, observaciones, usuario)
         break
       case 'rechazar_besalco':
         console.log('API Debug - Ejecutando rechazo por Besalco...')
@@ -41,16 +39,16 @@ export const POST: APIRoute = async ({ params, request }) => {
         console.log('API Debug - Rechazo por Besalco completado')
         break
       case 'validar_linkapsis':
-        validacionId = await CanchaService.validarLinkapsis(canchaId, true, observaciones, mediciones, false, usuario)
+        await CanchaService.validarLinkapsis(canchaId, true, observaciones, mediciones, false, usuario)
         break
       case 'rechazar_linkapsis':
-        validacionId = await CanchaService.validarLinkapsis(canchaId, false, observaciones, undefined, false, usuario)
+        await CanchaService.validarLinkapsis(canchaId, false, observaciones, undefined, false, usuario)
         break
       case 'validar_llay_llay':
-        validacionId = await CanchaService.validarLlayLlay(canchaId, true, observaciones, mediciones, false, usuario)
+        await CanchaService.validarLlayLlay(canchaId, true, observaciones, mediciones, false, usuario)
         break
       case 'rechazar_llay_llay':
-        validacionId = await CanchaService.validarLlayLlay(canchaId, false, observaciones, undefined, false, usuario)
+        await CanchaService.validarLlayLlay(canchaId, false, observaciones, undefined, false, usuario)
         break
       case 'cerrar_cancha':
         await CanchaService.cerrarCancha(canchaId)
@@ -59,8 +57,8 @@ export const POST: APIRoute = async ({ params, request }) => {
         await CanchaService.borrarCancha(canchaId)
         break
       default:
-        console.log('API Debug - Acción no reconocida:', accion)
-        return new Response(JSON.stringify({ message: 'Acción no válida: ' + accion }), {
+        console.log('API Debug - Acci├│n no reconocida:', accion)
+        return new Response(JSON.stringify({ message: 'Acci├│n no v├ílida: ' + accion }), {
           status: 400,
           headers: {
             'Content-Type': 'application/json',
@@ -68,9 +66,7 @@ export const POST: APIRoute = async ({ params, request }) => {
         })
     }
     
-    console.log('API Debug - Validación ID creada:', validacionId)
-    
-    return new Response(JSON.stringify({ success: true, validacionId }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
