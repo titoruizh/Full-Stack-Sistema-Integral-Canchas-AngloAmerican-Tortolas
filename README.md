@@ -1,282 +1,293 @@
-# Sistema de Gestión de Canchas - AngloAmerican
+# Sistema Integral de Gestión Georreferenciada - AngloAmerican
 
-## 🎯 Descripción
+![Astro](https://img.shields.io/badge/Astro-5.15-BC52EE?logo=astro)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)
+![Mapbox](https://img.shields.io/badge/Mapbox-GL_JS_3.8-000000?logo=mapbox)
 
-Sistema completo de gestión de canchas georreferenciadas que maneja el flujo de trabajo entre AngloAmerican, Besalco, Linkapsis y LlayLlay. Incluye:
+## 🎯 Descripción del Proyecto
 
-- 📍 Sistema de PKs georreferenciados con Mapbox
-- 🔄 Flujo de trabajo con trazabilidad completa
-- ✅ Validaciones y rechazos con historial
-- 🔐 Sistema de autenticación y roles
-- 🗺️ Visualización de mapas y polígonos
+**Sistema web full-stack** para gestión operacional de trabajos de construcción georreferenciados en faena minera AngloAmerican. Coordina el flujo de trabajo entre 4 empresas contratistas con **trazabilidad completa**, **validaciones multi-nivel** y **visualización geoespacial avanzada**.
 
-## 📚 Documentación
+### Problema Resuelto
+Reemplaza procesos manuales en Excel y WhatsApp por un sistema centralizado que garantiza:
+- ✅ Trazabilidad de cada acción con timestamp y responsable
+- ✅ Validaciones técnicas estructuradas (espesores, densidad, etc.)
+- ✅ Georreferenciación precisa con conversión UTM ↔ WGS84
+- ✅ Control de estados y rechazos con historial completo
 
-Toda la documentación del proyecto está organizada en [`/docs`](docs/):
+---
 
-- **[Índice de Documentación](docs/INDEX.md)** - Punto de entrada a toda la documentación
-- **[Arquitectura del Sistema](docs/ARCHITECTURE.md)** - Visión general de la arquitectura
-- **[Estándares de Código](docs/CODE_STANDARDS.md)** - Guía de desarrollo
+## 🚀 Funcionalidades Destacadas
 
-### Enlaces Rápidos
-- [Flujos de Trabajo](docs/flujos/) - Diagramas y descripciones de flujos
-- [Integraciones](docs/integraciones/) - Mapbox, TileServer, etc.
-- [Base de Datos](docs/database/) - Esquemas, migraciones y queries
-- [Instrucciones](docs/instrucciones/) - Guías paso a paso
+### 1. Sistema de Flujo Multi-Empresa (Workflow Engine)
+**Máquina de estados** con transiciones controladas entre 4 empresas:
+
+```
+AngloAmerican → Besalco → Linkapsis → LlayLlay → AngloAmerican
+     ↓            ↓          ↓           ↓
+  [Creada]   [Proceso]  [Validación] [Validación]  [Cerrada]
+                          Espesores    Densidad
+```
+
+- **Roles y permisos específicos** por empresa
+- **Sistema de rechazos** que devuelve trabajos a Besalco con observaciones obligatorias
+- **Triggers PostgreSQL** que automatizan transiciones y notificaciones
+- **Historial completo** de cada transición con usuario y timestamp
+
+### 2. Georreferenciación y Mapas Interactivos
+
+#### Sistema de PKs (Postes Kilométricos)
+- **138 puntos georreferenciados** con coordenadas UTM Zona 19S
+- Conversión automática **UTM ↔ WGS84** usando Proj4
+- Normalización inteligente de formatos irregulares (0+550.800 → 0+551)
+- **100% de coincidencias** entre mediciones y coordenadas
+
+#### Visualización Mapbox GL JS
+- **Mapa base offline** con tiles propios (TileServer + Docker)
+- **Capas GeoJSON** de polígonos y sectores
+- **Marcadores dinámicos** con clasificación por colores (verde/amarillo/rojo)
+- **Zoom automático** a bounding box de puntos activos
+- **Popup interactivos** con datos técnicos en tiempo real
+
+### 3. Módulo de Revanchas (Mediciones de Seguridad)
+
+Sistema completo para gestión de mediciones críticas de seguridad en tranque de relaves:
+
+#### Carga de Datos
+- **Parser inteligente** de archivos Excel/CSV con validación de estructura
+- Detección automática de fecha de medición (celda específica)
+- Normalización de formatos irregulares de PKs
+- **Constraint UNIQUE** por (muro, fecha) para evitar duplicados
+
+#### Procesamiento Automático
+- **Triggers PostgreSQL** que calculan estadísticas globales:
+  - Min/Max/Promedio de revancha, ancho, coronamiento
+  - Identificación de PKs críticos
+  - Conteo de alertas por nivel
+- **Vistas materializadas** para queries geoespaciales optimizadas
+- **Clasificación por colores** según umbrales de seguridad:
+  ```
+  Revancha:  🟢 ≥3.5m  🟡 3.0-3.5m  🔴 <3.0m
+  Ancho:     🟢 ≥18m   🟡 15-18m    🔴 <15m
+  Dist.Geo:  🟢 ≥1.0m  🟡 0.5-1.0m  🔴 <0.5m
+  ```
+
+#### Análisis y Comparación
+- **Vista temporal** de mediciones históricas por PK
+- **Comparación entre fechas** con cálculo de deltas
+- **Identificación de tendencias** (crecimiento/decrecimiento)
+- **Alertas tempranas** para puntos que se acercan a umbrales críticos
+
+### 4. API REST Completa
+
+Endpoints organizados por dominio:
+
+```
+/api/auth/              # Autenticación y gestión de sesiones
+/api/canchas/           # CRUD de trabajos (canchas)
+/api/validaciones/      # Validaciones y rechazos
+/api/revanchas/         # Mediciones y estadísticas
+/api/pks/               # Sistema de coordenadas
+```
+
+- **Respuestas estandarizadas** con códigos HTTP semánticos
+- **Validación de entrada** con sanitización
+- **Manejo de errores** robusto con logs detallados
+- **Rate limiting** y protección CORS
+
+---
 
 ## 🏗️ Stack Tecnológico
 
-- **Frontend**: Astro 5.x (SSR + Client Islands)
-- **Backend**: Supabase (PostgreSQL + Edge Functions)
-- **Mapas**: Mapbox GL JS + TileServer
-- **Estilos**: CSS vanilla con diseño responsivo
-- **Deploy**: Vercel (Frontend) + Docker (TileServer)
+### Frontend
+- **Astro 5.15** - Framework SSR con Islands Architecture
+- **TypeScript** - Tipado estático end-to-end
+- **Mapbox GL JS 3.8** - Renderización de mapas WebGL
+- **CSS vanilla** - Sin frameworks, diseño responsivo custom
 
-## � Flujo de Trabajo
+### Backend
+- **Supabase** - PostgreSQL + Row Level Security (RLS)
+- **Edge Functions** - Lógica serverless con Deno
+- **Database Triggers** - Automatización de cálculos y validaciones
+- **Views & Materialized Views** - Queries complejas optimizadas
 
-1. **AngloAmerican** crea canchas → Estado: "Creada"
-2. **AngloAmerican** envía a Besalco → Estado: "En Proceso"
-3. **Besalco** realiza trabajos → Estado: "Finalizada" (pasa a Linkapsis)
-4. **Linkapsis** valida espesores:
-   - ✅ Validada → pasa a LlayLlay
-   - ❌ Rechazada → vuelve a Besalco
-5. **LlayLlay** valida densidad:
-   - ✅ Validada → vuelve a AngloAmerican
-   - ❌ Rechazada → vuelve a Besalco
-6. **AngloAmerican** cierra la cancha → Estado: "Cerrada"
+### GIS & Datos
+- **Proj4** - Transformación de coordenadas
+- **GeoJSON** - Formato estándar para geometrías
+- **TileServer GL** - Servidor de tiles propio (WMTS)
+- **Docker** - Containerización del TileServer
 
-## 🗄️ Base de Datos
+### DevOps
+- **Vercel** - Deploy automático con CI/CD
+- **pnpm** - Gestión de dependencias eficiente
+- **Git** - Control de versiones con convenciones semánticas
 
-### Configuración de Supabase
+---
 
-**URL**: https://chzlwqxjdcydnndrnfjk.supabase.co
-**Key**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoemx3cXhqZGN5ZG5uZHJuZmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1MjQxMDMsImV4cCI6MjA3NjEwMDEwM30.uyI7C2j8yz1WqAWXft4cbZTBdliJlYVhHv4oL1Nthxo
+## 🎨 Arquitectura del Sistema
 
-### Ejecutar Script SQL
+```
+┌─────────────────────────────────────────────────┐
+│           CLIENTE (Astro SSR + Islands)          │
+│  ┌────────────┐  ┌────────────┐  ┌───────────┐ │
+│  │   Pages    │  │ Components │  │   Utils   │ │
+│  │  .astro    │  │   .astro   │  │    .ts    │ │
+│  └────────────┘  └────────────┘  └───────────┘ │
+└────────────────────┬────────────────────────────┘
+                     │
+           ┌─────────▼─────────┐
+           │   API REST Layer   │
+           │  (/api endpoints)  │
+           └─────────┬─────────┘
+                     │
+     ┌───────────────┼───────────────┐
+     │               │               │
+┌────▼─────┐  ┌─────▼──────┐  ┌────▼─────┐
+│ Supabase │  │  Mapbox    │  │TileServer│
+│PostgreSQL│  │   API      │  │  Docker  │
+└──────────┘  └────────────┘  └──────────┘
+```
 
-1. Ve a tu dashboard de Supabase (https://supabase.com/dashboard/projects)
-2. Navega a SQL Editor
-3. Ejecuta el archivo `supabase_setup.sql` completo
-4. Esto creará todas las tablas, relaciones, triggers y datos iniciales
+### Patrones Implementados
+- **Repository Pattern** - Abstracción de acceso a datos
+- **Service Layer** - Lógica de negocio centralizada
+- **State Machine** - Control de transiciones de estados
+- **Observer Pattern** - Triggers para eventos de BD
+- **Factory Pattern** - Creación de objetos complejos (GeoJSON)
 
-### Estructura de Tablas
+---
 
-- **empresas**: Catálogo de empresas participantes
-- **estados_cancha**: Estados posibles de las canchas
-- **canchas**: Tabla principal con información de canchas
-- **historial_cancha**: Trazabilidad completa de cambios
-- **validaciones**: Registro de validaciones/rechazos específicos
+## 📊 Características Técnicas Avanzadas
 
-## 🚀 Inicio Rápido
+### Base de Datos
+- **23 tablas** con relaciones complejas (1:N, N:M)
+- **12 triggers** para automatización de lógica de negocio
+- **8 vistas** materializadas para queries geoespaciales
+- **Row Level Security** (RLS) con políticas por rol
+- **Constraints** avanzados: CHECK, UNIQUE compuestos, FK con CASCADE
+- **Funciones PL/pgSQL** para cálculos complejos
 
-### Prerrequisitos
+### Performance
+- **Índices compuestos** en columnas de búsqueda frecuente
+- **Vistas materializadas** para queries costosas
+- **Paginación server-side** en listados grandes
+- **Lazy loading** de capas de mapa
+- **Code splitting** automático con Astro Islands
 
-- Node.js 18+ 
-- pnpm (recomendado) o npm
-- Cuenta de Supabase
-- API Key de Mapbox (opcional para desarrollo)
+### Seguridad
+- **Autenticación JWT** con refresh tokens
+- **RLS policies** a nivel de fila en PostgreSQL
+- **Sanitización de inputs** contra SQL injection
+- **CORS configurado** para dominios autorizados
+- **Rate limiting** en endpoints críticos
+- **Secrets management** con variables de entorno
+
+---
+
+## 🛠️ Desarrollo y Setup
+
+### Prerequisitos
+```bash
+Node.js 18+
+pnpm 8+
+PostgreSQL 15+ (o cuenta Supabase)
+Docker (opcional, para TileServer local)
+```
 
 ### Instalación
 
 ```bash
-# Clonar el repositorio
-git clone <repo-url>
-cd canchas-anglo2
+# Clonar repositorio
+git clone https://github.com/titoruizh/Full-Stack-Sistema-Integral-Canchas-AngloAmerican-Tortolas.git
+cd Full-Stack-Sistema-Integral-Canchas-AngloAmerican-Tortolas
 
 # Instalar dependencias
 pnpm install
 
-# Configurar variables de entorno (ver docs/SETUP.md)
+# Configurar variables de entorno
 cp .env.example .env
+# Editar .env con tus credenciales
 
 # Ejecutar en desarrollo
 pnpm dev
-
-# Construir para producción
-pnpm build
 ```
 
-### Configuración Inicial
-
-Ver [Guía de Configuración Completa](docs/SETUP.md) para:
-- Configuración de Supabase
-- Setup de Mapbox y TileServer
-- Variables de entorno
-- Despliegue en Vercel
-
-## 📖 Para Desarrolladores
-
-Si vas a trabajar en este proyecto o colaborar:
-
-1. Lee [CONTRIBUTING.md](CONTRIBUTING.md) para guías de contribución
-2. Revisa [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) para estándares de código
-3. Familiarízate con la [Arquitectura](docs/ARCHITECTURE.md)
-4. Consulta la documentación de componentes en [`docs/componentes/`](docs/componentes/)
-
-## 🔗 Enlaces Útiles
-
-- **Dashboard Supabase**: https://chzlwqxjdcydnndrnfjk.supabase.co
-- **Producción**: (añadir URL de Vercel)
-- **Documentación API**: [docs/api/](docs/api/)
-
-## 📝 Licencia
-
-(Añadir información de licencia)
-
-- Node.js 18+
-- pnpm (o npm/yarn)
-
-### Pasos de Instalación
-
-1. **Instalar dependencias**
-   ```bash
-   pnpm install
-   ```
-
-2. **Configurar variables de entorno**
-   El archivo `.env` ya está configurado con las credenciales correctas.
-
-3. **Ejecutar el script SQL en Supabase**
-   - Copia todo el contenido de `supabase_setup.sql`
-   - Pégalo en el SQL Editor de Supabase
-   - Ejecuta el script
-
-4. **Iniciar el servidor de desarrollo**
-   ```bash
-   pnpm dev
-   ```
-
-5. **Acceder a la aplicación**
-   - Abre http://localhost:4323 en tu navegador
-
-## 💻 Uso de la Aplicación
-
-### Selección de Empresa
-
-1. Al ingresar, selecciona tu empresa en el dropdown superior
-2. Las acciones disponibles cambiarán según tu empresa
-
-### AngloAmerican
-
-- **Crear canchas**: Completa Muro, Sector y Nombre
-- **Enviar a Besalco**: Cuando la cancha esté creada
-- **Cerrar cancha**: Cuando vuelva validada
-
-### Besalco
-
-- **Finalizar trabajo**: Para canchas en proceso o rechazadas
-
-### Linkapsis
-
-- **Validar espesores**: Aprueba y envía a LlayLlay
-- **Rechazar**: Devuelve a Besalco con observaciones
-
-### LlayLlay
-
-- **Validar densidad**: Aprueba y envía a AngloAmerican
-- **Rechazar**: Devuelve a Besalco con observaciones
-
-## 🔍 Características del Sistema
-
-### Trazabilidad Completa
-
-- Cada cambio se registra automáticamente
-- Historial detallado con timestamps
-- Registro de quién realizó cada acción
-
-### Validaciones y Rechazos
-
-- Observaciones obligatorias en rechazos
-- Tipos específicos de validación (espesores, densidad)
-- Mantenimiento del estado histórico
-
-### Nomenclatura de Canchas
-
-Las canchas siguen el formato: `MURO_SECTOR_NOMBRE`
-
-Ejemplos:
-- `MP_S5_TALUD` (Muro Principal, Sector 5, Talud)
-- `MS_S3_BERMA` (Muro Secundario, Sector 3, Berma)
-- `MT_S1_PISTA` (Muro Terciario, Sector 1, Pista)
-
-### Estados de Cancha
-
-- **Creada**: Recién creada por AngloAmerican
-- **En Proceso**: Trabajándose por Besalco
-- **Finalizada**: Trabajo completado, esperando validación
-- **Validada**: Aprobada por validador correspondiente
-- **Rechazada**: Rechazada, requiere retrabajo
-- **Cerrada**: Proceso completo, cancha cerrada
-
-## 🎨 Interfaz de Usuario
-
-### Diseño Responsivo
-
-- Adaptable a dispositivos móviles
-- Tabla scrolleable en pantallas pequeñas
-- Botones optimizados para touch
-
-### Indicadores Visuales
-
-- Estados con colores distintivos
-- Empresas identificadas por colores
-- Botones contextuales según permisos
-
-### Experiencia de Usuario
-
-- Confirmaciones para acciones críticas
-- Mensajes de éxito/error claros
-- Loading states durante operaciones
-
-## 📂 Estructura del Proyecto
-
+### Scripts Disponibles
+```bash
+pnpm dev      # Desarrollo con hot-reload (localhost:4321)
+pnpm build    # Build optimizado para producción
+pnpm preview  # Preview del build de producción
 ```
-canchas-anglo2/
-├── src/
-│   ├── pages/              # Rutas y páginas
-│   │   ├── index.astro     # Dashboard principal
-│   │   ├── login.astro     # Autenticación
-│   │   └── api/            # Endpoints API
-│   ├── components/         # Componentes reutilizables
-│   ├── lib/                # Librerías (Supabase, etc.)
-│   ├── utils/              # Utilidades (mapbox, auth, etc.)
-│   └── styles/             # Estilos globales
-├── public/                 # Archivos estáticos
-│   └── mapbox-gis/         # GeoJSON y token Mapbox
-├── docs/                   # 📚 Documentación completa
-│   ├── INDEX.md            # Índice de documentación
-│   ├── ARCHITECTURE.md     # Arquitectura del sistema
-│   ├── CODE_STANDARDS.md   # Estándares de código
-│   ├── SETUP.md            # Guía de instalación
-│   ├── componentes/        # Docs de componentes
-│   ├── api/                # Docs de APIs
-│   ├── database/           # Scripts SQL
-│   ├── flujos/             # Diagramas de flujo
-│   └── integraciones/      # Mapbox, TileServer, etc.
-├── CONTRIBUTING.md         # Guía de contribución
-└── README.md               # Este archivo
-```
-
-## 🎯 Proyecto Reorganizado y Profesionalizado
-
-**Fecha**: Diciembre 2025
-
-Este proyecto ha sido **reorganizado y documentado profesionalmente** para:
-
-✅ **Facilitar el crecimiento** - Estructura escalable y clara  
-✅ **Mejorar colaboración** - Estándares consistentes  
-✅ **Optimizar IA** - Documentación estructurada para mejores respuestas  
-✅ **Acelerar onboarding** - Nuevos desarrolladores entienden rápido  
-
-Ver [docs/REORGANIZACION.md](docs/REORGANIZACION.md) para detalles de los cambios.
-
-### ¿Por dónde empezar?
-
-1. **Nuevos al proyecto**: [docs/INDEX.md](docs/INDEX.md)
-2. **Instalar y configurar**: [docs/SETUP.md](docs/SETUP.md)
-3. **Contribuir**: [CONTRIBUTING.md](CONTRIBUTING.md)
-4. **Desarrollar**: [docs/CODE_STANDARDS.md](docs/CODE_STANDARDS.md)
 
 ---
 
-**Sistema desarrollado para AngloAmerican** 🏗️⚡
+## 📈 Métricas del Proyecto
+
+- **~15,000 líneas de código** (TypeScript + SQL + Astro)
+- **138 puntos georreferenciados** con coordenadas precisas
+- **23 tablas relacionales** con integridad referencial completa
+- **12 triggers automáticos** para lógica de negocio
+- **8 vistas SQL** optimizadas para reportes
+- **4 empresas** coordinadas en flujo de trabajo
+- **6 estados** de cancha con transiciones controladas
+- **100% tipo-seguro** con TypeScript
+
+---
+
+## 🎓 Habilidades Demostradas
+
+### Full-Stack Development
+- ✅ Arquitectura de sistemas complejos multi-actor
+- ✅ Diseño de APIs RESTful escalables
+- ✅ Implementación de máquinas de estado
+- ✅ Integración de servicios externos (Mapbox, Supabase)
+
+### Base de Datos
+- ✅ Diseño de esquemas relacionales normalizados
+- ✅ Optimización de queries con índices y vistas
+- ✅ Triggers y stored procedures complejos
+- ✅ Migraciones y versionado de esquema
+
+### GIS y Mapas
+- ✅ Transformación de coordenadas entre sistemas (UTM/WGS84)
+- ✅ Renderización de mapas con Mapbox GL JS
+- ✅ Procesamiento de geometrías GeoJSON
+- ✅ Deploy de TileServer con Docker
+
+### DevOps y Buenas Prácticas
+- ✅ CI/CD con Vercel
+- ✅ Containerización con Docker
+- ✅ Versionado semántico con Git
+- ✅ Documentación técnica exhaustiva
+- ✅ Testing y validación de datos
+
+---
+
+## 📚 Documentación
+
+Para información detallada del proyecto, consulta la [documentación completa](docs/):
+
+- **[Arquitectura](docs/ARCHITECTURE.md)** - Diseño del sistema
+- **[Estándares de Código](docs/CODE_STANDARDS.md)** - Guías de desarrollo
+- **[Base de Datos](docs/database/)** - Esquemas y migraciones
+- **[API](docs/api/)** - Documentación de endpoints
+- **[Flujos](docs/flujos/)** - Diagramas de procesos
+
+---
+
+## 📞 Contacto
+
+**Desarrollador**: Tito Ruiz  
+**GitHub**: [@titoruizh](https://github.com/titoruizh)  
+**Proyecto**: [Full-Stack-Sistema-Integral-Canchas-AngloAmerican-Tortolas](https://github.com/titoruizh/Full-Stack-Sistema-Integral-Canchas-AngloAmerican-Tortolas)
+
+---
+
+## 📝 Licencia
+
+Este proyecto fue desarrollado como solución interna para AngloAmerican. El código se comparte con fines de portafolio profesional.
+
+---
+
+> 💡 **Nota para Reclutadores**: Este proyecto demuestra experiencia real en desarrollo full-stack con tecnologías modernas, resolución de problemas complejos de negocio, y capacidad para arquitecturar sistemas escalables y mantenibles.
