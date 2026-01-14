@@ -257,4 +257,7 @@ Para información detallada del proyecto, consulta la [documentación completa](
 Este proyecto fue desarrollado como solución interna para AngloAmerican. El código se comparte con fines de portafolio profesional.
 
 ---
+<<<<<<< HEAD
 
+=======
+>>>>>>> cc28d3d (update readme)
