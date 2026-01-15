@@ -298,7 +298,7 @@ Datos Persistentes
 
 ### Por Tema
 
-- **Autenticación**: [CODE_STANDARDS.md](CODE_STANDARDS.md#-seguridad), [login.astro](componentes/paginas.md#-loginastro), [API Auth](ARCHITECTURE.md#autenticación)
+- **Autenticación**: [CODE_STANDARDS.md](CODE_STANDARDS.md#-seguridad), [LOGIN_COMPLETO.md](componentes/LOGIN_COMPLETO.md), [API Auth](ARCHITECTURE.md#autenticación)
 - **Mapas**: [MAPBOX_INTEGRATION.md](integraciones/MAPBOX_INTEGRATION.md), [mapbox-utils.md](componentes/mapbox-utils.md), [mapbox-window.astro](componentes/paginas.md#-mapbox-windowastro)
 - **PKs**: [PKS_GEORREFERENCIADOS](diseno/PKS_GEORREFERENCIADOS_README.md), [SISTEMA_PKS](database/SISTEMA_PKS_GEORREFERENCIADOS.sql)
 - **Revanchas**: [SISTEMA_REVANCHAS](arquitectura/SISTEMA_REVANCHAS_COMPLETO.md), [INSTRUCCIONES](instrucciones/INSTRUCCIONES_REVANCHAS.md)

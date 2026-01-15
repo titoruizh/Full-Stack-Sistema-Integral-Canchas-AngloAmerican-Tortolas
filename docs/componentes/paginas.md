@@ -186,6 +186,8 @@ async function showTimeline(canchaId) {
 
 ## 🔐 login.astro - Página de Autenticación
 
+> **Documentación Completa**: Para ver todos los detalles de implementación, animaciones y flujos, ver **[LOGIN_COMPLETO.md](LOGIN_COMPLETO.md)**.
+
 ### Descripción
 Página de login con selección de empresa y autenticación de usuarios.
 
