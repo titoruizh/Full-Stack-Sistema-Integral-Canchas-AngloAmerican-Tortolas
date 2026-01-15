@@ -616,7 +616,7 @@ const logosMap = {
         <!-- Modal de Bienvenida -->
         <div id="welcome-modal" class="welcome-modal">
             <div class="welcome-modal-content">
-                <div class="welcome-icon">⛏️</div>
+                <div id="welcome-icon" class="welcome-icon">⛏️</div>
                 <h2 class="welcome-title">¡Bienvenido!</h2>
                 <p class="welcome-message">
                     Iniciando sesión y cargando tu espacio de trabajo...
@@ -1064,11 +1064,42 @@ const logosMap = {
                 showWelcomeModal() {
                     const modal = document.getElementById("welcome-modal");
                     modal.classList.add("show");
+                    this.animateWelcomeIcons();
 
                     // Ocultar el modal después de 2.5 segundos
                     setTimeout(() => {
                         modal.classList.remove("show");
                     }, 2500);
+                }
+
+                animateWelcomeIcons() {
+                    const iconElement = document.getElementById("welcome-icon");
+                    if (!iconElement) return;
+
+                    const icons = ["🚜", "👷", "🚁", "🗺️", "🏗️", "📐", "🧱"];
+                    let index = 0;
+
+                    // Cambio inicial inmediato
+                    iconElement.textContent = icons[0];
+                    index++;
+
+                    const interval = setInterval(() => {
+                        iconElement.style.transition =
+                            "transform 0.15s ease-out";
+                        iconElement.style.transform = "scale(0.8)";
+
+                        setTimeout(() => {
+                            iconElement.textContent = icons[index];
+                            iconElement.style.transform = "scale(1.1)";
+                            index = (index + 1) % icons.length;
+                        }, 150);
+
+                        setTimeout(() => {
+                            iconElement.style.transform = "scale(1)";
+                        }, 300);
+                    }, 600);
+
+                    setTimeout(() => clearInterval(interval), 3000);
                 }
 
                 checkExistingLogin() {

@@ -88,6 +88,15 @@ Clase dedicada a dibujar y animar el canvas del fondo.
 - Dibuja líneas de conexión entre partículas cercanas.
 - Implementa repulsión/atracción al mouse.
 
+### Experiencia de Usuario (UX)
+
+- **Modal de Bienvenida Dinámico**:
+  - Al iniciar sesión exitosamente, se muestra un modal con barra de progreso.
+  - **Animación de Iconos Mineros**: Durante la carga, el icono central rota mostrando equipos y herramientas de faena (`🚜`, `🚁`, `👷`, `🗺️`, `🏗️`) para una experiencia temática inmersiva.
+- **Mensajes de Estado**: 
+  - Errores y éxitos se muestran en contenedores dedicados con iconos descriptivos.
+- **Loading States**: Botón de login muestra spinner y texto "Verificando..." durante la petición API.
+
 ### Estilos (CSS)
 
 - **Tipografía**:
