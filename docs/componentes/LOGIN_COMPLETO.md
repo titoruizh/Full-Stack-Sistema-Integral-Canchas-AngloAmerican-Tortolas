@@ -90,13 +90,25 @@ Clase dedicada a dibujar y animar el canvas del fondo.
 
 ### Estilos (CSS)
 
+- **Tipografía**:
+  - **Título Principal**: Texto con gradiente (`linear-gradient` de oscuro a azul vibrante) y tamaño aumentado a `5rem` para mayor impacto.
+  - **Subtítulo**: Mejor contraste y peso para legibilidad.
+- **Video Background (Stand-by)**:
+  - Funcionalidad implementada pero **desactivada temporalmente** (código comentado en `login.astro`).
+  - Lista para activarse descomentando el bloque HTML `<video>`.
+  - Ubicación prevista: `/public/videos/login-bg.mp4`.
+- **Partículas "Neon Sutil"**:
+  - Los puntos tienen un ligero resplandor (`shadowBlur`) y color azul más brillante para resaltar sobre el video.
 - **Hover Effect Refinado**: Se busca una sensación "premium" y sutil.
-  - Elevación suave: `translateY(-8px)` (en lugar de saltos bruscos).
+  - Elevación suave: `translateY(-8px)`.
   - Escala ligera: `scale(1.02)`.
   - Sombras multicapa: Combinación de sombra difusa y borde sutil (`0 0 0 1px`).
 - **Backdrop Filter**: Se usa `backdrop-filter: blur(12px)` para el efecto de vidrio en las tarjetas.
 - **Layout**: Diseño Grid responsive que se adapta para mostrar tarjetas rectangulares (aprox 2:1 ratio) optimizando el espacio vertical.
 - **Gradientes**: Uso extensivo de gradientes sutiles para fondos y borders.
+- **Tipografía**:
+  - **Título Principal**: Texto con gradiente (`linear-gradient` de oscuro a azul vibrante) usando `background-clip: text` para integrarse con la paleta de colores.
+  - **Subtítulo**: Mejor contraste y peso para legibilidad.
 - **Animaciones Keyframes**:
   - `fadeIn`: Entrada suave de elementos.
   - `slideUp`: Aparición del formulario desde abajo.
