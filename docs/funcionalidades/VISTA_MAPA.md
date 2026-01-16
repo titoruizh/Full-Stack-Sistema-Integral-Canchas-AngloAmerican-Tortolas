@@ -4,7 +4,20 @@ El sistema integra un visor geoespacial avanzado basado en **Mapbox GL JS**, enr
 
 ## 1. Arquitectura del Mapa
 
-El mapa se implementa a través de un componente encapsulado `MiningMap.astro` que se carga usualmente dentro de un iframe (`src/pages/mapbox-window.astro`) para aislamiento de estilos y rendimiento.
+El mapa se ha refactorizado en una arquitectura modular para mejorar la mantenibilidad y el rendimiento.
+
+### Componentes Principales (`src/components/map/`)
+*   **`MapManager.ts`:** Controlador lógico central (TypeScript puro). Maneja la instancia de Mapbox, capas, eventos y datos.
+*   **`MiningMap.astro`:** Contenedor y orquestador.
+*   **`MapControls.astro`**: UI de controles flotantes.
+
+### Integración de Datos (Dashboard)
+El mapa opera en dos modos:
+1.  **Modo Estático:** Muestra capas base (polígonos, sectores) cargadas desde GeoJSON estáticos.
+2.  **Modo Dashboard:** Muestra canchas dinámicas filtradas por el usuario ("Mis Acciones", "Estados").
+    *   **Mecanismo:** El Dashboard pasa una lista de IDs (`canchaIds`) al iframe del mapa.
+    *   **Filtrado:** `MapManager` consulta `/api/canchas?ids=...` para obtener solo los datos relevantes.
+    *   **Visualización:** Las canchas se colorean según su estado (Creada: Azul, Cerrada: Verde, etc.) y el mapa hace zoom automático (`fitBounds`) a los resultados.
 
 ### Tecnologías Clave
 *   **Motor:** Mapbox GL JS v3.8.0.
