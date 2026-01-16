@@ -1725,7 +1725,9 @@ console.log("🏗️ MiningMap iniciado con:", {
             geojsonData.features.length,
           );
 
-          // 1. Preparar datos (Colores y Líneas)
+          // 1. Preparar datos y Agrupar por Muro
+          // Helper functions are defined within this scope
+
           const getColorByRevancha = (revancha) => {
             if (!revancha || revancha === 0) return "#94a3b8";
             if (revancha > 3.5) return "#10b981";
@@ -1733,15 +1735,24 @@ console.log("🏗️ MiningMap iniciado con:", {
             return "#ef4444";
           };
 
-          const enrichedFeatures = geojsonData.features.map((feature) => ({
-            ...feature,
-            properties: {
-              ...feature.properties,
-              dynamic_color: getColorByRevancha(feature.properties.revancha),
-            },
-          }));
+          const getAnchoColor = (ancho) => {
+            const val = parseFloat(ancho);
+            if (val > 18) return "#10b981";
+            if (val >= 15) return "#eab308";
+            return "#ef4444";
+          };
 
-          // Calcular líneas de conexión
+          const normalizeMuroName = (nombre) => {
+            if (!nombre) return "Desconocido";
+            const upper = nombre.toUpperCase();
+            // Critical fix: Check OESTE first because "OESTE" contains "ESTE"
+            if (upper.includes("OESTE") || upper === "MO") return "Oeste";
+            if (upper.includes("ESTE") || upper === "ME") return "Este";
+            if (upper.includes("PRINCIPAL") || upper === "MP")
+              return "Principal";
+            return nombre;
+          };
+
           const getDistance = (coord1, coord2) => {
             const R = 6371000;
             const lat1 = (coord1[1] * Math.PI) / 180;
@@ -1758,34 +1769,25 @@ console.log("🏗️ MiningMap iniciado con:", {
             return R * c;
           };
 
-          // Calculate bearing between two coordinates
           const getBearing = (coord1, coord2) => {
             const lat1 = (coord1[1] * Math.PI) / 180;
             const lat2 = (coord2[1] * Math.PI) / 180;
             const deltaLon = ((coord2[0] - coord1[0]) * Math.PI) / 180;
-
             const y = Math.sin(deltaLon) * Math.cos(lat2);
             const x =
               Math.cos(lat1) * Math.sin(lat2) -
               Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
-
             return (Math.atan2(y, x) * 180) / Math.PI;
           };
 
-          // Generate perpendicular line coordinates
           const getPerpendicularLine = (point, bearing, length, direction) => {
-            // direction: 1 for right (+90°), -1 for left (-90°)
             const perpBearing = bearing + 90 * direction;
             const lat = point[1];
             const lon = point[0];
-
-            // Convert to radians
             const brng = (perpBearing * Math.PI) / 180;
             const latRad = (lat * Math.PI) / 180;
             const lonRad = (lon * Math.PI) / 180;
-
-            // Calculate endpoint
-            const R = 6371000; // Earth radius in meters
+            const R = 6371000;
             const newLat = Math.asin(
               Math.sin(latRad) * Math.cos(length / R) +
                 Math.cos(latRad) * Math.sin(length / R) * Math.cos(brng),
@@ -1796,147 +1798,163 @@ console.log("🏗️ MiningMap iniciado con:", {
                 Math.sin(brng) * Math.sin(length / R) * Math.cos(latRad),
                 Math.cos(length / R) - Math.sin(latRad) * Math.sin(newLat),
               );
-
             return [
               point,
               [(newLon * 180) / Math.PI, (newLat * 180) / Math.PI],
             ];
           };
 
-          // Get color for ancho value
-          const getAnchoColor = (ancho) => {
-            const val = parseFloat(ancho);
-            if (val > 18) return "#10b981"; // Verde
-            if (val >= 15) return "#eab308"; // Amarillo
-            return "#ef4444"; // Rojo
-          };
+          // Group and clean data
+          const pksByWall = {};
+
+          geojsonData.features.forEach((feature) => {
+            const rawMuro = feature.properties.muro;
+            const muro = normalizeMuroName(rawMuro);
+            if (!pksByWall[muro]) pksByWall[muro] = [];
+            pksByWall[muro].push({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                dynamic_color: getColorByRevancha(feature.properties.revancha),
+                normalized_muro: muro,
+              },
+            });
+          });
 
           const lineFeatures = [];
-          const MAX_DISTANCE = 100;
+          const widthLines = [];
+          const cleanPoints = [];
 
-          for (let i = 0; i < enrichedFeatures.length; i++) {
-            const current = enrichedFeatures[i];
-            for (let j = i + 1; j < enrichedFeatures.length; j++) {
-              const next = enrichedFeatures[j];
-              const distance = getDistance(
-                current.geometry.coordinates,
-                next.geometry.coordinates,
+          Object.entries(pksByWall).forEach(([wallName, features]) => {
+            // Sort by PK with robustness and logging
+            const maxVal = 999999;
+            const sorted = features.sort((a, b) => {
+              const getVal = (pkStr) => {
+                if (pkStr === null || pkStr === undefined) return maxVal;
+                if (typeof pkStr === "number") return pkStr;
+                try {
+                  // Clean string (remove "PK", spaces, etc if needed, though usually just "+")
+                  const clean = pkStr.toString().replace(/PK/i, "").trim();
+                  const parts = clean.split("+");
+                  const val =
+                    parts.length === 2
+                      ? parseInt(parts[0]) * 1000 + parseFloat(parts[1])
+                      : parseFloat(clean);
+                  return isNaN(val) ? maxVal : val;
+                } catch (e) {
+                  return maxVal;
+                }
+              };
+              return getVal(a.properties.pk) - getVal(b.properties.pk);
+            });
+
+            if (wallName === "Oeste" || wallName === "MO") {
+              console.log(
+                `🔍 [DEBUG ${wallName}] Total: ${features.length}, First 3:`,
+                sorted.slice(0, 3).map((f) => f.properties.pk),
+                "Last 3:",
+                sorted.slice(-3).map((f) => f.properties.pk),
               );
-              if (distance <= MAX_DISTANCE) {
+            }
+
+            // Remove duplicates
+            const unique = [];
+            sorted.forEach((f) => {
+              if (unique.length === 0) unique.push(f);
+              else if (
+                unique[unique.length - 1].properties.pk !== f.properties.pk
+              )
+                unique.push(f);
+            });
+
+            cleanPoints.push(...unique);
+
+            // Generate geometry
+            const lineLength = 33;
+            // Direction: -1 (Left) for Oeste, 1 (Right) for Principal/Este
+            const wallDirection = wallName === "Oeste" ? -1 : 1;
+
+            for (let i = 0; i < unique.length; i++) {
+              const current = unique[i];
+              const currCoord = current.geometry.coordinates;
+
+              // Connectivity Line
+              if (i < unique.length - 1) {
+                const next = unique[i + 1];
                 lineFeatures.push({
                   type: "Feature",
                   geometry: {
                     type: "LineString",
-                    coordinates: [
-                      current.geometry.coordinates,
-                      next.geometry.coordinates,
-                    ],
+                    coordinates: [currCoord, next.geometry.coordinates],
                   },
                   properties: {
                     from_color: current.properties.dynamic_color,
                     to_color: next.properties.dynamic_color,
+                    muro: wallName,
                   },
                 });
               }
-            }
-          }
 
-          // Generate perpendicular width lines
-          // Group PKs by wall
-          const pksByWall = {
-            Principal: [],
-            Este: [],
-            Oeste: [],
-          };
-
-          enrichedFeatures.forEach((feature) => {
-            const muro = feature.properties.muro;
-            if (pksByWall[muro]) {
-              pksByWall[muro].push(feature);
-            }
-          });
-
-          // Sort each wall by PK number
-          Object.keys(pksByWall).forEach((wall) => {
-            pksByWall[wall].sort((a, b) => {
-              const pkA = parseFloat(a.properties.pk.replace("+", "."));
-              const pkB = parseFloat(b.properties.pk.replace("+", "."));
-              return pkA - pkB;
-            });
-          });
-
-          console.log("🔍 PKs by wall:", {
-            Principal: pksByWall.Principal.length,
-            Este: pksByWall.Este.length,
-            Oeste: pksByWall.Oeste.length,
-          });
-          console.log(
-            "Sample feature muro:",
-            enrichedFeatures[0]?.properties?.muro,
-          );
-
-          // Generate perpendicular lines
-          const widthLines = [];
-          const lineLength = 33; // meters - 2/3 of original 50m
-
-          Object.entries(pksByWall).forEach(([wall, features]) => {
-            const direction = wall === "Oeste" ? -1 : 1; // Oeste left, Principal/Este right
-
-            for (let i = 0; i < features.length; i++) {
-              const current = features[i];
+              // Tangent Bearing Calculation
               let bearing;
+              if (unique.length < 2) continue;
 
-              if (i < features.length - 1) {
-                // Not the last point: use bearing to next point
-                const next = features[i + 1];
+              if (i === 0) {
                 bearing = getBearing(
-                  current.geometry.coordinates,
-                  next.geometry.coordinates,
+                  currCoord,
+                  unique[i + 1].geometry.coordinates,
+                );
+              } else if (i === unique.length - 1) {
+                bearing = getBearing(
+                  unique[i - 1].geometry.coordinates,
+                  currCoord,
                 );
               } else {
-                // Last point: use bearing from previous segment
-                if (i > 0) {
-                  const prev = features[i - 1];
-                  bearing = getBearing(
-                    prev.geometry.coordinates,
-                    current.geometry.coordinates,
-                  );
-                } else {
-                  // Solo hay un punto, skip
-                  continue;
-                }
+                const prevCoord = unique[i - 1].geometry.coordinates;
+                const nextCoord = unique[i + 1].geometry.coordinates;
+                const bearingPrev = getBearing(prevCoord, currCoord);
+                const bearingNext = getBearing(currCoord, nextCoord);
+
+                // Vector average for smooth tangent
+                let sumX =
+                  Math.cos((bearingPrev * Math.PI) / 180) +
+                  Math.cos((bearingNext * Math.PI) / 180);
+                let sumY =
+                  Math.sin((bearingPrev * Math.PI) / 180) +
+                  Math.sin((bearingNext * Math.PI) / 180);
+                bearing = (Math.atan2(sumY, sumX) * 180) / Math.PI;
               }
 
+              // Perpendicular Line
               const lineCoords = getPerpendicularLine(
-                current.geometry.coordinates,
+                currCoord,
                 bearing,
                 lineLength,
-                direction,
+                wallDirection,
               );
 
               widthLines.push({
                 type: "Feature",
-                geometry: {
-                  type: "LineString",
-                  coordinates: lineCoords,
-                },
+                geometry: { type: "LineString", coordinates: lineCoords },
                 properties: {
                   ancho: current.properties.ancho,
                   color: getAnchoColor(current.properties.ancho),
                   pk: current.properties.pk,
-                  muro: wall,
+                  muro: wallName,
                 },
               });
             }
           });
 
-          console.log("✅ Width Lines Generated:", widthLines.length, "lines");
-          console.log("Sample:", widthLines[0]);
+          console.log(
+            "✅ Width Lines Generated (Refactored):",
+            widthLines.length,
+          );
 
-          // 2. Agregar Sources
+          // 2. Add Sources
           map.addSource("revanchas-source", {
             type: "geojson",
-            data: { type: "FeatureCollection", features: enrichedFeatures },
+            data: { type: "FeatureCollection", features: cleanPoints },
           });
 
           map.addSource("revanchas-lines", {

@@ -52,20 +52,26 @@ Al seleccionar un muro, el mapa:
 
 En el dashboard principal (`index.astro`), existe un interruptor "Ver Revanchas" que proyecta puntos de control georreferenciados sobre el mapa.
 
-### Flujo de Datos
-1.  **Activación:** Usuario activa el toggle `#toggle-revanchas`.
-2.  **Consulta API:** `GET /api/revanchas/georreferenciadas?formato=geojson`.
-    *   Filtra por el Muro actualmente seleccionado en el mapa.
-    *   Devuelve un `FeatureCollection` de puntos.
-3.  **Comunicación Inter-Ventana:**
-    *   El dashboard envía un mensaje `postMessage` al iframe del mapa con tipo `mostrar-revanchas`.
-4.  **Renderizado:**
-    *   El componente `MiningMap` recibe el mensaje.
-    *   Dibuja círculos interactivos en las coordenadas `[lon, lat]`.
-    *   **Interactividad:** Al pasar el mouse, muestra un popup con metadatos (PK, valores de revancha, fecha).
+### 4. Funcionalidad: Visualización de Revanchas (Modo Elegante)
 
-### Backend (`api/revanchas/georreferenciadas.ts`)
-Endpoint optimizado que consulta la vista `vista_revanchas_georreferenciadas` de Supabase. Filtra registros que tengan explícitamente `tiene_coordenadas = true`.
+En el dashboard principal (`index.astro`), el toggle "Ver Revanchas" activa una visualización técnica avanzada sobre el mapa.
+
+#### Flujo de Datos
+1.  **Activación:** Usuario activa el toggle.
+2.  **Consulta:** `GET /api/revanchas/georreferenciadas?formato=geojson` (Filtrado por muro activo).
+3.  **Procesamiento ("Renderizado Elegante"):**
+    *   **Normalización:** Detecta automáticamente el muro (MP, ME, MO) basándose en las propiedades, con correcciones para evitar colisiones de nombres (e.g. priorizar "Oeste" sobre "Este").
+    *   **Limpieza:** Ordena los puntos numéricamente por PK y elimina duplicados exactos o erróneos.
+    *   **Geometría Avanzada:**
+        *   **Línea Eje:** Conecta los PKs secuencialmente para formar el trazo del muro.
+        *   **Líneas Perpendiculares (Ancho):** Genera líneas de 33m que representan el ancho de la revancha.
+        *   **Direccionalidad:**
+            *   **Muro Oeste (MO):** Perpendicular hacia la **Izquierda (-90°)** del avance.
+            *   **Muro Principal/Este (MP/ME):** Perpendicular hacia la **Derecha (+90°)** del avance.
+        *   **Suavizado de Curvas:** Utiliza el promedio vectorial de los segmentos adyacentes (tangente) para calcular el ángulo de la perpendicular, asegurando visualización correcta en curvas.
+    *   **Código de Colores:**
+        *   **Puntos (Revancha):** Verde (>3.5m), Amarillo (3.0-3.5m), Rojo (<3.0m).
+        *   **Líneas Ancho:** Verde (>18m), Amarillo (15-18m), Rojo (<15m).
 
 ---
 
