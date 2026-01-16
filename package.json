@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "map": "tileserver-gl-light public/mapbase.mbtiles --port 8081"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.0",

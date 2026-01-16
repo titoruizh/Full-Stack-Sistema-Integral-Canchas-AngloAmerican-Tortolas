@@ -1,0 +1,54 @@
+---
+
+---
+
+<div id="view-login" class="login-window hidden">
+    <button type="button" class="back-btn" id="btn-back">
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M19 12H5M12 19l-7-7 7-7"></path></svg
+        >
+        Volver
+    </button>
+    <div class="selected-company-header">
+        <img id="selected-company-img" src="" alt="" class="selected-logo" />
+        <p style="color: #64748b; font-size: 0.9rem;">
+            Ingrese sus credenciales de acceso
+        </p>
+    </div>
+
+    <form id="loginForm">
+        <input type="hidden" id="empresaId" />
+
+        <div id="messageContainer"></div>
+
+        <div class="form-group">
+            <label for="usuarioSelect">Usuario</label>
+            <select id="usuarioSelect" class="form-control" required>
+                <option value="">Cargando usuarios...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="passwordInput">Contraseña</label>
+            <input
+                type="password"
+                id="passwordInput"
+                class="form-control"
+                placeholder="••••••••"
+                required
+            />
+        </div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+            <span id="loginBtnText">Iniciar Sesión</span>
+        </button>
+    </form>
+</div>
